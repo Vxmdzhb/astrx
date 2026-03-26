@@ -12,8 +12,6 @@ use AstrX\Result\DiagnosticLevel;
  */
 final class CaptchaWrongDiagnostic extends AbstractDiagnostic
 {
-    public const string ID    = 'astrx.captcha/wrong_text';
-    public const DiagnosticLevel LEVEL = DiagnosticLevel::NOTICE;
 
     public function __construct(string $id, DiagnosticLevel $level)
     {
