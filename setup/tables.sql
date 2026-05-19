@@ -140,13 +140,7 @@ CREATE TABLE `session`
 (
     `id`        VARCHAR(128) NOT NULL PRIMARY KEY,
     `timestamp` INT UNSIGNED NOT NULL,
-    `data`        MEDIUMBLOB   NOT NULL DEFAULT '',
-    -- Handover columns for session ID regeneration grace period.
-    -- When a session ID is regenerated, the old row keeps a pointer to the
-    -- successor for `regenerate_grace_period` seconds so in-flight requests
-    -- using the old ID are transparently redirected.
-    `replaced_by` CHAR(128)    NULL DEFAULT NULL,
-    `replace_at`  INT UNSIGNED NULL DEFAULT NULL
+    `data`      MEDIUMBLOB   NOT NULL DEFAULT ''
 );
 
 
@@ -216,8 +210,8 @@ CREATE TABLE `user`
     `verified`         TINYINT      NOT NULL DEFAULT 0,
     `avatar`           TINYINT      NOT NULL DEFAULT 0,
     `deleted`          TINYINT      NOT NULL DEFAULT 0,
-    `deletion_mode`    ENUM('none','keep_visible','keep_suspended','soft_redact','hard_redact')
-                                   NOT NULL DEFAULT 'none',
+    `deletion_mode`    TINYINT      NULL,                 -- 0=full 1=hard_redact 2=soft_redact 3=keep_visible 4=keep_suspended
+    `theme`            VARCHAR(64)  NULL,                 -- per-user theme override, NULL = use global
     `token_hash`       VARCHAR(255) NULL,
     `token_type`       TINYINT      NULL,
     `token_used`       TINYINT      NOT NULL DEFAULT 0,
@@ -227,6 +221,12 @@ CREATE TABLE `user`
     INDEX idx_mailbox  (mailbox),
     INDEX idx_deleted  (deleted)
 );
+
+-- Ghost user (all-zero id) holds re-assigned content from hard-redacted users.
+-- Created at install time so the ON DELETE SET NULL pattern always has a target.
+INSERT IGNORE INTO `user` (id, username, type, verified, deleted)
+VALUES (UNHEX('00000000000000000000000000000000'),
+        '[deleted]', 0, 0, 0);
 
 
 -- ============================================================
@@ -292,7 +292,7 @@ CREATE TABLE `mute`
 CREATE TABLE `captcha`
 (
     `id`         CHAR(32)    NOT NULL PRIMARY KEY,
-    `text`       VARCHAR(64) NOT NULL,  -- SHA-256 hex digest (64 chars)
+    `text`       VARCHAR(32) NOT NULL,
     `expires_at` TIMESTAMP   NOT NULL,
     INDEX idx_expires (expires_at)
 );
@@ -354,39 +354,6 @@ CREATE TABLE `site_config`
 );
 
 
-
--- ============================================================
--- AUTH: DIAGNOSTIC VISIBILITY
--- ============================================================
-
--- Which diagnostic codes are visible to each non-admin group.
--- Presence of a row means that group can see that code.
--- ADMIN always has full visibility (enforced in code, never stored here).
--- All other groups default to deny; rows are added via the admin UI.
---
--- group_name matches UserGroup enum case names: USER, MOD, GUEST.
-CREATE TABLE `diagnostic_visibility`
-(
-    `code`       VARCHAR(100) NOT NULL,
-    `group_name` VARCHAR(20)  NOT NULL,
-    PRIMARY KEY (`code`, `group_name`),
-    INDEX idx_group (`group_name`)
-);
-
--- Optional per-code level overrides.
--- When a row exists for a code, the stored level replaces the level
--- the emitting class passed to the diagnostic constructor.
--- This lets the admin promote or demote a code's severity without
--- touching source code.
--- level values mirror DiagnosticLevel: DEBUG=0 INFO=1 NOTICE=2
---   WARNING=3 ERROR=4 CRITICAL=5 ALERT=6 EMERGENCY=7
-CREATE TABLE `diagnostic_level_override`
-(
-    `code`  VARCHAR(100) NOT NULL PRIMARY KEY,
-    `level` TINYINT      NOT NULL
-);
-
-
 -- ============================================================
 -- WEBMAIL
 -- ============================================================
@@ -398,6 +365,26 @@ CREATE TABLE `webmail_trusted_sender`
     `created_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`user_id`, `sender_email`),
     FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+
+-- ============================================================
+-- DIAGNOSTICS: per-group visibility + level overrides
+-- ============================================================
+
+CREATE TABLE `diagnostic_visibility`
+(
+    `code`       VARCHAR(128) NOT NULL,
+    `group_name` VARCHAR(32)  NOT NULL,
+    PRIMARY KEY (`code`, `group_name`),
+    INDEX idx_code (`code`)
+);
+
+CREATE TABLE `diagnostic_level_override`
+(
+    `code`  VARCHAR(128) NOT NULL PRIMARY KEY,
+    `level` TINYINT      NOT NULL
 );
 
 
@@ -482,7 +469,8 @@ VALUES
     ('WORDING_ADMIN_CONFIG_MAIL',       1, 'admin_config_mail',      1, 1, 0, 0),  -- id=26
     ('WORDING_WEBMAIL',                 1, 'webmail',                1, 1, 0, 0),  -- id=27
     ('WORDING_ADMIN_CONFIG_WEBMAIL',    1, 'admin_config_webmail',   1, 1, 0, 0),  -- id=28
-    ('WORDING_ADMIN_AUDIT_LOG',         1, 'admin_audit_log',        1, 1, 0, 0);  -- id=29
+    ('WORDING_ADMIN_AUDIT_LOG',         1, 'admin_audit_log',        1, 1, 0, 0),  -- id=29
+    ('WORDING_ADMIN_THEMES',            1, 'admin_themes',           1, 1, 0, 0);  -- id=30
 
 
 INSERT INTO `page_robots` (page_id, `index`, follow)
@@ -490,7 +478,7 @@ VALUES
     (1,1,1),(2,0,0),(3,1,1),(4,1,1),(5,1,1),(6,0,0),(7,0,0),(8,0,0),(9,1,1),
     (10,0,0),(11,0,0),(12,0,0),(13,0,0),(14,0,0),(15,0,0),(16,0,0),(17,0,0),(18,0,0),(19,0,0),
     (20,0,0),(21,0,0),(22,0,0),(23,0,0),(24,0,0),(25,0,0),(26,0,0),
-    (27,0,0),(28,0,0),(29,0,0);
+    (27,0,0),(28,0,0),(29,0,0),(30,0,0);
 
 
 INSERT INTO `page_meta` (page_id, title, description)
@@ -523,7 +511,8 @@ VALUES
     (26, 'Config — Mail',               'Edit mail configuration.'),
     (27, 'Webmail',                     'Read and send emails from your mailbox.'),
     (28, 'Config — Webmail / IMAP',     'Edit IMAP and webmail configuration.'),
-    (29, 'Admin — Audit Log',           'History of all admin actions.');
+    (29, 'Admin — Audit Log',           'History of all admin actions.'),
+    (30, 'Admin — Themes',              'Choose the global site theme.');
 
 
 INSERT INTO `page_closure` (ancestor, descendant)
@@ -532,13 +521,13 @@ VALUES
     (1,1),(2,2),(3,3),(4,4),(5,5),(6,6),(7,7),(8,8),(9,9),(10,10),
     (11,11),(12,12),(13,13),(14,14),(15,15),(16,16),(17,17),(18,18),(19,19),
     (20,20),(21,21),(22,22),(23,23),(24,24),(25,25),(26,26),
-    (27,27),(28,28),(29,29),
+    (27,27),(28,28),(29,29),(30,30),
     -- User section children (9 is ancestor)
     (9,3),(9,4),(9,5),(9,6),(9,7),(9,8),(9,19),(9,27),
     -- Admin section children (18 is ancestor)
     (18,11),(18,12),(18,13),(18,14),(18,15),(18,16),(18,17),
     (18,20),(18,21),(18,22),(18,23),(18,24),(18,25),(18,26),
-    (18,28),(18,29);
+    (18,28),(18,29),(18,30);
 
 
 INSERT INTO `keyword` (keyword, i18n)
@@ -641,27 +630,10 @@ VALUES (3,'http://www.example.com'),(4,'http://blackhost.xyz');
 -- Default admin user
 -- ----------------------------------------------------------
 
-INSERT INTO `user` (id, username, mailbox, password, type, verified, deleted)
-VALUES (UNHEX(REPLACE(UUID(), '-', '')), 'Administrator', 'postmaster',
+INSERT INTO `user` (id, username, password, type, verified, deleted)
+VALUES (UNHEX(REPLACE(UUID(), '-', '')), 'Administrator',
         '$argon2id$v=19$m=65536,t=4,p=1$b2Z2cnVLM0pSMy9xUVVicw$6KUaczD3Y6rGl28q61y6YXxriNmGqKv2I6xucl8rcSE',
         1, 1, 0);
-
-
--- ----------------------------------------------------------
--- Ghost account (@ghost)
--- Fixed ID: all-zeros binary(16) = '00000000000000000000000000000000'
--- Used as the target when hard_redact reassigns comments.
--- No password, no mailbox — this account cannot log in.
--- Do NOT delete this row.
--- ----------------------------------------------------------
-
-INSERT INTO `user`
-    (id, username, password, mailbox, email, display_name,
-     type, verified, deleted, deletion_mode)
-VALUES
-    (UNHEX('00000000000000000000000000000000'),
-     '[deleted]', NULL, NULL, NULL, '[deleted]',
-     3, 0, 0, 'none');
 
 
 -- ----------------------------------------------------------
