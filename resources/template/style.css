@@ -368,3 +368,30 @@ h2 {
 #wm-compose-hdr td       { padding:2px 0; }
 #wm-compose-hdr td input,
 #wm-compose-hdr td select { width:100%; box-sizing:border-box; }
+/* =========================================================================
+   AstrX universal overflow guard (fix120)
+   =========================================================================
+   Layout invariants applied with !important to override per-theme rules.
+   These are LAYOUT properties (not colors or decoration) — themes should
+   never override them. If a theme needs custom spacing/borders, keep doing
+   that on th/td individually. */
+table {
+    table-layout: fixed !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    /* Cancel the legacy default-theme triple-threat that broke layout. */
+    display: table !important;
+    overflow-x: visible !important;
+    white-space: normal !important;
+}
+table th, table td {
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    white-space: normal !important;
+}
+.input, input[type="submit"], input[type="button"], button {
+    max-width: 100% !important;
+    word-break: break-word !important;
+    box-sizing: border-box !important;
+    white-space: normal !important;
+}
