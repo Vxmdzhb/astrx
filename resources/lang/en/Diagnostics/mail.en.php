@@ -8,6 +8,7 @@ use AstrX\Mail\Diagnostic\ImapFetchDiagnostic;
 use AstrX\Mail\Diagnostic\ImapStartTlsDiagnostic;
 use AstrX\Mail\Diagnostic\MailApiErrorDiagnostic;
 use AstrX\Mail\Diagnostic\MailInvalidPayloadDiagnostic;
+use AstrX\Mail\Diagnostic\MailInvalidRecipientDiagnostic;
 use AstrX\Mail\Diagnostic\MailSendFailedDiagnostic;
 use AstrX\Mail\Diagnostic\MailerNotConfiguredDiagnostic;
 use AstrX\Mail\Diagnostic\TrustAddFailedDiagnostic;
@@ -57,6 +58,12 @@ return [
             assert($d instanceof MailSendFailedDiagnostic);
             return 'Failed to send message: ' . $d->detail();
         },
+
+    // Generic on purpose: the offending value is carried on the diagnostic for
+    // logs only and must never be echoed back to the user.
+    'astrx.mail/invalid_recipient' =>
+        fn(DiagnosticInterface $d, Translator $t): string =>
+        'The message could not be sent: a recipient address, sender, or header field was invalid.',
 
     // ── Mailbox management API ────────────────────────────────────────────────
 
