@@ -12,9 +12,22 @@
 /diff
 
 # ─────────────────────────────────────────────────────────────
-# Generated template cache — rebuilt on demand by TemplateEngine
+# Generated template cache and uploaded files — contents never
+# committed, but each directory is kept (.gitkeep): docker-compose.yml
+# mounts a volume at each one inside the read-only ./resources mount,
+# and Docker cannot create a missing mountpoint in a read-only mount
+# ("make mountpoint …: read-only file system").
 # ─────────────────────────────────────────────────────────────
-/resources/template/cache/
+/resources/template/cache/*
+!/resources/template/cache/.gitkeep
+/resources/avatar/*
+!/resources/avatar/.gitkeep
+/resources/board_uploads/*
+!/resources/board_uploads/.gitkeep
+/resources/chat_uploads/*
+!/resources/chat_uploads/.gitkeep
+/resources/media_uploads/*
+!/resources/media_uploads/.gitkeep
 
 # ─────────────────────────────────────────────────────────────
 # Per-install runtime state & secrets — NEVER commit
