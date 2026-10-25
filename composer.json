@@ -9,7 +9,7 @@
         "tor",
         "cms"
     ],
-    "homepage": "https://github.com/hydrastro/astrx",
+    "homepage": "https://github.com/Vxmdzhb/astrx",
     "require": {
         "php": ">=8.4",
         "ext-ctype": "*",
@@ -42,12 +42,88 @@
     },
     "repositories": [
         {
-            "type": "path",
-            "url": "packages/*"
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/cms"
         },
         {
-            "type": "path",
-            "url": "packages/modules/*"
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/framework"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/library"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-blocklist"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-bottrap"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-canary"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-chat"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-content"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-downloads"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-fedsearch"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-gitbrowse"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-imageboard"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-media"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-mirrors"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-onionsearch"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-search"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-suiteadmin"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-tipline"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-torrentsearch"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-webmail"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Vxmdzhb/module-websearch"
         }
     ],
     "autoload": {
