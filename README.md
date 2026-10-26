@@ -24,7 +24,8 @@ you can use on their own.
 - **Chat**: rooms, private messages and attachments. New messages show up
   through a plain HTML refresh, no script needed.
 - **Content**: Markdown pages with wiki links, backlinks and a page graph.
-- **Webmail**: an IMAP/SMTP client in the browser.
+- **Webmail**: an IMAP/SMTP client in the browser, which blocks remote
+  images until you trust the sender ([screenshots](docs/screenshots/README.md#webmail)).
 - **Tip line**: anonymous tips, sealed with a public key the moment they
   arrive and only readable offline, with the private key.
 - **Search**: the site's own full-text search, plus web, onion and torrent

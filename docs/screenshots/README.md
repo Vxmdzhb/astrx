@@ -15,6 +15,19 @@ some of the others.
 | ![The user area](user-home-default.png) | ![Account settings](settings-default.png) |
 | The user area | Account settings |
 
+## Webmail
+
+| | |
+|---|---|
+| ![The inbox](webmail-inbox.png) | ![Reading a message](webmail-message.png) |
+| The inbox | A message, with its attachment |
+| ![Remote images blocked](webmail-images-blocked.png) | ![Replying](webmail-reply.png) |
+| A newsletter: its remote images are blocked until you trust the sender | Replying |
+
+<p align="center"><img src="webmail-themes.png" alt="The inbox in Dracula, Light, Terminal and Synthwave"></p>
+
+The inbox in Dracula, Light, Terminal and Synthwave.
+
 ## The admin panel
 
 | | |
