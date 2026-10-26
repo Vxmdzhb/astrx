@@ -29,7 +29,8 @@ you can use on their own.
 - **Tip line**: anonymous tips, sealed with a public key the moment they
   arrive and only readable offline, with the private key.
 - **Search**: the site's own full-text search, plus web, onion and torrent
-  search when you run the engines from [astrx-suite][suite].
+  search when you run the engines from [astrx-suite][suite]
+  ([screenshots](docs/screenshots/README.md#the-search-engines)).
 - **Trust pages**: a warrant canary, signed downloads and a signed list of
   onion mirrors.
 - **The basics**: accounts with two-factor login, an admin panel, themes,

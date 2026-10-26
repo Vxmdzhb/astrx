@@ -28,6 +28,28 @@ some of the others.
 
 The inbox in Dracula, Light, Terminal and Synthwave.
 
+## The search engines
+
+The Rust engines from [astrx-suite](https://github.com/Vxmdzhb/astrx-suite),
+as the site shows them. The indexes were filled by crawling a few made-up
+sites and onion services, and with public-domain and free-software torrents.
+
+| | |
+|---|---|
+| ![Federated search, clear-web tab](search-web.png) | ![Federated search, torrents tab](search-torrents.png) |
+| One search box: the clear-web tab | The same box: the torrents tab |
+| ![Onion search](search-onion.png) | ![Engine status in the admin panel](admin-engines.png) |
+| Onion search | Engine status and onion seeds, in the admin panel |
+
+## Trust pages
+
+| | |
+|---|---|
+| ![Warrant canary](trust-canary.png) | ![Signed downloads](trust-downloads.png) |
+| A warrant canary, signed with the operators' key | A release manifest, its signature checked on the page |
+| ![Onion mirrors](trust-mirrors.png) | ![Tip line](trust-tipline.png) |
+| The signed list of official addresses | The anonymous tip line |
+
 ## The admin panel
 
 | | |
@@ -50,6 +72,8 @@ The inbox in Dracula, Light, Terminal and Synthwave.
 | Data retention | Panic lockdown |
 | ![Languages](admin-language.png) | ![Invitations](admin-invites.png) |
 | Languages and translations | Invitations |
+| ![Blocklist](admin-blocklist.png) | ![A wiki page](wiki-page.png) |
+| The engines' blocklist | A wiki page, with its backlinks |
 
 ## Other themes
 
