@@ -885,12 +885,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-webmail.git",
-                "reference": "b1278de7a85970b1a53fb486771663c2948e91a9"
+                "reference": "bbcb4c957a55fed0ea398aafa4c68b74da12fca5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-webmail/zipball/b1278de7a85970b1a53fb486771663c2948e91a9",
-                "reference": "b1278de7a85970b1a53fb486771663c2948e91a9",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-webmail/zipball/bbcb4c957a55fed0ea398aafa4c68b74da12fca5",
+                "reference": "bbcb4c957a55fed0ea398aafa4c68b74da12fca5",
                 "shasum": ""
             },
             "require": {
@@ -920,7 +920,7 @@
                 "source": "https://github.com/Vxmdzhb/module-webmail/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-webmail/issues"
             },
-            "time": "2026-10-26T11:49:17+00:00"
+            "time": "2026-10-26T15:24:30+00:00"
         },
         {
             "name": "astrx/module-websearch",
