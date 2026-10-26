@@ -23,6 +23,16 @@ without touching the others: `php tools/module.php disable websearch`. A page
 whose engine is down shows a friendly "unavailable" message; it never breaks
 the site.
 
+The installer creates each page and its navbar link. *Search All* (fedsearch)
+and *Git* (gitbrowse) appear in the public navbar, *Engines* and *Blocklist*
+in the admin panel. The three single-engine pages get a link too, switched
+off, because *Search All* already has a tab for each; switch them on in
+Admin → Navbar to list them on their own. On a site installed before these
+pages existed, `php tools/install.php --schema-only` adds them.
+
+[Screenshots](screenshots/README.md#the-search-engines) show the pages with
+the engines running.
+
 ## Running the engines
 
 **With Docker**, clone astrx-suite next to this repository and bring
