@@ -1,78 +1,118 @@
 # AstrX
 
-A PHP framework and application for server-rendered websites.
+AstrX is a website you can run yourself: news and comments, an imageboard,
+a chat, a wiki, webmail, an anonymous tip line, and search across your site,
+the web and onion services. All of it works without JavaScript, so it runs
+fine in Tor Browser on its safest setting.
 
-AstrX grew out of the sites I wanted to build. It has a template engine, typed results and diagnostics, authorization policies, and modules for features such as chat, search and webmail. The main interface works without JavaScript. The PHP runtime uses no external Composer packages.
+It is also the PHP framework the site is built on, split into small packages
+you can use on their own.
 
-The repository currently includes both the framework components and my application. The PHP core is not yet distributed as a separate library. The Rust services live in their own workspace under [`astrx-suite/`](astrx-suite/README.md) and communicate with the application over HTTP.
+<p align="center">
+  <img src="docs/screenshots/home.png" width="49%" alt="The home page with news and comments, in the Dracula theme">
+  <img src="docs/screenshots/chat.png" width="49%" alt="The chat, with messages and the list of people online">
+  <img src="docs/screenshots/board.png" width="49%" alt="A thread on the imageboard, in the Sepia theme">
+  <img src="docs/screenshots/admin.png" width="49%" alt="The admin panel's theme picker">
+</p>
 
-## Getting started
+## What's in it
+
+- **Imageboard**: boards, threads, image posts, moderation, feeds and a choice
+  of classic styles.
+- **Chat**: rooms, private messages and attachments. New messages show up
+  through a plain HTML refresh, no script needed.
+- **Content**: Markdown pages with wiki links, backlinks and a page graph.
+- **Webmail**: an IMAP/SMTP client in the browser.
+- **Tip line**: anonymous tips, sealed with a public key the moment they
+  arrive and only readable offline, with the private key.
+- **Search**: the site's own full-text search, plus web, onion and torrent
+  search when you run the engines from [astrx-suite][suite].
+- **Trust pages**: a warrant canary, signed downloads and a signed list of
+  onion mirrors.
+- **The basics**: accounts with two-factor login, an admin panel, themes,
+  comments, invites, captchas, a bot trap and data retention rules.
+
+Ten themes ship with it, from plain black-and-white to amber terminal and
+synthwave, and each visitor can pick their own:
+
+<p align="center"><img src="docs/screenshots/themes.png" alt="The same page in six of the bundled themes"></p>
+
+Every feature is a module. Switch off the ones you don't want and their pages
+and menu entries disappear; their data stays until you purge it.
+
+## Running it
+
+You need PHP 8.4 with PDO MySQL, OpenSSL, GD and mbstring, Composer and
+MariaDB (or MySQL).
 
 ```sh
-git clone https://github.com/hydrastro/astrx.git
+git clone https://github.com/Vxmdzhb/astrx.git
 cd astrx
-php tools/install.php --help
+composer install
+php tools/install.php
+php -S 127.0.0.1:8080 -t public public/index.php
 ```
 
-The bundled application requires PHP 8.4 or newer, MariaDB/MySQL, and PHP extensions including PDO MySQL, OpenSSL, GD and mbstring. Optional features have additional requirements. Set your web server's document root to `public/`.
+Then open <http://127.0.0.1:8080/en/>. The installer asks for the database
+details and an admin account. For a real server, point nginx (or anything
+that speaks PHP-FPM) at `public/`.
 
-Follow [getting started](docs/getting-started.md) for installation, writable directories and Docker deployment. Start with a local development installation.
+There is also a Docker setup that brings up the site, the database and (with
+[astrx-suite][suite] cloned next to this repository) the Rust engines, and a Nix flake (`nix develop`) with everything needed
+to work on it. [Getting started](docs/getting-started.md) covers both, along
+with backups and upgrades.
 
-## Use individual components
+## Using the framework without the site
 
-```php
-require 'src/autoload.php';
+The site is one application of the framework, not the only one. Each part is
+its own package with its own repository:
 
-$result = AstrX\Result\Result::ok(21)
-    ->map(static fn (int $n): int => $n * 2);
-```
+| Package | What it gives you |
+|---|---|
+| [framework] | Typed results, configuration, injection, HTTP and routing, templates, translation, sessions |
+| [library] | Database, permissions, captchas, image handling, mail |
+| [cms] | Accounts, admin panel, pages, navigation, themes, comments, news |
+| `module-*` | One package per feature above, for example [module-chat] |
 
-This loader starts no application, session or database connection. Run
-`php examples/components.php` for a small example.
+`framework` runs an application on its own; [`examples/minimal`](examples/minimal)
+is a small one. None of the packages pulls in third-party PHP code.
 
-The code is organised as Composer packages in `packages/`: `astrx/framework`
-(results, configuration, injection, HTTP, routing, templates, translation,
-sessions, the module contract), `astrx/library` (database, authorization,
-captcha, images, mail), `astrx/cms` (accounts, admin, pages, navigation,
-comments, news) and one `astrx/module-<key>` per optional module. Each requires
-only the packages it uses; `astrx/framework` runs an application on its own
-(`examples/minimal`). They are not published or tagged yet — see
-[architecture](docs/architecture.md#packages) and
-[repository direction](docs/repository-structure.md).
+## The Rust engines
 
-## How it works
-
-- Controllers handle requests and return data to server-rendered templates.
-- `Result<T>` carries successful values or failures. Typed diagnostics can be collected, translated and rendered consistently.
-- `Gate` checks named permissions and delegates resource-specific decisions to policies.
-- Configuration is stored in PHP arrays. Injectable settings are declared on setters with attributes.
-- Module manifests register application features. Disabling a module removes its exposed functionality while retaining its source and stored data.
-
-The [architecture guide](docs/architecture.md) follows a request through the current application. It also explains which parts still need to be separated before the core is convenient to use on its own.
-
-## Modules and Rust services
-
-The application includes content pages, an imageboard, chat, media, webmail and search integrations. See [modules](docs/MODULES.md) for their lifecycle and configuration.
-
-The Rust workspace contains a Git browser, onion and web search services, torrent discovery/search, and an operations dashboard. The PHP application uses HTTP clients to integrate them; they can also be built independently. Network-enabled Rust builds have external crate dependencies.
+Search, the git browser and the operations dashboard are separate services
+written in Rust. They live in [astrx-suite][suite], which builds them into a
+single `astrx` binary and runs them in a few containers. The site talks to
+them over HTTP, and is perfectly happy without them.
 
 ## Documentation
 
-- [Installation](docs/getting-started.md)
-- [Architecture](docs/architecture.md)
-- [Modules](docs/MODULES.md)
+- [Getting started](docs/getting-started.md): installing, Docker, Nix
+- [Modules](docs/MODULES.md): turning features on and off, writing your own
+- [Architecture](docs/architecture.md): how a request moves through the code
+- [Operations](docs/OPERATIONS.md): storage, backups, upgrades
+- [Connecting the Rust engines](docs/suite-search-modules.md)
+- [How the project is organised](docs/repository-structure.md): the
+  repositories, and working on several at once
 - [JSON API](docs/API.md)
-- [Operations and storage](docs/OPERATIONS.md)
-- [Repository direction](docs/repository-structure.md)
-- [Profiling](docs/PROFILING.md)
-- [Review fixes and upgrade notes](docs/REVIEW-FIXES.md)
 
 ## Contributing
 
-Start with a reproducible bug, a small example, or a focused change. [CONTRIBUTING.md](CONTRIBUTING.md) explains the layout, the rules the checks enforce and what a pull request needs; report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
+Bug reports and small, focused changes are the easiest to take.
+[CONTRIBUTING.md](CONTRIBUTING.md) explains the layout and the checks a
+change has to pass. Please report security problems privately, as described
+in [SECURITY.md](SECURITY.md).
 
-## Project status
+## Status
 
-The API and repository layout are still developing. There are no comparative performance results attached to this README, and the project should not be described as independently security-audited.
+There are no version numbers: every repository moves forward on `main`, and
+lockfiles pin the exact commits a build uses. APIs can still change between
+commits, and the code hasn't had an independent security audit.
 
-The PHP project's license needs an explicit top-level license file. Rust manifests currently declare MIT. Clarify the repository-wide licensing and notices before distributing a reusable core release.
+The license is still being written. Until it is published, please ask before
+reusing the code.
+
+[suite]: https://github.com/Vxmdzhb/astrx-suite
+[framework]: https://github.com/Vxmdzhb/framework
+[library]: https://github.com/Vxmdzhb/library
+[cms]: https://github.com/Vxmdzhb/cms
+[module-chat]: https://github.com/Vxmdzhb/module-chat
