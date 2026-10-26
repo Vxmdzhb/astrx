@@ -1,7 +1,7 @@
 # Contributing to AstrX
 
-Thank you for helping. This page says how the repository is organised, which
-rules the checks enforce, and what a change needs before it is merged.
+Thank you for helping. This page says where things live, which rules the
+checks enforce, and what a change needs before it is merged.
 
 ## Set up
 
@@ -12,21 +12,32 @@ You need PHP 8.4 with the extensions listed in `composer.json` (and
 - Without Nix: install them yourself, or use the Docker setup in
   [getting started](docs/getting-started.md).
 
-The site loads its own classes, so Composer is optional. `composer install`
-links the packages into `vendor/` if you want to consume them through Composer.
+Then `composer install`, which puts the packages in `vendor/`.
 
 ## Where things live
 
-| Path | What | Composer package |
-|---|---|---|
-| `packages/framework/` | results and diagnostics, configuration, injection, HTTP, routing, templates, translation, sessions, the module contract | `astrx/framework` |
-| `packages/library/` | database connection, authorization gate, API keys, captcha, images, identicons, mail | `astrx/library` |
-| `packages/cms/` | accounts, admin panel, pages, navigation, themes, comments, news, invites, data retention | `astrx/cms` |
-| `packages/modules/<key>/` | one optional module each (chat, imageboard, search, webmail, …) | `astrx/module-<key>` |
-| `src/AstrX/` | this website: the request pipeline, its own pages, the installed-module list | the root package |
-| `resources/` | the site's layout, themes and its own catalogs; overrides of any package's templates, catalogs and config | — |
-| `src/setup/` | the site's own schema pieces and migrations (its JS runtime pages, sitemap, exit page); the core tables are the CMS's (`packages/cms/resources/sql/`) | — |
-| `astrx-suite/` | the Rust engines (separate Cargo workspace) | — |
+This repository is the site. The code it's built from lives in packages, each
+in a repository of its own (see
+[how the project is organised](docs/repository-structure.md)):
+
+| Package | What |
+|---|---|
+| [`astrx/framework`](https://github.com/Vxmdzhb/framework) | results and diagnostics, configuration, injection, HTTP, routing, templates, translation, sessions, the module contract |
+| [`astrx/library`](https://github.com/Vxmdzhb/library) | database connection, authorization gate, API keys, captcha, images, identicons, mail |
+| [`astrx/cms`](https://github.com/Vxmdzhb/cms) | accounts, admin panel, pages, navigation, themes, comments, news, invites, data retention |
+| `astrx/module-<key>` | one optional module each (chat, imageboard, search, webmail, …) |
+
+In this repository:
+
+| Path | What |
+|---|---|
+| `src/AstrX/` | the site: the request pipeline, its own pages, the installed-module list |
+| `resources/` | the site's layout, themes and catalogs; overrides of any package's templates, catalogs and config |
+| `src/setup/` | the site's own schema pieces and migrations (its JS runtime pages, sitemap, exit page); the core tables are in the cms package |
+| `tools/`, `tests/` | the installer, the checks below, and the tests |
+
+A fix to a package goes to that package's repository; to try it here, see
+[working on several repositories at once](docs/repository-structure.md#working-on-several-repositories-at-once).
 
 A package keeps its templates, catalogs and default config in its own
 `resources/`. The site's `resources/` overrides a template by name, and a

@@ -1,6 +1,6 @@
 # Architecture
 
-This page describes the current repository. The proposed core/application separation is described in [repository direction](repository-structure.md); it has not happened merely because it is documented.
+This page describes how the site's code fits together. For the repositories and how they relate, see [how the project is organised](repository-structure.md).
 
 ## Request lifecycle
 
@@ -18,11 +18,11 @@ Every top-level AstrX namespace belongs to one layer. A namespace may depend on 
 
 | Layer | Namespaces | Package |
 |---|---|---|
-| foundation | `Result`, `Support` | `astrx/framework` (`packages/framework`) |
+| foundation | `Result`, `Support` | `astrx/framework` |
 | component | `Config`, `Injector`, `Http`, `Routing`, `ErrorHandler`, `I18n`, `Template`, `Session`, `Csrf`, `Module`, `Pagination`, `Kernel` | `astrx/framework` |
-| library | `Database`, `Image`, `Auth`, `Api`, `Captcha`, `Identicon`, `Mail` | `astrx/library` (`packages/library`) |
-| feature | `User`, `Admin`, `Page`, `Navbar`, `Theme`, `Comment`, `News`, `Invite`, `Retention` | `astrx/cms` (`packages/cms`) |
-| feature | `Chat`, `Imageboard`, `Content`, `Search`, `Webmail`, … (every optional module) | one `astrx/module-<key>` each (`packages/modules/<key>`) |
+| library | `Database`, `Image`, `Auth`, `Api`, `Captcha`, `Identicon`, `Mail` | `astrx/library` |
+| feature | `User`, `Admin`, `Page`, `Navbar`, `Theme`, `Comment`, `News`, `Invite`, `Retention` | `astrx/cms` |
+| feature | `Chat`, `Imageboard`, `Content`, `Search`, `Webmail`, … (every optional module) | one `astrx/module-<key>` each |
 | application | `Site`, `ContentManager`, `Prelude`, `ApplicationContainer`, `ApplicationPolicies`, `ApplicationPermissions`, `ApplicationModules` | this website (`src/AstrX`, the root `composer.json`) |
 
 ## Packages
@@ -31,7 +31,7 @@ Each package has its own `composer.json` naming the packages it requires, and `t
 
 Packages also carry their resources. A module names its directory in its manifest; `astrx/framework`, `astrx/library` and `astrx/cms` name theirs in `composer.json` (`extra.astrx.resources`): the framework's diagnostic messages and default configuration, the library's captcha partial and catalogs, the CMS's admin and account templates, its catalogs and its defaults. `ApplicationContainer::resourceRoots()` layers them — core packages, then modules — under the site's `resources/`, which overrides a template by name and a catalog or config file key by key ([operations](OPERATIONS.md#site-resources-over-package-defaults)).
 
-The root `composer.json` reaches the packages through path repositories (`packages/*`, `packages/modules/*`), so `composer install` links them into `vendor/` for anyone who consumes them through Composer. The site does not need Composer at runtime: `src/classloader.php` reads `src/sources.php`, which `php tools/packages.php --write` generates from the packages' PSR-4 maps (CI fails when it is stale). The packages have no tags and no license yet; both come before any of them is published separately.
+Each package has a repository of its own, and the root `composer.json` installs them from there into `vendor/`; `composer.lock` pins the commit of each. At runtime the site loads classes itself: `src/classloader.php` reads `src/sources.php`, which `php tools/packages.php --write` generates from the packages' PSR-4 maps (CI fails when it is stale).
 
 Lower layers reach upward only through narrow contracts that the application binds:
 
@@ -88,4 +88,4 @@ Cache identity includes canonical source path, content, parse mode, PHP-processi
 
 Application modules are classes implementing `Module\Module`, installed by listing them in `ApplicationModules::INSTALLED`; a listed module with no `true` flag in `Modules.config.php` is off. See [the module guide](MODULES.md). Disabling a module affects its routes/navigation and preserves stored data; it does not physically remove the source files. Purging is a different, destructive operation—read [the module guide](MODULES.md) before using it.
 
-The Rust services have a separate Cargo workspace. PHP bridge clients communicate with them over HTTP. The core PHP package should eventually define only the contracts it needs; engine clients, service configuration and the full deployment belong with the application or optional integration packages.
+The Rust engines live in their own repositories (see [connecting the engines](suite-search-modules.md)). The PHP side talks to them over HTTP only, through the bridge modules.

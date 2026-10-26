@@ -1,7 +1,7 @@
 # Operations
 
-Use the PHP application database and each Rust service's actual storage format.
-The old Python/SQLite service commands do not describe this repository.
+The site keeps its state in MariaDB/MySQL and in a few directories; each Rust
+engine keeps its own index files.
 
 ## Store ownership and publication
 
@@ -69,13 +69,12 @@ chosen by the rendering caller; it has its own cache identity.
 
 Reload long-lived PHP workers when deploying code. Build and test the exact
 production image. Keep the database image on its existing release series until
-an intentional, backed-up database upgrade. Review [upgrade notes](REVIEW-FIXES.md)
-for API and deployment behavior changes.
+an intentional, backed-up database upgrade.
 
 ## Site resources over package defaults
 
 The packages ship their own templates, catalogs and default configuration
-(`packages/*/resources/`, each module's `resources/`). The site's `resources/`
+(each package's `resources/`, under `vendor/astrx/`). The site's `resources/`
 only overrides them: a template by name, a catalog or config file key by key.
 The admin pages, the Language editor and the installer write the site's files.
 

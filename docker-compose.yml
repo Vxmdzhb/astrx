@@ -1,46 +1,30 @@
-# AstrX — the whole project, one command.
+# AstrX: the site, its database and the Rust engines, with one command.
 #
-#   cp .env.example .env      # set the database secrets (compose fails without)
-#   docker compose up -d      # PHP app + all five Rust engines + Tor
+#   cp .env.example .env      # set the database secrets first
+#   docker compose up -d
 #
-# This file was, until recently, ONLY the Rust suite's stack. Commit 15f8436
-# landed `astrx-suite/docker-compose.yml` at the repository root as well as in
-# its own directory, overwriting the PHP application's compose file — so
-# `docker/nginx/Dockerfile`, `docker/php/Dockerfile` and `docker/mysql/Dockerfile`
-# had nothing building them at all, and `docker compose up` in a fresh clone
-# brought up the engines and no website. Nothing caught it because nothing tests
-# the deployment. This file restores the application stack and *composes* the two
-# rather than one clobbering the other.
+# The engines come from the astrx-suite repository, cloned next to this one
+# (../astrx-suite); its compose file is included below, so the services are
+# defined in one place only. To run the engines without the site, use that
+# repository on its own.
 #
-# THE TWO STACKS
-#   The Rust engines keep their own self-contained deployment at
-#   `astrx-suite/docker-compose.yml`, which still works standalone
-#   (`cd astrx-suite && docker compose up -d`) — that is the right thing to run
-#   if you want the engines without the CMS. This file `include:`s it, so there
-#   is exactly one definition of those services and no copy to drift.
+# The suite's `internal` network has no route to the host or the internet,
+# and the engines publish no ports. `phpfpm` joins that network and reaches
+# each engine by name:
 #
-# HOW THEY REACH EACH OTHER
-#   The suite's `internal` network deliberately has no route to the host or the
-#   internet; the engines publish NO ports. `phpfpm` therefore joins that network
-#   directly and addresses each engine by its service name, which is both simpler
-#   and safer than punching ports through to the host:
+#     gitweb:8801  onioncrawler-search:8802  websearch-serve:8803
+#     torrentds-search:8804  suitedash:8806
 #
-#       gitweb:8801  onioncrawler-search:8802  websearch-serve:8803
-#       torrentds-search:8804  suitedash:8806
-#
-#   Point the bridge configs at those names — `resources/config/GitBrowse.config.php`,
-#   `SuiteDash.config.php`, `WebSearch.config.php`, `OnionSearch.config.php`,
-#   `TorrentSearch.config.php` — instead of `127.0.0.1:88xx`, which is only
-#   correct when you run the engines directly on the host. See
-#   `docs/suite-search-modules.md`.
+# Use those names in the bridge configs (resources/config/GitBrowse,
+# SuiteDash, WebSearch, OnionSearch and TorrentSearch .config.php) instead of
+# 127.0.0.1:88xx, which is only right when the engines run on the host. See
+# docs/suite-search-modules.md.
 
 name: astrx
 
-# One definition of the engine services, pulled in rather than copied. Requires
-# Docker Compose >= 2.20; if yours is older, run the two stacks separately as
-# described above.
-# The Rust suite is its own repository (https://github.com/Vxmdzhb/astrx-suite); clone it next to
-# this one (../astrx-suite) for its services.
+# The engine services, included rather than copied (https://github.com/Vxmdzhb/astrx-suite,
+# cloned at ../astrx-suite). Needs Docker Compose 2.20 or newer; with an older
+# one, run the two stacks separately.
 include:
   - path: ../astrx-suite/docker-compose.yml
 
@@ -118,9 +102,7 @@ services:
       - mariadb-data:/var/lib/mysql
     networks: [php-network]
     environment:
-      # No default weak secret in the repo — the committed value here used to be
-      # the MariaDB hash of 'password'. Supply it via .env; compose fails fast if
-      # it is unset rather than starting with something guessable.
+      # No default secret: set it in .env. Compose refuses to start without it.
       MARIADB_ROOT_PASSWORD_HASH: "${MARIADB_ROOT_PASSWORD_HASH:?set MARIADB_ROOT_PASSWORD_HASH in .env}"
       # The application account is provisioned through the official MariaDB
       # entrypoint rather than a hardcoded CREATE USER / GRANT ALL in init.sql,
@@ -139,9 +121,8 @@ networks:
   # pinned subnet); naming it here only joins it.
 
 volumes:
-  # The database used to live in an unmounted container layer, so `docker
-  # compose down -v` silently destroyed every board, page and account. It now
-  # has a named volume like every other stateful service in the project.
+  # The database gets a named volume, like every other service that keeps
+  # state.
   mariadb-data:
   app-config:
   template-cache:

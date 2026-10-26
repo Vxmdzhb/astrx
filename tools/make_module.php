@@ -2,10 +2,10 @@
 declare(strict_types=1);
 
 /**
- * AstrX module scaffolder — `php tools/make_module.php <key> [--nav] [--guard]`
+ * AstrX module scaffolder: `php tools/make_module.php <key> [--nav] [--guard] [--out=DIR]`
  *
- * Generates a new optional-module skeleton so adding one is a single command:
- * a Composer package in packages/modules/<key>/ (namespace AstrX\<Studly>):
+ * Creates a new optional module as a Composer package of its own, next to this
+ * checkout (`../module-<key>`, or --out=DIR), namespace AstrX\<Studly>:
  *   - composer.json, README.md               the package (astrx/module-<key>)
  *   - <Studly>Module.php                     the module class (its manifest())
  *   - Controller/<Studly>Controller.php      its page controller
@@ -16,9 +16,8 @@ declare(strict_types=1);
  *                                            nav slot (only with --nav)
  *       lang/{en,it}/pages.{en,it}.php       its page slug + title (merged into `pages`)
  *       sql/<key>.down.sql                   teardown stub for `module.php purge`
- * then prints the remaining manual steps (install it in ApplicationModules and
- * the root composer.json, config flag, page tagging). Its namespace joins the
- * feature layer of tools/check_architecture.php by being a module package.
+ * then prints the remaining steps (publish it, install it in the site, config
+ * flag, page tagging).
  *
  * <key> is lowercase [a-z0-9_], the on/off key used in Modules.config.php and the
  * page.module tag; the namespace is its StudlyCase form. Never overwrites
@@ -38,11 +37,13 @@ $argv    = $argv ?? [];
 $key     = '';
 $withNav = false;
 $withGuard = false;
+$outDir  = '';
 foreach (array_slice($argv, 1) as $arg) {
     if ($arg === '--nav') { $withNav = true; }
+    elseif (str_starts_with($arg, '--out=')) { $outDir = substr($arg, 6); }
     elseif ($arg === '--guard') { $withGuard = true; }
     elseif ($arg === '--help' || $arg === '-h') {
-        mk_out("Usage: php tools/make_module.php <key> [--nav] [--guard]\n  <key>   lowercase [a-z0-9_]; --nav adds a section navbar (a layout partial), --guard a PageGuard.\n");
+        mk_out("Usage: php tools/make_module.php <key> [--nav] [--guard] [--out=DIR]\n  <key>   lowercase [a-z0-9_]; --nav adds a section navbar (a layout partial), --guard a PageGuard.\n  --out   where to create the package (default: ../module-<key>, next to this checkout).\n");
         exit(0);
     }
     elseif ($key === '' && !str_starts_with($arg, '-')) { $key = $arg; }
@@ -55,13 +56,14 @@ if ($key === '' || preg_match('/^[a-z][a-z0-9_]*$/', $key) !== 1) {
 $studly = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
 
 $root      = dirname(__DIR__);
-$moduleDir = $root . "/packages/modules/{$key}";
-$package   = 'astrx/module-' . str_replace('_', '-', $key);
+$short     = 'module-' . str_replace('_', '-', $key);
+$moduleDir = rtrim($outDir !== '' ? $outDir : dirname($root) . '/' . $short, '/');
+$package   = 'astrx/' . $short;
 $manifest  = "{$moduleDir}/{$studly}Module.php";
 $downFile  = "{$moduleDir}/resources/sql/{$key}.down.sql";
 
 if (is_file($manifest)) {
-    mk_fail("module already exists: packages/modules/{$key}/{$studly}Module.php");
+    mk_fail("module already exists: {$manifest}");
 }
 if (!is_dir($moduleDir) && !@mkdir($moduleDir, 0o755, true) && !is_dir($moduleDir)) {
     mk_fail("could not create {$moduleDir}");
@@ -77,12 +79,12 @@ $guardRef = $withGuard ? "[\\AstrX\\{$studly}\\{$studly}PageGuard::class]"     :
 $written = [];
 
 /** Write a file only if absent, recording its relative path in $written. */
-$emit = static function (string $path, string $body) use ($root, &$written): void {
+$emit = static function (string $path, string $body) use ($moduleDir, &$written): void {
     if (is_file($path)) { return; }
     $dir = dirname($path);
     if (!is_dir($dir) && !@mkdir($dir, 0o755, true) && !is_dir($dir)) { mk_fail("could not create {$dir}"); }
     if (@file_put_contents($path, $body) === false) { mk_fail("could not write {$path}"); }
-    $written[] = substr($path, strlen($root) + 1);
+    $written[] = substr($path, strlen($moduleDir) + 1);
 };
 
 $composer = [
@@ -95,6 +97,10 @@ $composer = [
         'astrx/framework' => 'self.version',
     ],
     'autoload'    => ['psr-4' => ["AstrX\\{$studly}\\" => '']],
+    'repositories' => [
+        ['type' => 'vcs', 'url' => 'https://github.com/Vxmdzhb/cms'],
+        ['type' => 'vcs', 'url' => 'https://github.com/Vxmdzhb/framework'],
+    ],
 ];
 $emit("{$moduleDir}/composer.json", json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n");
 $emit("{$moduleDir}/README.md", <<<MD
@@ -284,24 +290,28 @@ PHP);
 }
 
 // ── Report ───────────────────────────────────────────────────────────────────
-mk_out("Scaffolded module '{$key}' ({$studly}):\n");
+mk_out("Scaffolded module '{$key}' ({$studly}) in {$moduleDir}:\n");
 foreach ($written as $w) {
     mk_out("  + {$w}\n");
 }
 mk_out(<<<TXT
 
 Next steps:
-  1. Install it: add  {$studly}\\{$studly}Module::class  to
-     ApplicationModules::INSTALLED (src/AstrX/ApplicationModules.php),
-     '{$key}' => true  to resources/config/Modules.config.php (no flag = off),
-     and  "{$package}": "*@dev"  to the root composer.json's require; then
+  1. Make it a repository (git init, commit, push, e.g. to
+     github.com/Vxmdzhb/{$short}). While you work on it locally, a Composer
+     path repository pointing at {$moduleDir} works too.
+  2. Install it in the site: add its repository and  "{$package}": "*@dev"
+     to composer.json, run  composer update {$package},  then add
+     {$studly}\\{$studly}Module::class  to ApplicationModules::INSTALLED
+     (src/AstrX/ApplicationModules.php) and  '{$key}' => true  to
+     resources/config/Modules.config.php (no flag = off); then
      php tools/packages.php --write  (the class loader's map).
-  2. Add its page row (url_id '{$wording}', file_name '{$key}') and tag it so
+  3. Add its page row (url_id '{$wording}', file_name '{$key}') and tag it so
      it can be gated — in a migrate_*.sql, e.g.:
          UPDATE `page` SET `module` = '{$key}' WHERE `file_name` LIKE '{$key}%';
      Its template and page title are already in resources/.
-  3. Fill in the {$key}.down.sql DROP TABLEs (and the nav/guard stubs if generated).
-  4. Verify:  php tools/packages.php && php tools/check_modules.php \\
+  4. Fill in the {$key}.down.sql DROP TABLEs (and the nav/guard stubs if generated).
+  5. Verify:  php tools/packages.php && php tools/check_modules.php \\
                && php tools/check_architecture.php
      (packages.php also tells you if composer.json requires the wrong packages)
 

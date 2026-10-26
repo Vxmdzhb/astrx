@@ -2,25 +2,15 @@
 declare(strict_types=1);
 
 /**
- * Raw-output ({{&x}}) allowlist lint — NO AstrX bootstrap, no database.
+ * Lint for raw output ({{&x}}) in templates (no bootstrap, no database).
  *
- * `{{x}}` escapes. `{{&x}}` does not: whatever the binding holds is written into
- * the page verbatim. Every one of them is a place where an injected string
- * becomes markup, so every one of them needs a reason. Two had drifted:
+ * `{{x}}` escapes; `{{&x}}` writes the value into the page as is. Each one is
+ * a place where a string becomes markup, so each one must be listed here
+ * with a one-line reason: what produces the value and why it is safe HTML.
+ * Adding a `{{&x}}` anywhere else fails this test.
  *
- *   - user/profile.html rendered {{&profile_avatar_src}} raw while
- *     partials/comments.html used the escaped {{avatar_src}} for the identical
- *     <img src> construct — the same value, two different rules.
- *   - board.html rendered {{&lbl_formatting_hint}}, a TRANSLATION string, raw.
- *     Lang files are editable from the Language admin page, so that was an
- *     admin-tier stored-XSS sink reachable without touching any code.
- *
- * A reviewer found those two. This is what finds the third: adding a `{{&x}}`
- * to a template now fails the lint until someone writes down, on one line, what
- * produces the value and why it is trusted HTML.
- *
- * Wire into CI next to the other portable gates:
- *     php tests/raw_output_allowlist_test.php
+ * Translation strings never qualify: they can be edited from the Language
+ * admin page.
  *
  * Run:  php tests/raw_output_allowlist_test.php
  */
@@ -28,7 +18,7 @@ declare(strict_types=1);
 $ROOT         = dirname(__DIR__);
 $TEMPLATE_DIR = $ROOT . '/resources/template';
 
-// Modules ship templates and catalogs of their own (packages/modules/<key>/resources/);
+// Modules ship templates and catalogs of their own (in their resources/);
 // the autoloader is only needed to ask the module list where they are.
 require $ROOT . '/src/autoload.php';
 $MODULE_ROOTS = AstrX\ApplicationContainer::resourceRoots();

@@ -44,8 +44,8 @@ jobs:
       - name: Module integrity (manifests, contributors, guards, teardown)
         run: php tools/check_modules.php
 
-      # Layered, acyclic namespace graph — what keeps the framework/library/
-      # feature/application split (and the future Composer packages) possible.
+      # Layered, acyclic namespace graph: what keeps the framework, library,
+      # features and application separable.
       # An upward import or a new cycle fails here with the file:line.
       - name: Architecture (layers + no namespace cycles)
         run: php tools/check_architecture.php
@@ -56,10 +56,10 @@ jobs:
       - name: Packages (dependencies declared, class map current)
         run: php tools/packages.php
 
-      # No third-party packages: this validates every composer.json and installs
-      # the path packages, whose autoloader tests/composer_autoload_test.php
-      # exercises (every class resolves; loading it is inert). The license
-      # warning is expected until a license is chosen.
+      # Validates composer.json. The autoloader Composer generated is
+      # exercised by tests/composer_autoload_test.php (every class resolves;
+      # loading it has no side effects). The license warning is expected until
+      # a license is chosen.
       - name: Composer metadata + autoloader
         run: |
           composer validate --no-check-publish
@@ -141,19 +141,12 @@ jobs:
       - name: Schema convergence (a fresh install == an upgraded one)
         run: php tests/schema_convergence_test.php
 
-      # A step with no `shell:` key runs as `bash -e {0}` — errexit is ON even
-      # though nothing here calls `set -e`. That is what made the previous
-      # version of this step useless: `code=$(curl …)` is a bare assignment, so
-      # its exit status IS curl's, and curl exits 7 on connection-refused — the
-      # one failure this step can actually hit (it exits 0 for any HTTP status,
-      # which is the whole point of -w '%{http_code}'). errexit fired ON THE
-      # ASSIGNMENT, before the diagnostic block, so a broken boot reached GitHub
-      # as "Process completed with exit code 7" with zero output.
-      # Hence: every curl is guarded — `|| true` where the status is all we
-      # want, `|| rc=$?` in the poll, which guards AND keeps curl's exit code
-      # for the diagnosis below — readiness is polled instead of
-      # `sleep 2`-and-hope, and the failure path is one `if` block that always
-      # runs and distinguishes "never came up" from "answered non-200".
+      # Steps without a `shell:` key run as `bash -e`, so a failing command in an
+      # assignment (`code=$(curl …)`) ends the step before it can print anything.
+      # Every curl here is guarded: `|| true` where only the status matters, and
+      # `|| rc=$?` in the poll, which keeps curl's exit code for the diagnosis.
+      # The failure path is a single `if` block that always runs and tells "never
+      # came up" apart from "answered with something other than 200".
       - name: Smoke — home renders with every module ON
         run: |
           php -S 127.0.0.1:8080 -t public public/index.php >/tmp/srv-8080.log 2>&1 &
@@ -167,22 +160,16 @@ jobs:
           # the same reason.
           trap 'kill "${SRV:-}" 2>/dev/null || true' EXIT
 
-          # Readiness poll. 000 = curl got no HTTP status at all = nothing is
-          # listening yet; any real status (500 included) means the server is up
-          # and this step must report it rather than keep waiting.
+          # Wait for the server. 000 means nothing is listening yet; any real status,
+          # 500 included, means it is up and the step should report it.
           #
-          # The bound is the WALL CLOCK, not an iteration count. `for _ in $(seq
-          # 1 100)` bounds attempts, and an attempt is cheap only when the
-          # connection is REFUSED; a server that accepts and never answers —
-          # single-threaded `php -S` blocked on a DB connect, an infinite loop —
-          # costs the whole --max-time per attempt, so the old 100 × 10s was ~17
-          # minutes, claiming "within 20s" the entire way. $SECONDS is bash's own
-          # clock and READY_SECONDS feeds both the loop and the message, so the
-          # bound and the text it prints cannot drift apart.
+          # The wait is bounded by wall-clock time, not by attempts: a server that
+          # accepts connections and never answers costs the whole --max-time per try.
+          # READY_SECONDS drives both the loop and the message.
           #
-          # NOTE: this poll and the diagnosis block below are duplicated verbatim
-          # in the two Matrix steps (bar the port/URL). Keep the three copies in
-          # step — GitHub does not expand YAML anchors in workflows.
+          # This poll and the diagnosis below are repeated in the two matrix steps
+          # (only the port differs). GitHub doesn't expand YAML anchors, so keep the
+          # copies in step by hand.
           READY_SECONDS=20
           code=''
           rc=0
@@ -222,9 +209,8 @@ jobs:
           fi
           echo "home = 200 with every module ON"
 
-      # NOTE: the `php -r` module-list one-liner is duplicated verbatim in the
-      # next step. Keep the two byte-identical — they previously differed by the
-      # is_string() guard, so the two steps could disagree about what a module is.
+      # The `php -r` module-list one-liner is repeated in the next step. Keep the
+      # two identical.
       - name: Matrix — each module OFF then ON; home must stay up (200)
         run: |
           set -euo pipefail
@@ -251,18 +237,10 @@ jobs:
           trap 'kill "${SRV:-}" 2>/dev/null || true' EXIT
           port=8100
           for m in $MODULES; do
-            # A fresh port per iteration. The loop used to rebind the SAME :8081
-            # roughly 200 ms after `kill`, and `kill` only SENDS SIGTERM — it
-            # waits for nothing. If the socket was not released by then, or
-            # anything else on the runner held the port (this job's own leaked
-            # smoke-step server, for one), the new server exited 1 with "Address
-            # already in use" as a background job errexit never sees, and the
-            # step then blamed the module: with nothing listening the check reads
-            # "home = 000 with '<module>' disabled", and with a foreign listener
-            # on the port it reports THAT process's status — reproduced as
-            # "home = 500 with 'blocklist' disabled" against a server that had
-            # nothing to do with blocklist. `wait` below closes the release race
-            # from the other side.
+            # A new port for every iteration. `kill` only sends SIGTERM, so reusing the
+            # port right away can hit "Address already in use", and the check would then
+            # blame the module for a server that never started (or report another
+            # process's status). The `wait` below covers the other side of that race.
             port=$((port + 1))
             log="/tmp/srv-${port}-${m}.log"
             php tools/module.php disable "$m"
@@ -281,11 +259,9 @@ jobs:
               sleep 0.2
             done
 
-            # Capture the body BEFORE the kill. The failure block below runs
-            # after kill/wait, so the curl it used to do there always hit a dead
-            # port: "===== RESPONSE BODY =====" printed nothing, every time, in
-            # the step most likely to need it. The body IS the diagnostic —
-            # testing mode renders the exception into the response.
+            # Read the body before the kill: the failure block runs after the server is
+            # gone, and the body is the useful part (testing mode renders the exception
+            # into the response).
             body=''
             if [ "$code" != "200" ]; then
               body=$(curl -s --connect-timeout 1 --max-time 5 "http://127.0.0.1:${port}/en/" || true)

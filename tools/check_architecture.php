@@ -7,7 +7,7 @@ declare(strict_types=1);
  * A zero-dependency, database-free CI gate that keeps the namespace dependency
  * graph layered and acyclic, so the packages stay separable.
  *
- * Every top-level AstrX namespace in src/ and packages/ (and every top-level
+ * Every top-level AstrX namespace in src/ and in the packages (and every top-level
  * class such as AstrX\ContentManager) is assigned to exactly ONE layer in
  * LAYERS below (a module's namespace by its package). The tool tokenizes
  * every PHP file, resolves the AstrX names each one references
@@ -47,7 +47,7 @@ if (PHP_SAPI !== 'cli') {
  * this website (src/AstrX).
  *
  * The modules are not listed here: every namespace a package of type
- * astrx-module provides (packages/modules/*) joins the feature layer.
+ * astrx-module provides (one astrx/module-<key> each) joins the feature layer.
  *
  * @var array<string, list<string>>
  */

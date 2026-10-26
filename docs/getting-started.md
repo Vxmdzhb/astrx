@@ -1,6 +1,6 @@
 # Getting started
 
-This guide is for the bundled application in the current repository. A separately installable PHP core package is planned, not yet available.
+How to install the site, locally or with Docker, and how to run the checks.
 
 ## Requirements
 
@@ -11,8 +11,9 @@ The portable PHP tests also use PDO SQLite. Rust services are built separately w
 ## Obtain the source
 
 ```sh
-git clone https://github.com/hydrastro/astrx.git
+git clone https://github.com/Vxmdzhb/astrx.git
 cd astrx
+composer install
 php tools/install.php --help
 ```
 
@@ -52,8 +53,10 @@ It is a development server. Visit `http://127.0.0.1:8080/en/` after completing t
 
 ## Docker deployment
 
-The root Compose file combines the PHP application with the Rust suite. Copy
-`.env.example` to `.env` and set the database credentials. These values configure
+The root Compose file combines the PHP application with the Rust suite, which
+it expects at `../astrx-suite` (clone it next to this repository). The
+containers mount `vendor/` from this checkout, so run `composer install` first.
+Copy `.env.example` to `.env` and set the database credentials. These values configure
 Compose; they do not automatically generate the application's PHP configuration.
 For an existing database, first set `MARIADB_IMAGE` to the version already in use.
 The `mariadb:11.4` default is for fresh installations, not a downgrade instruction.
@@ -117,16 +120,15 @@ php tools/check_architecture.php
 php tools/packages.php      # after moving or adding code: php tools/packages.php --write
 ```
 
-The site loads its classes itself (`src/classloader.php`), so Composer is not
-needed to run it. `composer install` links the packages in `packages/` into
-`vendor/` for code that consumes them through Composer.
+`composer install` puts the packages (framework, library, cms and the
+modules) in `vendor/`, at the commits `composer.lock` pins. At runtime the
+site loads its classes itself (`src/classloader.php`).
 
 Each PHP test file is independently executable. The CI workflow runs `tests/*_test.php` and `tests/suite-bridge/*_test.php` and includes a separate MariaDB install/module matrix. `schema_convergence_test.php` needs a database; a skip is not a successful schema comparison.
 
-Use the PHPStan version and configuration pinned in `.github/workflows/ci.yml`. For Rust:
+Use the PHPStan version and configuration pinned in `.github/workflows/ci.yml`. The Rust engines have their own repositories and CI; in a checkout of one of them:
 
 ```sh
-cd astrx-suite
 cargo check --workspace --all-features --all-targets --locked
 cargo test --workspace --no-default-features --locked
 cargo test --workspace --all-features --locked

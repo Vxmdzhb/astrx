@@ -54,8 +54,8 @@ reinstall the schema (`tools/install.php`) to bring a purged module back.
 
 A module is these things, none of which live in core:
 
-1. **A Composer package** — `packages/modules/<key>/` (`astrx/module-<key>`,
-   type `astrx-module`), whose root is the namespace `AstrX\<Module>` — holding
+1. **A Composer package**: `astrx/module-<key>`, type `astrx-module`, in a
+   repository of its own, whose root is the namespace `AstrX\<Module>`, holding
    **a module class**, `<Module>Module.php`, implementing `AstrX\Module\Module`,
    whose `manifest()` declares the module, listed in
    `ApplicationModules::INSTALLED` (see [Packages](#packages)).
@@ -123,7 +123,7 @@ A module keeps its templates, translations and default configuration in its
 own directory, declared by `'resources'` (relative to the module class):
 
 ```
-packages/modules/imageboard/resources/
+module-imageboard/resources/
 ├── template/                 board.html, admin/admin_boards.html, partials/board_nav.html …
 ├── lang/
 │   ├── en/                   Imageboard.en.php, pages.en.php, Navbar.en.php, Admin.en.php,
@@ -333,7 +333,7 @@ type-hint `Auth\Identity`, not the account session; use
 
 A module ships its SQL in `resources/sql/`; the installers
 (`tools/install.php`, `public/setup.php`) apply it together with the CMS's
-(`packages/cms/resources/sql/`, the core tables), the site's (`src/setup/`)
+(in its `resources/sql/`: the core tables), the site's (`src/setup/`)
 and every other installed module's (`AstrX\Database\SchemaFiles` decides the
 order):
 
@@ -395,9 +395,9 @@ DELETE nid FROM `navbar_entry_ids` nid
 
 ## Packages
 
-A module is a Composer package of type `astrx-module` in `packages/modules/<key>/`,
-with its namespace at the package root (the module class, `Controller/`,
-`resources/` side by side):
+A module is a Composer package of type `astrx-module` in a repository of its
+own (`module-<key>`), with its namespace at the package root (the module
+class, `Controller/`, `resources/` side by side):
 
 ```json
 {
@@ -416,11 +416,11 @@ with its namespace at the package root (the module class, `Controller/`,
 It requires the packages whose namespaces its code uses — almost always
 `astrx/framework` and `astrx/cms`, often `astrx/library`; the federated search
 also requires `astrx/module-search` — and `tools/packages.php` checks that list
-against the code. The root `composer.json` reaches every package through path
-repositories (`packages/*`, `packages/modules/*`), so `composer install` links
-them into `vendor/`. The site itself does not need Composer: `src/classloader.php`
-loads classes from `src/sources.php`, which `tools/packages.php --write`
-generates from the packages' `composer.json` maps.
+against the code. The site's `composer.json` lists each package's repository,
+`composer install` puts them in `vendor/` (at the commits `composer.lock`
+pins), and `src/classloader.php` loads classes from `src/sources.php`, which
+`tools/packages.php --write` generates from the packages' `composer.json`
+maps.
 
 ## Adding a module
 
@@ -428,21 +428,25 @@ generates from the packages' `composer.json` maps.
 php tools/make_module.php forum --nav --guard
 ```
 
-scaffolds the package `packages/modules/forum/` (`astrx/module-forum`): its
+scaffolds the package `astrx/module-forum` next to this checkout
+(`../module-forum`, or `--out=DIR`): its
 `composer.json`, `ForumModule.php`, its controller, a `resources/` directory
 with the page's template and its slug and title in both locales, and its
 teardown `resources/sql/forum.down.sql` — plus a section navbar partial in the
 layout's `nav` slot with `--nav`, and a `ForumPageGuard` with `--guard` — then
 prints the remaining steps:
 
-1. Install it: add `Forum\ForumModule::class` to `ApplicationModules::INSTALLED`,
-   `'forum' => true` to `resources/config/Modules.config.php` (no flag = off)
-   and `"astrx/module-forum": "*@dev"` to the root `composer.json`; then
-   `php tools/packages.php --write` updates the class loader's map.
-2. Add its tables and page rows in a migration in its `resources/sql/`, tagging
+1. Make it a repository and push it (while you work on it, a Composer `path`
+   repository pointing at the directory works too).
+2. Install it: add its repository and `"astrx/module-forum": "*@dev"` to the
+   site's `composer.json` and run `composer update astrx/module-forum`; add
+   `Forum\ForumModule::class` to `ApplicationModules::INSTALLED` and
+   `'forum' => true` to `resources/config/Modules.config.php` (no flag = off);
+   then `php tools/packages.php --write` updates the class loader's map.
+3. Add its tables and page rows in a migration in its `resources/sql/`, tagging
    the pages: `UPDATE page SET module='forum' WHERE file_name LIKE 'forum%';`
-3. Fill in the teardown `DROP TABLE`s and the nav/guard stubs.
-4. `php tools/packages.php && php tools/check_modules.php && php tools/check_architecture.php`.
+4. Fill in the teardown `DROP TABLE`s and the nav/guard stubs.
+5. `php tools/packages.php && php tools/check_modules.php && php tools/check_architecture.php`.
 
 Its namespace joins the architecture's `feature` layer because it is a module
 package; `tools/packages.php` tells you when its `composer.json` requires a

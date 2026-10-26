@@ -11,11 +11,10 @@ namespace AstrX\Tools;
 
 /**
  * src/sources.php names, for a package's namespace, every place the package
- * may be: in this repository (packages/…) and installed by Composer
+ * may be: a path repository in this checkout, and where Composer installs it
  * (vendor/astrx/…). The tools see each namespace once, at the first of those
- * that exists — in a checkout that also ran `composer install`, vendor/
- * holds links back to packages/, and walking both would count every class
- * twice.
+ * that exists: with path repositories, vendor/ holds links back to them, and
+ * walking both would count every class twice.
  *
  * @return array<string, list<string>> namespace prefix => source directories
  */
@@ -119,8 +118,8 @@ function packages(string $root): array
 }
 
 /**
- * Whether the packages are this repository's own (packages/…), as opposed to
- * installed by Composer.
+ * Whether the packages are path repositories in this checkout, as opposed to
+ * installed by Composer from their own repositories.
  */
 function packagesAreLocal(string $root): bool
 {

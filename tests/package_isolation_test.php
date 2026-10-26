@@ -5,8 +5,8 @@ declare(strict_types=1);
  * Each package loads with only the packages it declares.
  *
  * tools/packages.php checks a package's composer.json against the namespaces
- * its code names. This test checks what PHP itself needs: for every package in
- * packages/, it builds a directory holding that package plus — transitively —
+ * its code names. This test checks what PHP itself needs: for every installed
+ * package, it builds a directory holding that package plus — transitively —
  * the packages its composer.json requires, nothing else, and in a fresh PHP
  * process loads every class the package declares (classes, interfaces, traits,
  * enums, and so every parent and interface they need). A class that extends or
