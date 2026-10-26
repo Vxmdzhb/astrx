@@ -53,6 +53,9 @@ It is a development server. Visit `http://127.0.0.1:8080/en/` after completing t
 
 ## Docker deployment
 
+For a server, [running it in production](production.md) walks through the
+same steps, plus Tor, backups, updates and adding modules.
+
 The root Compose file combines the PHP application with the Rust suite, which
 it expects at `../astrx-suite` (clone it next to this repository). The
 containers mount `vendor/` from this checkout, so run `composer install` first.

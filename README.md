@@ -89,6 +89,8 @@ them over HTTP, and is perfectly happy without them.
 ## Documentation
 
 - [Getting started](docs/getting-started.md): installing, Docker, Nix
+- [Running it in production](docs/production.md): launching, Tor, backups,
+  updates, adding modules
 - [Modules](docs/MODULES.md): turning features on and off, writing your own
 - [Architecture](docs/architecture.md): how a request moves through the code
 - [Operations](docs/OPERATIONS.md): storage, backups, upgrades
