@@ -316,3 +316,38 @@ table td {
     overflow-wrap: anywhere !important;
     hyphens: auto;
 }
+
+/* Webmail: layout only. Colours, borders and fonts come from the rules above. */
+#wm-wrap { display: flex; gap: 1.2em; align-items: flex-start; }
+#wm-sidebar { flex: 0 0 11em; }
+#wm-content { flex: 1 1 auto; min-width: 0; }
+#wm-nav { list-style: none; margin: 0; padding: 0; text-align: left; }
+#wm-nav li { display: block; }
+#wm-nav li a { display: block; padding: 0.2em 0.5em; border-left: 3px solid transparent; }
+#wm-nav li.wm-cur a { border-left-color: currentColor; font-weight: bold; }
+#wm-nav li.wm-unseen a { font-weight: bold; }
+#wm-sidebar-btns { margin-top: 0.6em; }
+#wm-sidebar-btns .input { display: block; width: 100%; margin: 0 0 0.3em; text-align: center; white-space: nowrap; }
+.wm-toolbar form, .wm-bulk form, .wm-pager form, .wm-msg-actions form, .wm-notice form { display: inline; }
+.wm-msg-actions { margin-bottom: 0.6em; }
+.wm-msg-actions .input { margin: 0 0.2em 0.3em 0; }
+.wm-info, .wm-pager { margin: 0.4em 0; }
+.wm-bulk { margin: 0.6em 0; }
+#wm-list { width: 100%; border-collapse: collapse; }
+#wm-list th, #wm-list td { text-align: left; padding: 0.3em 0.5em; vertical-align: middle; }
+#wm-list th:first-child, #wm-list td:first-child { width: 1.8em; }
+#wm-list tr.wm-unread td { font-weight: bold; }
+#wm-msg-hdr { width: 100%; border-collapse: collapse; margin-bottom: 0.6em; }
+#wm-msg-hdr th { width: 7em; text-align: right; white-space: nowrap; padding-right: 0.8em; }
+.wm-notice { padding: 0.4em 0.7em; margin: 0.4em 0; border: 1px dashed currentColor; }
+.wm-msg-body pre, .wm-raw-headers { white-space: pre-wrap; overflow-wrap: anywhere; }
+.wm-att-table { border-collapse: collapse; }
+.wm-att-table td { padding: 0.1em 0.8em 0.1em 0; }
+#wm-compose { max-width: 50em; }
+#wm-compose-hdr { width: 100%; border-collapse: collapse; margin: 0.4em 0; }
+#wm-compose-hdr th { width: 7em; text-align: right; white-space: nowrap; padding-right: 0.8em; }
+#wm-compose-hdr td input, #wm-compose-hdr td select, #wm-compose textarea { width: 100%; }
+@media (max-width: 40em) {
+    #wm-wrap { flex-direction: column; }
+    #wm-sidebar { flex: none; width: 100%; }
+}
