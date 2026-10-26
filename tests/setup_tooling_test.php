@@ -2,21 +2,15 @@
 declare(strict_types=1);
 
 /**
- * Setup + module tooling — NO AstrX bootstrap, no database.
+ * Setup and module tooling (no bootstrap, no database).
  *
- * Pure-function coverage of the three places the install/teardown tooling was
- * quietly wrong:
- *
- *  1. runSQL() swallowed the whole of SQLSTATE 23000 to make the base schema
- *     re-runnable. 23000 also covers foreign-key (1451/1452) and NOT-NULL
- *     (1048) violations, so a migration whose INSERT failed integrity was
- *     recorded as applied and could never run again.
- *  2. `ADD COLUMN IF NOT EXISTS` is MariaDB-only. On MySQL 8 it is
- *     ER_PARSE_ERROR (42000), which runSQL deliberately does not swallow, so
- *     the install aborted on the first of the 33 such clauses.
- *  3. `module.php purge` dropped tables that only a migration creates, left the
- *     migration's row saying "applied", and told the operator to reinstall the
- *     schema — which then skipped those migrations and restored nothing.
+ *   1. Only the duplicate-key part of SQLSTATE 23000 counts as benign;
+ *      foreign-key (1451/1452) and NOT NULL (1048) violations are real
+ *      failures, and the migration is not recorded.
+ *   2. `ADD COLUMN IF NOT EXISTS` (MariaDB only) is rewritten for MySQL 8,
+ *      which would reject it.
+ *   3. `module.php purge` forgets the migrations that built what it drops, so
+ *      reinstalling the schema really restores it.
  *
  * Run:  php tests/setup_tooling_test.php
  */
@@ -307,10 +301,9 @@ function writeModulesFile(string $path, string $spelling): void
         . "    ],\n];\n");
 }
 
-// Every spelling that the old lowercase-only `(?:true|false)` pattern missed.
-// A miss fell through to the "insert a new entry" branch, which PREPENDS the
-// key — and PHP lets the LATER (original) entry win, so the tool reported a
-// successful flip over a module that was still on.
+// Every way of spelling a boolean must be matched. A miss would add a second
+// entry in front of the original, and PHP lets the later one win, so the
+// flip would silently do nothing.
 foreach (['true', 'TRUE', 'True', '1', "'true'", '"on"'] as $spelling) {
     $file = $TMP . 'Modules.config.php';
     writeModulesFile($file, $spelling);

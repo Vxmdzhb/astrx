@@ -12,14 +12,14 @@ use AstrX\I18n\DiagnosticRenderer;
 use AstrX\Result\DiagnosticsCollector;
 
 /**
- * Render the controller's output as a JSON envelope for API consumers.
+ * Render the controller's output as a JSON envelope for API clients.
  *
- * Envelope structure (success):
+ * Success:
  *   {
  *     "ok":     true,
  *     "status": 200,
- *     "data":   { ...filtered context, by scope... },
- *     "html":   "<rendered template>",   // omit when ?html=0
+ *     "data":   { ...the context, filtered by scope... },
+ *     "html":   "<rendered template>",   // left out with ?html=0
  *     "meta": {
  *       "locale": "en",
  *       "page":   "user-profile",
@@ -28,7 +28,7 @@ use AstrX\Result\DiagnosticsCollector;
  *     "diagnostics": [ ...visible diagnostics... ]
  *   }
  *
- * Envelope structure (failure — dominant diagnostic level >= ERROR):
+ * Failure (the worst diagnostic is ERROR or above):
  *   {
  *     "ok":     false,
  *     "status": 4xx | 5xx,
@@ -37,22 +37,14 @@ use AstrX\Result\DiagnosticsCollector;
  *     "meta": { "diagnostics": { ... } }
  *   }
  *
- * Design choices:
- *   - API data is filtered through ContextScope: only SHARED, API_PUBLIC, and
- *     (for admins) API_ADMIN keys are exposed.
- *   - Diagnostics are serialised from the same DiagnosticInterface objects the
- *     controllers/template engine emit. Only stable fields (id, level,
- *     level_value, rendered message) are exposed; extra context is included
- *     ONLY when a diagnostic opts in via DiagnosticContextInterface::context().
- *     Arbitrary getters are never reflected, so internal details (file paths,
- *     eval text, temp paths) cannot leak into API responses.
- *   - Diagnostic visibility follows DiagnosticVisibilityChecker, just like the
- *     HTML message bar. Hidden diagnostics still influence the HTTP status, but
- *     their details are not leaked in the JSON body.
- *   - html is included by default. Pass ?html=0 to omit it for pure-data
- *     clients that want less bandwidth.
- *   - We never include WEB_ONLY context (the default scope), so legacy
- *     controllers that haven't been audited can't accidentally leak data.
+ * - Data goes through ContextScope: only SHARED, API_PUBLIC and, for admins,
+ *   API_ADMIN keys are exposed. WEB_ONLY, the default, never is.
+ * - Diagnostics expose only stable fields (id, level, level_value, message),
+ *   plus context a diagnostic explicitly opts into with
+ *   DiagnosticContextInterface::context(). Getters are never reflected.
+ * - Which diagnostics are shown follows DiagnosticVisibilityChecker, as on
+ *   HTML pages. Hidden ones still affect the status code.
+ * - html is included unless the client passes ?html=0.
  */
 final class JsonRenderer
 {

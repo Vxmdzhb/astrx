@@ -14,9 +14,9 @@ use AstrX\Result\DiagnosticsCollector;
  *     an open, undeleted account logs that account into this request's
  *     (stateless) session.
  *   - A cookie session of a logged-in user is re-validated against the
- *     database on every request (R11): a closed or deleted account is logged
+ *     database on every request: a closed or deleted account is logged
  *     out, a changed role applies immediately, and a bumped session epoch
- *     evicts the session (R13).
+ *     evicts the session.
  */
 final class RequestIdentity
 {
@@ -77,17 +77,13 @@ final class RequestIdentity
             }
         }
 
-        // ── Cookie-session re-validation (R11, MED) ───────────────────────────
-        // The Gate resolves a request's role from SESSION state, written once at
-        // login and never re-checked against the DB. Without this, an admin action
-        // that demotes, bans, or deletes a user does NOT take effect until that
-        // user logs out or the session expires (up to the remember-me lifetime) —
-        // so a rogue/compromised privileged account can't be evicted, which is a
-        // core incident-response need. Re-load the row per request for a logged-in
-        // COOKIE session (the bearer path did its own check above): drop the
-        // session if the account is now closed/deleted; otherwise refresh the
-        // cached group so a role change applies immediately. On a DB error refuse
-        // this request without deleting the session, so it can be retried.
+        // ── Re-check cookie sessions against the database ──────────────────────
+        // The role is cached in the session at login. Reload the account on every
+        // request so that demoting, banning or deleting someone takes effect at once
+        // instead of when their session expires: drop the session if the account is
+        // closed or gone, otherwise refresh the cached group. (Bearer requests were
+        // checked above.) If the database fails, refuse this request but keep the
+        // session, so it can be retried.
         if (!$bearerPresent) {
             $revSessRes = $this->injector->createClass(\AstrX\User\UserSession::class)->drainTo($this->collector);
             $revRepoRes = $this->injector->createClass(\AstrX\User\UserRepository::class)->drainTo($this->collector);
@@ -118,16 +114,11 @@ final class RequestIdentity
                         if (is_scalar($row['type'] ?? null) && (int) $row['type'] !== $revSess->userType()->value) {
                             $revSess->refreshType((int) $row['type']);
                         }
-                        // R13: session-epoch force-logout. Adopt the DB
-                        // epoch on the first re-validation after login; a
-                        // later admin bump (evict-everywhere) then no longer
-                        // matches, so the session is dropped on its next
-                        // request — instant eviction of a compromised account.
-                        // Known narrow window: a bump landing between login
-                        // and this FIRST check is absorbed (adopted). An
-                        // actively-used stolen session has already adopted
-                        // and is evicted correctly; deleting/banning the
-                        // account evicts regardless via the check above.
+                        // Forced logout. The first check after login adopts the account's session
+                        // epoch; when an admin bumps it ("log out everywhere"), the session no longer
+                        // matches and is dropped on its next request. A bump that lands between
+                        // login and that first check is absorbed, which is a narrow window: deleting
+                        // or banning the account evicts it regardless.
                         $dbEpoch   = is_scalar($row['session_epoch'] ?? null) ? (int) $row['session_epoch'] : 0;
                         $sessEpoch = $revSess->sessionEpoch();
                         if ($sessEpoch === null) {

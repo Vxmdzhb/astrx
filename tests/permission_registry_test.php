@@ -2,16 +2,16 @@
 declare(strict_types=1);
 
 /**
- * Per-feature permissions (Auth\Permission implemented by each feature's enum).
+ * Per-feature permissions (Auth\Permission implemented by each feature's
+ * enum).
  *
- *   1. The registry built the way Prelude builds it (ApplicationPermissions::CORE
- *      plus every module manifest) exposes EXACTLY the 58 identifiers the old
- *      single Permission enum had. Grants are stored by identifier, so losing
- *      one would silently revoke it and the grants editor would drop it on save.
- *   2. Each enum lives in its feature's namespace, implements the contract and
- *      id() equals its value.
- *   3. Every grant in resources/config/Auth.config.php names a real permission
- *      (a wildcard must match at least one) — a typo there is a grant nobody gets.
+ *   1. The registry built the way Prelude builds it (CORE plus every module
+ *      manifest) exposes exactly the expected 58 identifiers. Grants are
+ *      stored by identifier, so a missing one would silently revoke it.
+ *   2. Each enum lives in its feature's namespace, implements the contract,
+ *      and id() equals its value.
+ *   3. Every grant in resources/config/Auth.config.php names a real
+ *      permission (a wildcard must match at least one).
  *   4. The registry rejects duplicates and non-permission classes.
  *
  * Standalone: no bootstrap, no database.
@@ -167,10 +167,8 @@ check('the same enum listed twice is harmless', count((new PermissionRegistry([
 check('get() finds a permission by id', $registry->get('chat.moderate') === AstrX\Chat\ChatPermission::MODERATE);
 
 echo "\n5. The grants editor shows every permission\n";
-// saveGrants() rebuilds each role from the checkboxes, so a permission with no
-// row reads as "unchecked". Before this check existed, the matrix rendered only
-// news/comment/user/ban/admin, and saving it silently revoked every chat,
-// board, api and webmail grant.
+// saveGrants() rebuilds each role from the checkboxes, so a permission with
+// no row in the editor would read as unchecked and be revoked on save.
 $editor = (new ReflectionClass(AstrX\Admin\Controller\AdminConfigAccessController::class))->newInstanceWithoutConstructor();
 $t = new AstrX\I18n\Translator(new AstrX\Result\DiagnosticsCollector());
 $t->setLocale('en');

@@ -97,12 +97,8 @@ namespace {
     $IH2 = str_repeat('b', 40);
 
     /**
-     * A localhost port nothing is listening on, probed upward from $from.
-     *
-     * The port used to be the constant 8815, which made this test fail as "mock
-     * server never became ready" for reasons that have nothing to do with the
-     * code under test: a CI runner with its own service there, a leftover server
-     * from an interrupted run, a second copy of the suite in parallel.
+     * A localhost port nothing is listening on, looking upward from $from, so a
+     * busy port doesn't make the test fail for unrelated reasons.
      */
     function freePort(int $from): int
     {
@@ -501,11 +497,10 @@ namespace {
         eq('block token trimmed', $bcx->onioncrawlerAdminToken(), 'spaced');
 
         // ===================================================================
-        // 12. template regression (F1): a torrent row keeps its .torrent link
-        //     and its seeders/leechers + category, which previously rendered
-        //     empty because they lived inside truthy {{#flag}} sections that the
-        //     engine strips of the loop-row context. The fix hoists the values
-        //     to loop level; assert against the REAL TemplateEngine when present.
+        // 12. A torrent row keeps its .torrent link, seeders/leechers and category.
+        //     The values sit at loop level rather than inside {{#flag}} sections,
+        //     which don't see the loop row; checked against the real TemplateEngine
+        //     when it is available.
         // ===================================================================
         echo "[fedsearch+torrentsearch] template: torrent row renders links + swarm/category (F1)\n";
         $torUrl  = $mockBase . '/torrent/' . $IH1 . '.torrent';

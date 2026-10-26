@@ -309,9 +309,8 @@ foreach (cm_installed() as $class) {
         $errors[] = "{$key}: not listed in Modules.config.php — add \"'{$key}' => true,\" "
             . 'to the Modules section so the module can be switched off';
     } elseif (!is_bool($configuredRaw[$key])) {
-        // Config::getConfigBool now rejects a non-boolean and falls back to ON
-        // instead of casting it truthy, so a quoted 'false' no longer reads as
-        // "enabled" — but it still does not mean what its author intended.
+        // Config::getConfigBool rejects a non-boolean and falls back to on, so a
+        // quoted 'false' doesn't mean what its author meant.
         $errors[] = "{$key}: Modules.config.php holds a " . get_debug_type($configuredRaw[$key])
             . ', not a boolean — write true or false';
     }

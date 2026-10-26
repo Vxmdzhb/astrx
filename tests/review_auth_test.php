@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-// Real service/repository regression; HTTP deployment is covered separately in CI.
+// Service and repository checks; HTTP deployment is covered separately in CI.
 use AstrX\Image\ImageSanitizer;
 use AstrX\Session\ServerSecret;
 use AstrX\User\AvatarService;

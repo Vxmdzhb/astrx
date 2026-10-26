@@ -81,11 +81,9 @@ final class AstrXCompiler
         $this->collectSource();
         $this->collectResources();
 
-        // R4-16: write to ".tmp" siblings first, lint the generated wrappers AND
-        // every embedded source string, and only rename into place on full
-        // success — so a syntax error in generated output can never leave a
-        // corrupt live bundle / front controller behind (the old code wrote the
-        // real files first and only linted the outer wrapper).
+        // Write to ".tmp" siblings first, lint the generated wrappers and every
+        // embedded source, and only then rename into place, so a syntax error never
+        // leaves a broken bundle or front controller live.
         $bundleTmp       = $this->outFile . '.tmp';
         $frontTmp        = $this->frontController . '.tmp';
         $compileFrontTmp = $this->compileFrontController . '.tmp';

@@ -125,17 +125,14 @@ final class PrgIntake
 
     /**
      * On the settling GET, put the files parked by redirect() back into the
-     * request's FileBag (peeking at the payload, not consuming it) so
-     * controllers read them through $request->files() as usual.
+     * request's FileBag (the payload is only peeked at), so controllers read them
+     * through $request->files() as usual.
      *
-     * The parked copies are this request's to clean up. A controller may move
-     * one into storage (UploadedFile::moveTo renames it), but most read and
-     * re-encode the bytes, which leaves the original in the temp dir. Once
-     * the payload has been consumed, AbstractPrgHandler's GC can no longer
-     * find it, so without this the user's original upload (EXIF and all)
-     * would stay in the temp dir indefinitely. At shutdown, any restored file
-     * that still exists is deleted, unless the payload is still pending (then
-     * the GC owns it, as for an abandoned redirect).
+     * This request cleans the parked copies up. A controller may move a file into
+     * storage, but most re-encode the bytes and leave the original behind, and
+     * once the payload is consumed the PRG garbage collector can't find it any
+     * more. So at shutdown every restored file that still exists is deleted,
+     * unless its payload is still pending (then the collector owns it).
      */
     public function restoreUploads(Request $request, PrgHandler $prg): void
     {

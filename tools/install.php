@@ -347,23 +347,18 @@ function runSQL(PDO $pdo, string $file): string
     return '';
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // MariaDB-only DDL → portable DDL
 //
-// The schema uses `ALTER TABLE … ADD COLUMN IF NOT EXISTS` (33 clauses) to make
-// the migrations idempotent. That syntax is a MariaDB extension. MySQL 8 rejects
-// it with ER_PARSE_ERROR (SQLSTATE 42000), which runSQL deliberately does NOT
-// swallow — so on the MySQL the README says AstrX supports, the install aborted
-// on the first such statement.
+// The migrations use `ALTER TABLE … ADD COLUMN IF NOT EXISTS` to stay
+// idempotent. MySQL 8 doesn't support that and fails with ER_PARSE_ERROR.
 //
-// Rather than rewrite 33 clauses across nine .sql files — which would change
-// every migration's sha256 and make runMigration() refuse to proceed on EXISTING
-// installs with "already ran with a different checksum" — the portable form is
-// produced here, at execution time, and only for servers that need it:
-// information_schema is consulted for each clause, satisfied clauses are
-// dropped, and what remains is emitted as plain ALTER TABLE. The .sql files stay
-// byte-identical, so no installed checksum moves.
-// ─────────────────────────────────────────────────────────────────────────────
+// Editing the .sql files would change their checksums and stop existing
+// installs from upgrading, so the portable form is produced here, at run
+// time, only for servers that need it: each clause is checked against
+// information_schema, satisfied ones are dropped, and the rest become plain
+// ALTER TABLE statements.
+// ─────────────────────────────────────────────────────────────────────────
 
 /**
  * Return $stmt in a form this server understands, or null when there is nothing
@@ -447,8 +442,8 @@ function serverHasIfNotExistsDdl(PDO $pdo): bool
         $v = $pdo->getAttribute(PDO::ATTR_SERVER_VERSION);
         if (is_string($v)) { $version = $v; }
     } catch (\PDOException) {
-        // Driver refused to report a version; assume the stricter dialect so we
-        // take the portable path rather than emitting syntax MySQL rejects.
+        // The driver didn't report a version; assume the stricter dialect and take
+        // the portable path.
     }
 
     // MariaDB has supported it since 10.0 and stamps its name into the version
@@ -521,26 +516,18 @@ function splitTopLevel(string $s): array
 /**
  * Is this error the harmless "it is already there" that makes a re-run safe?
  *
- * SQLSTATE alone is too coarse. '23000' is "integrity constraint violation" and
- * covers BOTH the duplicate key we want to ignore (1062) AND failures that mean
- * the statement did not do its job:
+ * SQLSTATE alone is too coarse. '23000' covers the duplicate key a re-run
+ * should ignore (1062), but also failures that mean the statement didn't do
+ * its job:
  *
  *   1451 / 1452  foreign key constraint fails
  *   1048         column cannot be null
  *
- * migrate_zz_content_module.sql ends with
- *     INSERT IGNORE INTO `navbar_internal` (id, page_id)
- *     SELECT @content_nav_id, @content_page_id …
- * and navbar_internal has foreign keys to navbar_entry(id) and page(id). When
- * @content_nav_id picks up a stale LAST_INSERT_ID() — the preceding
- * `INSERT … SELECT NULL WHERE <false>` inserts no row, so LAST_INSERT_ID() still
- * holds whatever ran before it — that INSERT fails with 1452. Swallowed as
- * '23000', the migration was then recorded as applied and the installer printed
- * "ok". The Content nav entry was permanently missing, and the checksum lock
- * guaranteed the migration could never run again to create it.
+ * Swallowing those would record a migration as applied while its rows are
+ * missing, and the checksum lock would stop it from ever running again.
  *
- * So: keep '42S01' (table/view exists) and '42S21' (duplicate column) whole, and
- * inside '23000' allow only the duplicate-key family.
+ * So '42S01' (table or view exists) and '42S21' (duplicate column) count as
+ * benign, and within '23000' only the duplicate-key family does.
  */
 function sqlErrorIsBenign(\PDOException $e): bool
 {
@@ -672,7 +659,7 @@ function makeAdmin(PDO $pdo, string $user, string $pass, string $mbox): string
         return 'Password must contain at least 12 characters and at most 4096 UTF-8 bytes.';
     }
     try {
-        // R4-20: idempotent. A bare INSERT into the UNIQUE username threw 23000
+        // idempotent. A bare INSERT into the UNIQUE username threw 23000
         // on any re-run of the installer. ON DUPLICATE KEY UPDATE re-provisions
         // the existing admin (mailbox/password/flags) in place, keeping its id.
         $stmt = $pdo->prepare(

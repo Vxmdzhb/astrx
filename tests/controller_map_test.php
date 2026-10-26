@@ -2,20 +2,14 @@
 declare(strict_types=1);
 
 /**
- * Site\ControllerMap — the explicit page → controller map that replaced
- * deriving 'AstrX\Controller\' . Studly(file_name) . 'Controller'.
+ * Site\ControllerMap, the explicit page-to-controller map.
  *
- * The map must serve exactly the pages the derivation served:
- *
- *   1. every concrete Kernel\Controller in the source tree is reachable through
- *      exactly one map entry (CORE or one module manifest), so no controller
- *      became unreachable when it moved into its feature's namespace;
- *   2. every entry's key is the file_name the old derivation would have needed
- *      for that class (Studly(key) . 'Controller' === short class name), so no
- *      page now reaches a different class;
- *   3. lookups normalise like the derivation did (case- and underscore-
- *      insensitive), so page rows written as 'Board_Mod' keep working;
- *   4. unmapped names and duplicate mappings behave safely.
+ *   1. Every concrete Kernel\Controller in the source tree is reachable
+ *      through exactly one entry (CORE or a module manifest).
+ *   2. Every key is the file_name that names its class
+ *      (Studly(key) . 'Controller' is the short class name).
+ *   3. Lookups ignore case and underscores, so 'Board_Mod' still works.
+ *   4. Unmapped names and duplicate entries are handled safely.
  *
  * Standalone: no bootstrap, no database.
  */

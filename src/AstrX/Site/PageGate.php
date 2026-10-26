@@ -128,32 +128,23 @@ final class PageGate
     }
 
     /**
-     * The permission a visitor must hold to ENTER this page, or null when the
-     * page is open to everyone.
+     * The permission a visitor needs to open this page, or null when it is open
+     * to everyone.
      *
-     * Three sources, checked in order, deliberately overlapping:
+     * Three sources, checked in order, overlapping on purpose:
      *
-     *   1. The page tree. Every descendant of the admin root requires
-     *      ADMIN_ACCESS. file_name is used rather than url_id because file_name
-     *      is never translated and is not editable through the Pages UI.
+     *   1. The page tree: everything under the admin root needs ADMIN_ACCESS.
+     *      file_name is used because it is never translated and can't be edited
+     *      from the Pages UI.
+     *   2. A #[RequiresPermission] attribute on the controller class or a parent.
+     *   3. The Admin*Controller naming convention.
      *
-     *   2. A #[RequiresPermission] attribute on the controller class (or on any
-     *      of its parents).
+     * The page tree is data, and a migration that forgets a page_closure row
+     * would silently open an admin page. 2 and 3 live in code, so no migration
+     * can unlock an Admin*Controller.
      *
-     *   3. The Admin*Controller naming the reflection router already keys
-     *      dispatch on.
-     *
-     * 2 and 3 exist because 1 alone is DATA: `GET /en/admin-content` with no
-     * session used to reach AdminContentController::handle() and render the
-     * admin shell under the controller's own 403, purely because
-     * migrate_zz_content_module.sql inserted the page's self row in
-     * `page_closure` and not the WORDING_ADMIN parent row. A missing row is now
-     * a cosmetic bug (the template resolves to the wrong include path) instead
-     * of a silently disabled gate — no migration can unlock an Admin*Controller.
-     *
-     * This is the coarse "may you open this page" gate only. Controllers keep
-     * their finer checks: AdminConfigSystemController still answers 403 to a MOD
-     * who holds ADMIN_ACCESS but not ADMIN_CONFIG_SYSTEM.
+     * This is only the coarse "may you open this page" check. Controllers keep
+     * their own finer checks.
      */
     public static function requiredPermission(Page $page, ?string $controllerClass): ?Permission
     {

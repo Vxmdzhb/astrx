@@ -13,22 +13,16 @@ use AstrX\User\UserPolicy;
 use AstrX\User\UserResource;
 
 /**
- * Application-level policy wiring (replaces Auth\GateBootstrapper).
+ * Which policy decides for which resource.
  *
- * The security layer (AstrX\Auth) must not name the features it protects, so
- * the resource → policy table lives here, in the application layer next to
- * Prelude and ContentManager. Always-on features are listed in core(); optional
+ * AstrX\Auth does not name the features it protects, so the table lives here,
+ * in the application layer. Always-on features are listed in core(); optional
  * modules declare theirs in their manifest's `policies` key and are registered
  * only while enabled (ModuleRegistry::enabledPolicies()).
  *
- * A policy is keyed by the class of the object callers actually PASS to
- * Gate::can(), not by the class that loads it. UserPolicy used to be keyed on
- * UserRepository::class, which is never passed as a resource: every
- * user.edit.any / user.delete.any / user.promote check fell to the \stdClass
- * entry (because AdminUsersController built its target with `(object) $row`)
- * and was answered by CommentPolicy, which has no arm for any of them.
- * UserResource exists so that binding is expressible only one way; see its
- * class docblock.
+ * A policy is keyed by the class of the object callers pass to Gate::can(),
+ * not by the class that loads it. That is why user checks go through
+ * UserResource; see its docblock.
  */
 final class ApplicationPolicies
 {

@@ -2,20 +2,16 @@
 declare(strict_types=1);
 
 /**
- * Site catalog pruning — `php tools/lang_prune.php [--write]`
+ * Site catalog pruning, `php tools/lang_prune.php [--write]`.
  *
- * The site's resources/lang/ overrides the packages' and modules' catalogs key
- * by key. An install that predates a catalog moving into a package (the CMS's
- * Admin, User, … catalogs; a module's keys) still holds a full copy of it, and
- * every key in that copy that equals the package's value shadows the package
- * for nothing: a later release that fixes or rewords the string never reaches
- * the site.
+ * The site's resources/lang/ overrides the packages' catalogs key by key.
+ * Keys there that only repeat the shipped value hide later changes to it.
  *
  * Without --write this lists, per domain and locale, how many of the site's
- * keys only repeat the shipped value. With --write it saves those domains the
- * way the admin Language editor does, which keeps only the keys the site
- * actually changed (and removes a file left with none). Keys the site changed
- * are never touched. Domains holding callables (Diagnostics/) are skipped.
+ * keys just repeat the shipped value. With --write it saves those domains the
+ * way the Language editor does, keeping only the keys the site actually
+ * changed (and removing files left empty). Diagnostics/ catalogs, which hold
+ * callables, are skipped.
  *
  * Exit 0; 1 when --write could not save a domain.
  */

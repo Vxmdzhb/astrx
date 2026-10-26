@@ -2,22 +2,19 @@
 declare(strict_types=1);
 
 /**
- * The framework layers run on their own — at runtime, not just in the import
+ * The framework runs on its own, at runtime and not just in the import
  * graph.
  *
- * tools/check_architecture.php proves no framework namespace IMPORTS a higher
- * layer. That cannot see string class names, global constants, file paths
- * assumed to exist, or the autoloader quietly finding application code. This
- * test closes that gap:
+ * tools/check_architecture.php proves no framework namespace imports a
+ * higher layer, but it can't see string class names, constants, assumed file
+ * paths, or the autoloader quietly finding application code. So this test:
  *
- *   1. copy ONLY the framework package (packages/framework: the foundation +
- *      component namespaces `check_architecture.php --list` names) and the
- *      class loader, mapped from that package's composer.json, into an empty
- *      directory, next to a copy of examples/minimal;
- *   2. confirm that tree cannot load a feature or application class;
- *   3. serve the example from it with PHP's built-in server and exercise every
- *      route: HTML page (escaped output, security headers), POST/redirect/GET,
- *      JSON, 404.
+ *   1. copies only the framework package and the class loader (mapped from
+ *      the package's composer.json) into an empty directory, next to a copy
+ *      of examples/minimal;
+ *   2. checks that tree cannot load a feature or application class;
+ *   3. serves the example from it with PHP's built-in server and tries every
+ *      route: HTML (escaping, security headers), POST/redirect/GET, JSON, 404.
  *
  * Standalone: no bootstrap, no database. Needs proc_open and a free TCP port.
  */

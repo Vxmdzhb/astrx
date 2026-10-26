@@ -2,16 +2,13 @@
 declare(strict_types=1);
 
 /**
- * Standalone UserService / AvatarService test — NO AstrX bootstrap, SQLite.
+ * UserService and AvatarService (no bootstrap, SQLite).
  *
- * Covers:
- *   3. the identicon seed is an HMAC keyed with the install secret, not a
- *      reproducible sha256 of public data plus a guessed e-mail;
- *   4. the code-enforced password floor, which holds with password_regex empty;
- *   5. the login captcha no longer depends on a counter the client owns;
- *   6. a password change evicts the account's other sessions;
- *   7. the TOTP secret is encrypted at rest, and pre-existing plaintext rows
- *      still work.
+ *   3. The identicon seed is an HMAC keyed with the install secret.
+ *   4. The password floor holds even with password_regex empty.
+ *   5. The login captcha doesn't depend on a counter the client controls.
+ *   6. Changing a password logs the account out everywhere else.
+ *   7. TOTP secrets are encrypted at rest; older plaintext rows still work.
  *
  * Run:  php tests/user_security_test.php
  */
@@ -300,7 +297,7 @@ namespace {
     check('two encryptions of the same secret differ (random IV)', $enc->invoke($svc, $base32) !== $stored);
     check('an empty secret stays empty',                          $enc->invoke($svc, '') === '');
 
-    // Rows written before this change hold plaintext and must keep working.
+    // Rows written before encryption hold plaintext and must keep working.
     check('a legacy plaintext row is still readable', $dec->invoke($svc, $base32) === $base32);
 
     // A row encrypted under a different install secret must not decode.
@@ -310,7 +307,7 @@ namespace {
         $dec->invoke($svcOther, $stored) === '',
     );
 
-    // Tampering must be caught by the MAC, not silently decrypted.
+    // Tampering must fail the MAC, not decrypt to garbage.
     $rawEnvelope = (string) base64_decode(substr($stored, 7), true);
     $last = strlen($rawEnvelope) - 1;
     $rawEnvelope[$last] = chr(ord($rawEnvelope[$last]) ^ 1);

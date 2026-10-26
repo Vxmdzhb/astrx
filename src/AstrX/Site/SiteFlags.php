@@ -20,7 +20,7 @@ final class SiteFlags
     public function __construct(private readonly ?PDO $pdo) {}
 
     /**
-     * R13: the operator-configured canonical .onion base URL for the
+     * The operator-configured canonical .onion base URL for the
      * Onion-Location header, or '' when unset or invalid.
      */
     public function onionPrimary(): string

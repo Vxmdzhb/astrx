@@ -127,37 +127,20 @@ function m_installed_keys(): array
 }
 
 /**
- * Rewrite Modules.config.php so $mod => $enabled, preserving the file's comments.
+ * Rewrite Modules.config.php so $mod => $enabled, keeping the file's
+ * comments. Four rules:
  *
- * Three things this has to get right, because getting any of them wrong prints
- * "Module 'chat' DISABLED" over a module that is still fully switched on:
- *
- *  1. Match the existing entry whatever its spelling. The old pattern was
- *     `(?:true|false)` — lowercase only — so `'chat' => TRUE` or `'chat' => 1`
- *     fell through to the "insert a new entry" branch, which PREPENDS the key
- *     just after `'Modules' => ['. PHP then evaluates both entries and the LATER
- *     one — the untouched original — wins. The tool reported success and
- *     changed nothing.
- *  2. Publish atomically. file_put_contents() truncates first, so a concurrent
- *     request can `require` a half-written config: a ParseError, i.e. a hard
- *     fatal on every page until the write finishes. atomicWrite() writes a
- *     sibling temp file and rename()s it in, and invalidates opcache — without
- *     that last step an install running opcache.validate_timestamps=0 keeps
- *     serving the pre-flip file and the toggle never takes effect at all.
- *  3. Verify. After writing, re-read the file and confirm the flag now reads as
- *     asked; anything else is reported as a failure instead of a success.
- *  4. Setting a flag to the value it ALREADY holds is a successful no-op, not an
- *     error. The old code compared the rewritten text against the original and
- *     called any non-difference "Could not update <file>", so `disable chat` on
- *     an already-disabled module exited 1 with a message about a file-write
- *     problem. Under CI's `set -euo pipefail` that killed the whole job, which
- *     made the module matrix non-restartable and non-reorderable and would
- *     hard-fail the moment anyone committed a module as `false`, or the loop was
- *     interrupted between its `disable` and its `enable`. The re-read in (3) is
- *     the source of truth for what the file now says; "could not update" is
- *     reserved for the case where the entry is absent AND the insert point is
- *     missing too (or preg_* itself failed) — nothing was written and nothing
- *     could be.
+ *  1. Match the existing entry however it's spelled (true, TRUE, 1, …).
+ *     Missing it would add a second entry in front, and PHP lets the later
+ *     one, the original, win.
+ *  2. Publish atomically with atomicWrite() (temp file, rename, opcache
+ *     invalidation), so no request ever loads a half-written config, and a
+ *     server with opcache.validate_timestamps=0 picks up the change.
+ *  3. Verify: re-read the file and report a failure unless the flag now reads
+ *     as asked.
+ *  4. Setting a flag to the value it already has is a successful no-op, so
+ *     scripts like CI's module matrix can run in any order and be restarted.
+ *     "Could not update" is only for when nothing could be written.
  */
 function m_set_flag(string $file, string $mod, bool $enabled): string
 {
@@ -309,16 +292,14 @@ function m_dropped_tables(string $downFile): array
 }
 
 /**
- * Migration files (basenames) that install anything the teardown of $mod removes.
+ * Migration files (basenames) that install anything the teardown of $mod
+ * removes.
  *
- * Two sources, so there is no second list to keep in sync with the manifests:
- *   - every migration the module ships itself (its resources/sql/migrate_*.sql)
- *     — they built its tables, pages and keys, and must run again on restore;
- *   - any OTHER migration (core's) that CREATEs one of the tables the teardown
- *     drops, or tags pages with `module` = '<mod>' — the ownership pattern core
- *     migrations used for the modules folded into the schema (chat, imageboard,
- *     bot trap): without re-running it, restored pages would come back untagged
- *     and therefore ungated.
+ * Two sources, so there's no second list to keep in sync:
+ *   - every migration the module ships (its resources/sql/migrate_*.sql);
+ *   - any other (core) migration that creates one of the tables the teardown
+ *     drops, or tags pages with `module` = '<mod>'. Without re-running those,
+ *     restored pages would come back untagged, and so ungated.
  *
  * @param  list<string> $allMigrations every migration path (SchemaFiles::migrations())
  * @param  list<string> $tables        the tables the teardown drops
@@ -355,15 +336,11 @@ function m_module_migrations(array $allMigrations, string $moduleSqlDir, array $
 }
 
 /**
- * Forget that $migrations ever ran, so the installer will apply them again.
+ * Forget that $migrations ran, so the installer applies them again.
  *
- * This is what makes `purge` reversible. runMigration() short-circuits on a
- * `migration` row whose checksum matches and returns '' — success — WITHOUT
- * executing anything. So after a purge dropped content_page / content_link (or
- * media, or tipline: tables that live in a migration, not in a schema piece,
- * which re-runs unconditionally) the installer printed "ok" for every one of them and
- * created nothing. Re-enabling the module then 500'd on every page, and no
- * documented command could bring it back.
+ * This is what makes `purge` reversible: runMigration() skips any migration
+ * whose checksum is already recorded, so without this a schema reinstall
+ * would print "ok" and recreate nothing.
  *
  * @param list<string> $migrations
  */

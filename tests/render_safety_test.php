@@ -2,28 +2,20 @@
 declare(strict_types=1);
 
 /**
- * Standalone render-safety test — NO AstrX bootstrap, no database.
+ * Turning a request into bytes (no bootstrap, no database).
  *
- * Covers three defects in the path that turns a request into bytes:
+ *   1. Compiled templates are published with Support\atomicWrite() (write a
+ *      temp file, then rename), so a concurrent request never loads a
+ *      half-written file.
+ *   2. ErrorHandler records masked PHP errors separately from the ones the
+ *      shutdown handler escalates, so a warning can't append an error page
+ *      to a good response (or to a downloaded attachment).
+ *   3. The admin System-config form validates template_dir,
+ *      template_cache_dir, template_extension and parse_mode: a blank
+ *      template_dir would break every page, including the one to fix it.
  *
- *   1. The compiled-template cache was written with file_put_contents() and then
- *      require_once'd. file_put_contents truncates first, so a concurrent
- *      request require'd a half-written PHP class — an uncaught ParseError, i.e.
- *      a 500. Support\atomicWrite() publishes by rename() instead.
- *
- *   2. ErrorHandler recorded every masked PHP error into the one list the
- *      shutdown handler escalated, so ANY E_WARNING appended
- *      "<h1>Internal Server Error</h1>" to an otherwise successful response —
- *      including, in the reviewer's repro, to a user's downloaded mail
- *      attachment. Recording and escalating are now separate.
- *
- *   3. The admin System-config form wrote template_dir / template_cache_dir /
- *      template_extension / parse_mode straight from POST. A blank template_dir
- *      bricks every render including the page that would fix it, and the
- *      PARSE_MODE_PLAIN codegen interpolated template_dir into a double-quoted
- *      PHP literal that is eval'd.
- *
- * Everything is written under a temp directory; the repo tree is never touched.
+ * Everything is written under a temp directory; the repository is never
+ * touched.
  *
  * Run:  php tests/render_safety_test.php
  */
@@ -85,10 +77,8 @@ namespace {
     atomicWrite($file, '<?php return 2;');
     clearstatcache();
     $afterAtomic = fileinode($file);
-    // A different inode is the observable signature of tmp+rename: the old file
-    // was replaced whole. An in-place write keeps the inode and has a window in
-    // which the file is truncated — which is precisely what a concurrent
-    // require_once used to land in.
+    // A new inode shows the file was replaced whole (temp file plus rename). An
+    // in-place write keeps the inode and has a moment where the file is empty.
     check('publishes a NEW inode (rename), never truncating the live file', $before !== $afterAtomic);
 
     $plainTarget = $TMP . '/cache/plain.php';
@@ -112,8 +102,8 @@ namespace {
     // =========================================================================
     echo "\n2. TemplateEngine cache + PARSE_MODE_PLAIN\n";
 
-    // A template directory whose name contains the characters that used to be
-    // interpolated into an eval'd double-quoted literal.
+    // A template directory whose name holds characters that must never reach
+    // generated PHP unescaped.
     $hostileDir = $TMP . '/tpl-$x-"q"/';
     mkdir($hostileDir, 0755, true);
     file_put_contents($hostileDir . 'plain.html', 'PLAIN-BODY-OK');
@@ -132,8 +122,7 @@ namespace {
     check('the compiled class was cached', is_file($cacheDir . $engine->getTemplateClassName('greet', 'Hello {{name}}!') . '.php'));
     eq('no staging file survives in the cache dir', [], glob($cacheDir . '*.tmp.*') ?: []);
 
-    // PARSE_MODE_PLAIN: used to check <name>.html for existence and then read
-    // <name>.php, so every page rendered 200 with an EMPTY body.
+    // PARSE_MODE_PLAIN must read the .html file it checked for.
     $plain = new TemplateEngine(new DiagnosticsCollector());
     $plain->setTemplateDir($hostileDir);
     $plain->setTemplateCacheDir($TMP . '/tplcache-plain/');

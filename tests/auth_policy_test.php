@@ -2,24 +2,18 @@
 declare(strict_types=1);
 
 /**
- * Standalone Gate/Policy test — NO AstrX bootstrap, no database.
- *
- * Covers the "UserPolicy never executes" defect and the structure put in to
- * stop it recurring:
+ * Gate and policies (no bootstrap, no database).
  *
  *   1. A user resource is a UserResource, and UserResource::fromRow() fails
- *      CLOSED (unknown group ⇒ ADMIN) instead of open.
- *   2. Gate routes UserResource to UserPolicy, so the "mods cannot edit
- *      admins / peers" rule actually runs.
- *   3. The original defect: a `(object) $userRow` \stdClass resource asking for
- *      a user.* permission no longer sails through as "no opinion" — Gate denies
- *      it, because \stdClass is CommentPolicy's and CommentPolicy does not
- *      govern user.*.
- *   4. USER_PROMOTE — the permission the old match had simply forgotten — is
- *      governed and enforced.
- *   5. The loudness invariant: for every registered policy, every permission in
- *      governs() is handled by evaluate(), and nothing else is ever routed to it.
- *   6. A resource class with no registered policy is denied, not allowed.
+ *      closed (an unknown group counts as ADMIN).
+ *   2. Gate routes UserResource to UserPolicy, so "mods cannot edit admins or
+ *      their peers" actually runs.
+ *   3. A plain \stdClass asking for a user.* permission is denied: \stdClass
+ *      belongs to CommentPolicy, which does not govern user.*.
+ *   4. USER_PROMOTE is governed and enforced.
+ *   5. For every policy, each permission in governs() is handled by
+ *      evaluate(), and nothing else is routed to it.
+ *   6. A resource class with no policy is denied.
  *
  * Run:  php tests/auth_policy_test.php
  */
@@ -186,7 +180,7 @@ use AstrX\User\UserPermission;
         $adminGate->can(UserPermission::EDIT_ANY, UserResource::fromRow($adminRow)),
     );
 
-    // The regression itself: the old `(object) $row` shape.
+    // A plain `(object) $row` resource.
     check(
         'REGRESSION: a \stdClass user row is DENIED for user.edit.any, not silently allowed',
         $modGate->cannot(UserPermission::EDIT_ANY, (object) $adminRow),
@@ -270,8 +264,7 @@ use AstrX\User\UserPermission;
             $unhandled === [],
         );
 
-        // And nothing outside governs() is answerable — the arm that used to be
-        // `default => null` and silently meant "allow".
+        // Nothing outside governs() gets an answer.
         $ungoverned = array_values(array_filter(
             allPermissions(),
             static fn (Permission $p): bool => !in_array($p, $governed, true),

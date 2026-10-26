@@ -134,25 +134,19 @@ public function respond(HttpStatus $status): void
     }
 
     /**
-     * The database-free error page.
+     * The error page that needs no database.
      *
-     * Reached whenever the themed error page cannot be built — above all when
-     * the database itself is down, which is exactly when an operator most needs
-     * to be told something. It therefore uses nothing but the config, the
-     * filesystem and the Http lang domain renderError() has already loaded:
+     * Used whenever the themed error page cannot be built, above all when the
+     * database is down. It relies only on the config, the filesystem and the
+     * Http catalog renderError() has already loaded:
      *
      *   - the status name and message come from the Http catalog
-     *     (http.status.<code>.*, whose en/it parity tools/check_lang_parity.php
-     *     enforces) instead of the English literals that used to be inlined here;
-     *   - the active theme's stylesheet is inlined, so a site with no database
-     *     still answers in its own skin rather than as an unstyled browser
-     *     default — ThemeService reads the filesystem only, and any failure
-     *     resolving it simply means no <style> block;
-     *   - in a dev-like environment the collected diagnostics are listed, so
-     *     environment=testing still debugs. That list is safe by construction:
-     *     the database diagnostics carry codes, never the DSN, host, user or
-     *     password (see Database\ConnectionFactory). It stays OFF in production/staging, where a
-     *     visitor must learn nothing from a 5xx.
+     *     (http.status.<code>.*);
+     *   - the active theme's stylesheet is inlined, so the page still looks like
+     *     the site (if the theme can't be resolved, there is simply no <style>);
+     *   - in a development environment the collected diagnostics are listed.
+     *     They carry codes, never the DSN, host, user or password (see
+     *     Database\ConnectionFactory). In production and staging they stay off.
      */
     private function renderFailsafe(HttpStatus $status): void
     {

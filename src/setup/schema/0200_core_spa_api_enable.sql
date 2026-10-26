@@ -1,6 +1,6 @@
 -- ---------- migrate_spa_api_enable.sql ----------
 -- ============================================================
--- AstrX migration: enable API for SPA + safety-net view rebuild (fix120)
+-- AstrX migration: enable API for SPA + safety-net view rebuild
 --
 -- This re-delivers fix119's enablement and ALSO rebuilds the resolved_page
 -- view in case the api_enabled column was missing from it (which would
@@ -9,7 +9,7 @@
 -- Safe to re-run. Idempotent. No data loss.
 -- ============================================================
 
--- 1. Ensure the column exists. NOTE: this is from migrate_api.sql (fix99);
+-- 1. Ensure the column exists. NOTE: this is from migrate_api.sql;
 --    we run it again here defensively in case the user has an older schema.
 ALTER TABLE `page`
     ADD COLUMN IF NOT EXISTS `api_enabled` TINYINT NOT NULL DEFAULT 0;

@@ -1,6 +1,6 @@
 -- ---------- migrate_js_spa.sql ----------
 -- ============================================================
--- AstrX migration: experimental JS SPA page (fix117)
+-- AstrX migration: experimental JS SPA page
 -- Registers /<locale>/js/ backed by JsController.
 -- ============================================================
 

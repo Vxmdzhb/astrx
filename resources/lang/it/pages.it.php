@@ -2,8 +2,7 @@
 declare(strict_types=1);
 
 /**
- * Slug URL pagine — locale it.
- * File completo con le nuove pagine di configurazione admin, webmail e audit log.
+ * Slug URL pagine, locale it.
  */
 return [
     // Pagine framework

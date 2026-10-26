@@ -2,24 +2,18 @@
 declare(strict_types=1);
 
 /**
- * Config layer — section/file routing, strict flags, injector resolution.
- * NO AstrX bootstrap, no database.
+ * Config: section-to-file routing, strict flags, injector resolution (no
+ * bootstrap, no database).
  *
- * What this pins down, one regression each:
- *
- *  1. ConfigWriter routes a section to the file that DECLARES it, not to the
- *     file name the caller passed. The webmail admin page read section
- *     `ImapClient` out of Mail.config.php and wrote it to Imap.config.php — a
- *     file no code path loads — so every IMAP setting, including the SOCKS5
- *     host/port that puts IMAP on Tor, was write-only.
- *  2. ModuleLoader loads EVERY candidate file before applying ANY section, so a
- *     class whose section lives in the parent's file still gets configured.
- *  3. Config::getConfigBool() parses 'false' as false. It used to `(bool)` it,
- *     and every non-empty string is truthy in PHP.
- *  4. Injector resolves an OPTIONAL class-typed constructor parameter instead of
- *     skipping straight to its null default.
- *  5. Injector::createClass() keeps a throwing/abstract/private constructor
- *     inside the Result envelope instead of letting a raw Error escape.
+ *   1. ConfigWriter writes a section to the file that declares it, whatever
+ *      file name the caller passed.
+ *   2. ModuleLoader loads every candidate file before applying any section,
+ *      so a class whose section lives in its parent's file is configured.
+ *   3. Config::getConfigBool() reads 'false' as false.
+ *   4. Injector resolves an optional class-typed constructor parameter
+ *      instead of going straight to its null default.
+ *   5. Injector::createClass() keeps a throwing, abstract or private
+ *      constructor inside the Result instead of letting an Error escape.
  *
  * Run:  php tests/config_domain_test.php
  */
@@ -88,7 +82,7 @@ namespace {
 
     $writer = new ConfigWriter(new ConfigDomainResolver($TMP));
 
-    // The bug: a caller that names the wrong file.
+    // A caller that names the wrong file.
     $result = $writer->write('Imap', [
         'FakeImapClient' => ['imap_socks5_host' => '127.0.0.1', 'imap_socks5_port' => 9050],
     ]);

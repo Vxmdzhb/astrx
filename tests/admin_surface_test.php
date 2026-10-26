@@ -2,23 +2,12 @@
 declare(strict_types=1);
 
 /**
- * Standalone admin-surface test — NO AstrX bootstrap, no database.
+ * Admin pages stay closed to anonymous visitors (no bootstrap, no database).
  *
- * Covers the two defects that let an anonymous visitor touch admin surfaces,
- * and the structure put in to stop them recurring:
- *
- *   1. migrate_zz_content_module.sql and migrate_zz_admin_language.sql inserted
- *      their pages' page_closure SELF row and forgot the WORDING_ADMIN parent
- *      row, so ContentManager's ancestry-walk admin guard did not fire for
- *      /en/admin-content or /en/admin-language: the login redirect was skipped
- *      and dispatch reached the controller, which rendered the admin shell under
- *      its own 403. The guard now ALSO reads the controller class, which no
- *      migration can edit.
- *
- *   2. /js/templates.js built its bundle with readdir + a prefix skip list, so
- *      the four admin templates that sat at the template ROOT shipped to any
- *      anonymous caller. The bundle is now derived from the page rows the caller
- *      is allowed to see.
+ *   1. The entry gate reads the controller class as well as the page tree, so
+ *      a page whose page_closure row is missing still requires admin access.
+ *   2. /js/templates.js bundles only templates of pages the caller may see,
+ *      never admin templates, wherever their files sit.
  *
  * Run:  php tests/admin_surface_test.php
  */
@@ -272,9 +261,8 @@ use AstrX\Admin\AdminPermission;
         $stillLeaking === [],
     );
 
-    // …and the guard is the allowlist, not the file's location: a name at the
-    // template ROOT is excluded exactly as one under admin/ is. That is the
-    // distinction the old str_starts_with('admin/') skip could not make.
+    // The allowlist decides, not the file's location: an admin template at the
+    // template root is excluded just like one under admin/.
     $rootAdmin = $sources->invoke(null, $templateRoots, ['admin' => true]);
     eq(
         'a root-level template IS bundled when a visible page maps to it',

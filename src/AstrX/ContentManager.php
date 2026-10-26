@@ -248,22 +248,15 @@ final class ContentManager
             return;
         }
 
-        // ── Response phase ────────────────────────────────────────────────────
-        // Baseline security headers go out ONCE, HERE, before any branch that can
-        // emit a body — the fragment branch, the API branch, the HTML branch and
-        // the template=0 fall-through all sit below this line. They used to be
-        // emitted only on the HTML branch, so
-        // `curl -H 'X-AstrX-JS-Browser: 1' http://host/en/main` returned a full
-        // HTML document with NO Content-Security-Policy and NO X-Frame-Options —
-        // and CSP `default-src 'none'` is what neutralises every {{&raw}} sink in
-        // the codebase. Emitting first means no early `return` added below can
-        // drop them; a branch that needs something different overrides that one
-        // header (header() replaces by default) instead of having to opt in.
+        // ── Response phase ─────────────────────────────────────────────────────
+        // The baseline security headers are sent once, here, before any branch that
+        // can emit a body (fragment, API, HTML, template=0). Sending them first means
+        // an early `return` added below cannot ship a page without them; a branch
+        // that needs a different value replaces that one header.
         //
-        // Controllers that stream their own bytes (captcha frame/image, media,
-        // avatars) exit() inside handle() and never reach this line, so the
-        // captcha iframe keeps its deliberate X-Frame-Options: SAMEORIGIN and is
-        // not sealed off by this response's frame-ancestors 'none'.
+        // Controllers that stream their own bytes (captcha frame and image, media,
+        // avatars) exit inside handle() and never get here, so the captcha iframe
+        // keeps its own X-Frame-Options: SAMEORIGIN.
         $this->emitSecurityHeaders();
 
         $renderError = (new PageRenderer($this->injector, $this->config, $this->collector))

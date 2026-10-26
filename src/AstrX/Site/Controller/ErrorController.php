@@ -62,13 +62,9 @@ final class ErrorController implements Controller
         // Show "Go back" only for client errors where going back makes sense
         $this->ctx->set('error_show_back', $isClientError);
 
-        // Show the diagnostics panel to ADMINS ONLY. Diagnostic text can carry
-        // internal details (raw PDO driver messages, absolute filesystem paths +
-        // line numbers, uncaught-exception class/message, upload temp paths — see
-        // the core/mail/captcha lang catalogs), so a non-admin must never see it.
-        // Previously `|| $isServerError` leaked all of that to any anonymous
-        // visitor who could force a 5xx (a DB error, an upload error, or any
-        // in-mask PHP warning — recon a Tor hidden service specifically must deny).
+        // Only admins see the diagnostics panel. Diagnostics can carry internal
+        // details (driver messages, file paths, exception text), and anyone can
+        // trigger a 5xx.
         $isAdmin   = $this->gate->can(AdminPermission::ACCESS);
         $showDiag  = $isAdmin;
 

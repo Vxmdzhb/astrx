@@ -6,28 +6,20 @@ namespace AstrX\Site;
 use AstrX\Module\ModuleRegistry;
 
 /**
- * Which controller serves a page: an explicit map from `page.file_name` to a
- * controller class.
+ * Which controller serves a page: an explicit map from `page.file_name` to
+ * a controller class.
  *
- * Replaces deriving the class name from the page row
- * ('board_mod' → AstrX\Controller\BoardModController). That derivation tied
- * every controller to one application namespace, so no feature could own its
- * HTTP layer, and it let a database value choose the class name. Now:
+ * - Optional modules declare their controllers in their manifest's
+ *   `controllers` key.
+ * - Always-on features and this site's own pages are listed in CORE.
  *
- *   - optional modules declare their controllers in their manifest's
- *     `controllers` key (packages/modules/<key>/<Module>Module.php);
- *   - always-on features and this site's own pages are listed in CORE.
+ * Keys are compared lowercase with underscores removed, so 'Board_Mod',
+ * 'boardmod' and 'board_mod' all reach BoardModController. A file_name with
+ * no entry has no controller, and the page is a 404.
  *
- * Lookup is equivalent to the old derivation for every class that exists:
- * keys are compared lowercase with underscores removed, which is exactly the
- * equivalence the old `ucwords()`/`str_replace('_', '')` + case-insensitive
- * class lookup gave ('Board_Mod', 'boardmod' and 'board_mod' all reach
- * BoardModController). A file_name with no entry has no controller (the page
- * gets the controller-missing 404, as before).
- *
- * Disabled modules' controllers stay in the map on purpose: whether a module's
- * page may be served is ModulePageGuard's decision, made before dispatch, and
- * the entry gate still has to read #[RequiresPermission] off the class.
+ * Disabled modules keep their entries on purpose: whether a module's page
+ * may be served is ModulePageGuard's call, made before dispatch, and the
+ * entry gate still needs to read #[RequiresPermission] off the class.
  */
 final class ControllerMap
 {
@@ -108,7 +100,7 @@ final class ControllerMap
         return new self(self::CORE + $registry->controllers());
     }
 
-    /** Normalise a page file_name the way the old class-name derivation did. */
+    /** Normalise a page file_name: lowercase, no underscores. */
     public static function key(string $fileName): string
     {
         return strtolower(str_replace('_', '', $fileName));

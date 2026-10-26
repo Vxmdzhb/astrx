@@ -2,18 +2,15 @@
 declare(strict_types=1);
 
 /**
- * Standalone PRG-handler + bot-trap test — NO AstrX bootstrap, no database.
+ * PRG handlers and the bot trap (no bootstrap, no database).
  *
- *   1. CommentPrgHandler now garbage-collects abandoned COMMENT_POST_ payloads
- *      and unlinks the upload temp files they hold. Before the shared base
- *      class, only COMMENT_TARGET_ was pruned, so every comment form a visitor
- *      opened and never submitted stayed in the session blob for the life of
- *      the session — unbounded growth against a MEDIUMBLOB column.
- *   2. The two handlers still use disjoint session namespaces and query keys,
- *      which is the whole reason there are two of them.
- *   3. BotTrapController's tarpit is bounded in concurrency: with every slot
- *      held, a hit returns immediately instead of pinning another php-fpm
- *      worker in sleep().
+ *   1. CommentPrgHandler collects abandoned COMMENT_POST_ payloads and
+ *      deletes the upload temp files they hold, so unsubmitted forms don't
+ *      grow the session forever.
+ *   2. The two handlers use separate session namespaces and query keys,
+ *      which is why there are two of them.
+ *   3. The bot trap's tarpit has a concurrency limit: with every slot taken, a
+ *      hit returns at once instead of holding another php-fpm worker.
  *
  * Run:  php tests/prg_bottrap_test.php
  */
@@ -40,19 +37,14 @@ namespace {
     require_once __DIR__ . '/lib/scratch.php';
     $scratch = AstrX\TestSupport\scratchDir('astrx_bottrap_test_');
 
-    // BotTrapController claims its tarpit slots in Paths::tempDir().
-    // The slots used to be the fixed sys_get_temp_dir() .
-    // '/astrx_bottrap_tarpit_N.lock', shared with every other user and every
-    // other run on the host: one leftover file this process cannot open or lock
-    // breaks BOTH checks below — the test can no longer claim every slot, and
-    // the slot it failed to claim is then free for the controller, which really
-    // does sleep 2 s where the test asserts it does not.
+    // BotTrapController takes its tarpit slots in Paths::tempDir(). The test runs
+    // in its own scratch directory, so leftovers from another run or user can't
+    // interfere.
     //
-    // This drives the SHIPPED route — define the constant a front controller
-    // would, and read it with Paths::fromConstants() the way Prelude does —
-    // so ASTRX_TEMP_DIR, which also decides where the server secret is
-    // written, is exercised by a test instead of being a branch nothing in the
-    // tree ever takes.
+    // It also goes through the real route: define the constant a front
+    // controller would and read it with Paths::fromConstants(), as Prelude does,
+    // so ASTRX_TEMP_DIR (which also decides where the server secret goes) is
+    // tested.
     define('ASTRX_TEMP_DIR', $scratch);
     $paths = AstrX\Support\Paths::fromConstants();
 

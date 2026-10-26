@@ -31,7 +31,7 @@ return [
                 'user.delete.own',
                 'webmail.access',
                 'webmail.send',
-                // API key management (fix103) — default: users can manage their own keys.
+                // API key management — default: users can manage their own keys.
                 // Remove these two lines to lock the API to admin-provisioned keys only.
                 'api.key.create',
                 'api.key.revoke',
@@ -57,17 +57,10 @@ return [
                 'user.delete.own',
                 'admin.access',
                 'admin.comments',
-                // R12 (tightened MOD grant set): the four admin.config.* grants a
-                // MOD used to hold were removed at the ROOT here. Every round found
-                // one more system-level lever a MOD could reach through them
-                // (R9 mail relay, R10 imageboard EXIF/IP + auth policy, R11 chat
-                // image_embed + captcha DoS + storage dirs). The R9–R11 controller
-                // gates still defend each lever individually (defense in depth);
-                // removing the grants closes the whole class. A MOD keeps every
-                // MODERATION power (comment.*, chat.moderate, board.moderate,
-                // admin.comments) — only CONFIG of those subsystems is now
-                // ADMIN-only. Removed: admin.config.captcha, admin.config.users,
-                // admin.config.chat, admin.config.imageboard (mail was removed in R9).
+                // Moderators keep every moderation power (comment.*, chat.moderate,
+                // board.moderate, admin.comments) but none of the admin.config.* grants:
+                // configuring captcha, users, chat, the imageboard and mail is for admins
+                // only. The controllers check these levers individually as well.
                 'api.key.create',
                 'api.key.revoke',
                 // Chat

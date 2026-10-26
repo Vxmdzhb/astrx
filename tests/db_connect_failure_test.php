@@ -2,37 +2,25 @@
 declare(strict_types=1);
 
 /**
- * Database-connection failure path — NO AstrX bootstrap, NO database.
+ * What happens when the database can't be reached (no bootstrap, no
+ * database).
  *
- * ContentManager::initPDO() used to call `new PDO(...)` unguarded, with a
- * fallback password literal behind it. Two things came out of that:
+ * A failed connection must never surface as an uncaught PDOException: in
+ * production that is a blank 500, and in testing it prints the exception,
+ * whose message names the host and account. And with no
+ * resources/config/PDO.config.php, nothing may be dialled at all.
  *
- *   1. Any unreachable/refusing database was an UNCAUGHT PDOException. In
- *      production that is a bare 500 with nothing an operator can read; under
- *      environment=testing it is a printed stack trace, and a PDOException's
- *      message carries the connection details — the host on a resolve failure
- *      ("getaddrinfo for db.internal failed"), the account and the calling host
- *      on an auth failure ("Access denied for user 'astrx'@'10.0.0.7'").
- *
- *   2. With no resources/config/PDO.config.php — the normal state of a fresh
- *      checkout, since the file is gitignored — the defaults 'localhost' /
- *      'user' / 'password' meant the framework quietly tried a guessable
- *      account against whatever was listening, and reported the auth failure
- *      as though the configuration had been read.
- *
- * What is asserted here:
- *   A. ConnectionFailure::classify() maps real SQLSTATE/driver codes.
+ *   A. ConnectionFailure::classify() maps real SQLSTATE and driver codes.
  *   B. DatabaseUnavailableDiagnostic::fromException() keeps the codes and
- *      DROPS the message — including from its own private state, so a
- *      print_r()/var_export() dump of the object cannot leak it either.
+ *      drops the message, from its own private state too, so dumping the
+ *      object can't leak it.
  *   C. Neither locale's catalog can print a credential.
- *   D. initPDO() returns Result::err + the right diagnostic instead of
- *      throwing, for: a refused connection, an incomplete config, and a driver
- *      this PHP build does not have.
- *   E. The credentials have no fallback left in the source.
- *   F. renderError() answers with the framework's themed, DB-free page —
- *      diagnostics shown under environment=testing, hidden in production,
- *      credentials in neither.
+ *   D. initPDO() returns Result::err with the right diagnostic for a refused
+ *      connection, an incomplete config and a missing driver.
+ *   E. There are no fallback credentials in the source.
+ *   F. renderError() answers with the themed, database-free page:
+ *      diagnostics shown in testing, hidden in production, credentials in
+ *      neither.
  *
  * Run:  php tests/db_connect_failure_test.php
  */
@@ -384,9 +372,8 @@ namespace {
         eq('naming every required key, in order',
             ['db_host', 'db_name', 'db_username', 'db_password'], $noConfigDiag->missingKeys());
     }
-    // The point of the named failure: NOTHING was dialled. A connect_failed here
-    // would mean the old behaviour — a guessed credential tried against
-    // whatever answers on localhost — had come back.
+    // With no config, nothing may be dialled: a connect_failed here would mean a
+    // guessed credential was tried against whatever listens on localhost.
     foreach ($noConfigDiags as $d) {
         check('no connection was attempted for an unconfigured database',
             !$d instanceof DatabaseUnavailableDiagnostic);
@@ -608,8 +595,7 @@ namespace {
         check('23000/1022 (duplicate key) is benign',
             sqlErrorIsBenign(pdoStmtError('23000', 1022)));
 
-        // The regression the CLI installer already fixed: a migration whose
-        // INSERT violates integrity must NOT be recorded as applied.
+        // A migration whose INSERT violates integrity must not be recorded as applied.
         check('23000/1452 (foreign key violation) is NOT benign',
             !sqlErrorIsBenign(pdoStmtError('23000', 1452)));
         check('23000/1451 (foreign key violation on delete) is NOT benign',

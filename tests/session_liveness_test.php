@@ -2,26 +2,20 @@
 declare(strict_types=1);
 
 /**
- * Standalone SecureSessionHandler test — NO AstrX bootstrap, SQLite in memory.
+ * SecureSessionHandler (no bootstrap, SQLite in memory).
  *
- * Covers the "gc() un-rotates a rotated session ID" defect and the two smaller
- * ones in the same file:
- *
- *   1. gc() DELETES rotated-away rows past the grace window instead of nulling
- *      replace_at. The old UPDATE erased the only evidence read() used, and the
- *      old row — which session_regenerate_id(false) had filled with the
- *      AUTHENTICATED snapshot — became an ordinary live session again.
+ *   1. gc() deletes rows that were rotated away, once past the grace window,
+ *      instead of turning them back into live sessions.
  *   2. validateId(), read() and gc() agree, because they share rowIsLive().
- *   3. read()'s destroy() sticks: the end-of-request write() no longer
- *      re-INSERTs the row it just deleted.
- *   4. ServerSecret: perms are tight from creation, the value is stable across
- *      instances, and an unusable location fails loudly instead of degrading to
- *      a per-request random key.
+ *   3. When read() destroys a session, the end-of-request write() doesn't
+ *      recreate it.
+ *   4. ServerSecret: tight permissions from creation, a stable value across
+ *      instances, and a loud failure (not a random per-request key) when no
+ *      location is usable.
  *
- * SQLite covers every statement this test exercises. write()'s UPSERT is
- * MySQL-specific, which test 3 turns to its advantage: a write that reaches the
- * database throws on SQLite, so "no exception AND no row" proves the guard
- * short-circuited before the query.
+ * write()'s UPSERT is MySQL syntax, which test 3 uses: a write that reached
+ * the database would throw on SQLite, so "no exception and no row" proves
+ * the guard stopped it first.
  *
  * Run:  php tests/session_liveness_test.php
  */
@@ -112,7 +106,7 @@ namespace {
 
     echo "gc() vs a rotated session row\n";
 
-    // ── 1. The defect: gc() used to un-rotate the old row ────────────────────
+    // ── 1. gc() must not bring a rotated session back ───────────────────────
     $pdo = freshPdo();
     $h   = handler($pdo);
     $now = time();
@@ -127,11 +121,11 @@ namespace {
         !rowExists($pdo, 'old-sid'),
     );
 
-    // The regression this replaces: after the old UPDATE, read() served the row.
+    // Clearing the pointer must not make the old row readable again.
     $pdo = freshPdo();
     $h   = handler($pdo);
     seedRow($pdo, 'old-sid', timestamp: $now, replaceAt: $now - 1000, data: 'logged_in|b:1;');
-    // Simulate what the OLD gc() did — clear the pointer, keep the row.
+    // Clear the pointer but keep the row.
     $pdo->exec('UPDATE session SET replaced_by = NULL, replace_at = NULL');
     check(
         'REGRESSION SHAPE: with replace_at cleared the row IS served '
@@ -241,18 +235,14 @@ namespace {
     check('the once-committed secret is ignored, not used',
         $s4->bytes() !== ServerSecret::LEAKED_SERVER_SECRET);
 
-    // Nothing readable, nothing creatable → loud failure, NOT a random key.
+    // Nothing readable and nothing creatable: fail loudly, never fall back to a
+    // random key.
     //
-    // The config-dir candidate is made unusable by pointing the config dir at
-    // a directory that does not exist (fopen('xb') then fails for root too — a
-    // permission-based setup would not, and this suite may run as root). The
-    // temp-dir candidate is occupied by a group/world-accessible file, which is
-    // exactly the local-user pre-seeding ServerSecret must refuse to trust.
-    //
-    // Both candidates live in this run's own scratch directory (see $paths at
-    // the top of this file), so this no longer has to stash and
-    // restore a shared /tmp path, and cannot be skipped — or silently derailed —
-    // by another user's leftovers.
+    // The config-dir candidate is made unusable by pointing it at a directory
+    // that doesn't exist (a permission-based setup wouldn't stop root). The
+    // temp-dir candidate is taken by a group/world-readable file, which is the
+    // kind of pre-seeded file ServerSecret must refuse to trust. Both live in
+    // this run's scratch directory.
     $tempCandidate = $scratch . '/astrx_server_secret';   // ServerSecret::TEMP_DIR_FILENAME
     touch($tempCandidate);
     chmod($tempCandidate, 0666);            // group/world accessible ⇒ untrusted

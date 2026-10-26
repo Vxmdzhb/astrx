@@ -20,14 +20,11 @@ declare(strict_types=1);
  * module without one is OFF).
  */
 return [
-    // EXHAUSTIVE: one entry per installed module (ApplicationModules::INSTALLED).
-    // tools/check_modules.php fails the build when a manifest has no entry here.
-    // It used to warn, and seven of the eighteen modules had drifted off the
-    // list — so "turn a module off" meant editing a file that did not mention
-    // it, and the only way to find out was to notice its pages were still there.
+    // One entry per installed module (ApplicationModules::INSTALLED);
+    // tools/check_modules.php fails the build when one is missing.
     //
     // Values must be real booleans. Config::getConfigBool rejects anything else
-    // (a quoted 'false' used to read back as TRUE) and falls back to ON.
+    // (a quoted 'false' would otherwise read as true) and falls back to on.
     'Modules' => [
         'imageboard'    => true,
         'chat'          => true,
@@ -44,8 +41,7 @@ return [
         'mirrors'       => true,
         'tipline'       => true,
 
-        // Search back-ends and admin surfaces. Previously absent from this file
-        // and therefore ON by an unwritten default.
+        // Search back ends and admin panels.
         'blocklist'     => true,
         'fedsearch'     => true,
         'gitbrowse'     => true,

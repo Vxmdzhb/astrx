@@ -60,12 +60,8 @@ namespace {
     }
 
     /**
-     * A localhost port nothing is listening on, probed upward from $from.
-     *
-     * The port used to be the constant 8811, which made this test fail as "mock
-     * server never became ready" for reasons that have nothing to do with the
-     * code under test: a CI runner with its own service there, a leftover server
-     * from an interrupted run, a second copy of the suite in parallel.
+     * A localhost port nothing is listening on, looking upward from $from, so a
+     * busy port doesn't make the test fail for unrelated reasons.
      */
     function freePort(int $from): int
     {

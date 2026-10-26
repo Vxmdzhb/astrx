@@ -20,7 +20,7 @@ if (!is_file($bundle)) {
     $fail('missing compiled bundle', 1);
 }
 
-// Staleness guard (F-26): a bundle older than any bundled source means it was not
+// Staleness guard: a bundle older than any bundled source means it was not
 // recompiled after an edit and would serve stale code. build/ is not committed, so
 // whenever a bundle exists it was produced in THIS environment and mtimes are
 // meaningful. The runtime-rewritten template cache is excluded.

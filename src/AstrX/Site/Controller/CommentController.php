@@ -28,28 +28,20 @@ use AstrX\Kernel\AbstractController;
 use AstrX\Comment\CommentPermission;
 
 /**
- * Public comment display and submission controller.
+ * Shows a page's comments and takes new ones. ContentManager adds it after
+ * the page's own controller when page.comments=1.
  *
- * Injected by ContentManager after the main page controller when page.comments=1.
- *
- * KEY DESIGN DECISIONS:
- *
- * 1. Uses CommentPrgHandler (dedicated session namespace + _cp query key) instead of
- *    the shared PrgHandler. This prevents other page controllers (UserController, etc.)
- *    from consuming the comment PRG token before this controller can process it.
- *
- * 2. Comment pagination uses dedicated query params (cp/co/cs/ci) that never conflict
- *    with news params (pn/show/order). Pagination URLs preserve all non-comment query
- *    params from the current request so news pagination is not lost.
- *
- * 3. Nested comments are produced by the flat-loop + close_divs_html technique:
- *    assembleTree() gives a depth-first flat list. Each row carries close_divs_html
- *    (N closing </div> tags). Template opens one outer div per comment and never
- *    explicitly closes it — close_divs_html does that after the inner content div.
- *    Children render inside the still-open parent outer div, giving visual nesting.
- *
- * 4. All conditional sections use [$enriched] (never bool) so Mustache never
- *    clobbers the comment-row context when entering a section.
+ * - It uses CommentPrgHandler (its own session namespace and `_cp` query key)
+ *   rather than the shared PrgHandler, so another controller on the page
+ *   cannot consume the comment's PRG token first.
+ * - Comment paging has its own query parameters (cp/co/cs/ci), separate from
+ *   the news ones (pn/show/order), and its links keep every other parameter.
+ * - Nesting: assembleTree() returns a depth-first flat list, and each row
+ *   carries close_divs_html with the right number of </div> tags. The
+ *   template opens one outer div per comment and never closes it itself, so
+ *   replies render inside their parent.
+ * - Conditional sections use [$enriched], never a bool, so the template
+ *   engine keeps the comment row's context inside them.
  */
 final class CommentController extends AbstractController
 {
@@ -200,7 +192,7 @@ final class CommentController extends AbstractController
         $order      = is_string($orderRaw) ? $orderRaw : self::DEFAULT_ORDER;
         $descending = ($order === 'desc');
         $perPage    = $this->commentService->commentsPerPage();
-        // R11 (LOW): a REQUEST-supplied count is clamped to [1,200] — a public
+        // A REQUEST-supplied count is clamped to [1,200] — a public
         // ?cs=0 must NOT force an unpaged full-page comment load (onion-bandwidth
         // amplification). Only the admin default ($perPage) may be 0 (= show all),
         // matching Pagination::fromRequest's MAX_REQUEST_PER_PAGE cap.
@@ -294,7 +286,7 @@ final class CommentController extends AbstractController
                                       && $row['user_id'] === $this->session->userId(),
                 ];
 
-            // R11 (HIGH): $row carries every DB column, including a guest
+            // $row carries every DB column, including a guest
             // commenter's self-submitted `email` (PII / deanonymization) and the
             // internal `flagged`/`hidden` moderation state. This item is published
             // to the API via ContextScope::SHARED, so on a page that is BOTH

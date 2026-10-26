@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-// Warm-cache regressions across fresh PHP processes, including the eval bundle.
+// Template cache across fresh PHP processes, including the eval bundle.
 $root = dirname(__DIR__);
 $tmp = sys_get_temp_dir() . '/astrx-template-process-' . bin2hex(random_bytes(6));
 mkdir($tmp . '/one', 0700, true);

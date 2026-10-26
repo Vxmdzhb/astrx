@@ -6,42 +6,30 @@ use AstrX\Config\ConfigDomainResolver;
 use AstrX\Config\InjectConfig;
 
 /**
- * AstrX config integrity check — `php tools/check_config.php`
+ * Config integrity check, `php tools/check_config.php`. No database, no
+ * dependencies.
  *
- * A zero-dependency, database-free CI gate over the config layer. Config in
- * AstrX is a two-level array: a FILE (`Mail.config.php`, a package's default
- * in its resources/config/, overridden key by key by the site's) holds one or
- * more SECTIONS (`Mailer`, `ImapClient`, `WebmailService`), and a class
- * reaches its section by convention — class short name, falling back to the
- * parent namespace segment — or by an explicit `#[ConfigDomain]`. 25 of the 38
- * sections have a name that differs from their file, and nothing used to check
- * that anyone actually agreed on the mapping. The webmail admin page read
- * section `ImapClient` (Mail.config.php) and wrote `Imap.config.php`, a file no
- * code path loads: every IMAP setting, including the SOCKS5 host/port that
- * routes IMAP through Tor, was silently write-only.
+ * A config file (`Mail.config.php`; a package ships the default in its
+ * resources/config/ and the site overrides it key by key) holds one or more
+ * sections (`Mailer`, `ImapClient`, `WebmailService`). A class finds its
+ * section by convention (its short name, then its parent namespace segment)
+ * or by an explicit #[ConfigDomain]. Most sections are named differently
+ * from their file, so this checks that everyone agrees:
  *
- * Four assertions:
+ *   A. REACHABLE    every section is reached by some class or by a
+ *                   getConfig*() call. Otherwise it's config with no effect.
+ *   B. SETTER KEY   every #[InjectConfig('k')] names a key that exists in the
+ *                   class's section. Otherwise the setter never fires.
+ *   C. CONSUMED     every key has a consumer: an #[InjectConfig] setter or a
+ *                   getConfig*() call. Otherwise it's a lever wired to
+ *                   nothing.
+ *   D. WRITE TARGET every ConfigWriter::write('<File>', …) names a file that
+ *                   exists, and every section it writes is declared there.
+ *                   Otherwise "saved" goes to a file nothing loads.
  *
- *   A. REACHABLE   — every declared section is reached by some class (by
- *                    #[ConfigDomain] or by the short-name/parent-namespace
- *                    convention) or by a getConfig*() call site. A section
- *                    nobody reaches is config an operator can edit forever with
- *                    no effect.
- *   B. SETTER KEY  — every #[InjectConfig('k')] names a key that exists in the
- *                    class's section. A typo'd or removed key means the setter
- *                    silently never fires and the hardcoded default stands.
- *   C. CONSUMED    — every key in a section has a consumer: an #[InjectConfig]
- *                    setter on a class in that section, or a getConfig*() call
- *                    site naming it. A key with no consumer is an admin lever
- *                    wired to nothing.
- *   D. WRITE TARGET— every ConfigWriter::write('<File>', …) call site names a
- *                    config file that exists, and every section it writes is
- *                    declared in that same file. This is the one that catches
- *                    "saved successfully" into a file nothing loads.
- *
- * Exit 0 when everything holds; exit 1 on any violation.
- * Pairs with PHPStan (types), check_lang_parity.php + check_diagnostics.php
- * (i18n) and check_modules.php (manifests).
+ * Exit 0 when everything holds, 1 on any violation. The other gates:
+ * PHPStan (types), check_lang_parity.php and check_diagnostics.php (i18n),
+ * check_modules.php (manifests).
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -363,10 +351,9 @@ foreach ($writeSites as $site) {
     }
 }
 
-// Informational: reads of a section or key nothing declares. These fall back
-// silently at runtime (Config::getConfig returns the caller's default before it
-// emits anything), so they are worth seeing even though a missing OPTIONAL
-// section is a legitimate pattern.
+// For information: reads of sections or keys nothing declares. They fall back
+// to the caller's default at runtime, which is fine for an optional section
+// but worth seeing.
 foreach ($readSections as $section => $_) {
     if (!isset($sections[$section])) {
         $notes[] = "read-but-undeclared section '{$section}' — every read falls back to its inline default";

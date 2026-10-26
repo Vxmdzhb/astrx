@@ -2,18 +2,14 @@
 declare(strict_types=1);
 
 /**
- * Scratch-directory helpers for the standalone tests.
+ * Scratch directories for the standalone tests.
  *
- * Every test in tests/ writes somewhere under sys_get_temp_dir(), and each one
- * used to clean up with its own glob() + @rmdir() pair. Those pairs fail
- * SILENTLY — @rmdir() on a non-empty directory returns false and nobody looks —
- * and none of them descended into subdirectories, which is how
- * render_safety_test.php left 29 /tmp/astrx-render-safety-* trees behind on one
- * machine. One helper for all of them, so the next test that creates a
- * subdirectory does not get to rediscover this.
+ * Every test writes under sys_get_temp_dir(). This removes a test's directory
+ * recursively, and loudly, instead of each test doing its own glob() and
+ * @rmdir().
  *
- * Deliberately NOT named *_test.php: CI runs `for t in tests/*_test.php`, and
- * this file has nothing to assert.
+ * Not named *_test.php: CI runs tests/*_test.php, and this file asserts
+ * nothing.
  */
 
 namespace AstrX\TestSupport;
@@ -50,16 +46,13 @@ function rmTree(string $dir): void
 }
 
 /**
- * Create a private per-run scratch directory, and remove it at shutdown even if
- * the test dies on the way — an early exit() or a fatal is exactly when the old
- * end-of-file cleanup was skipped.
+ * Create a private scratch directory for this run, removed at shutdown even
+ * if the test dies early.
  *
- * One caveat worth knowing, because it is what actually leaked: PHP runs
- * shutdown functions BEFORE object destructors. An object still alive at exit
- * whose destructor writes into the scratch dir — TemplateEngine flushes its
- * template-cache index from __destruct() — recreates part of the tree AFTER this
- * cleanup has run. Release those objects (unset()) at the end of the test: the
- * destructor then runs right there, before the removal.
+ * PHP runs shutdown functions before object destructors, so an object still
+ * alive at exit whose destructor writes into the directory (TemplateEngine
+ * saves its cache index in __destruct()) recreates part of it after the
+ * cleanup. unset() such objects at the end of the test.
  *
  * @param string $prefix e.g. 'astrx-render-safety-'
  * @return string absolute path, no trailing separator

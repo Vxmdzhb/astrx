@@ -1280,21 +1280,15 @@ JS;
     }
 
     /**
-     * The page rows an anonymous caller of /<locale>/js/* is allowed to see.
+     * The page rows an anonymous caller of /<locale>/js/* may see.
      *
-     * The /js artifacts are GUEST artifacts (served un-authenticated, is_admin
-     * hardcoded false). Exclude the entire admin subtree (the 'admin' page and
-     * every closure-descendant) so no /js artifact can enumerate the admin
-     * surface — slugs, titles and API URLs of banlist/users/config/audit-log —
-     * to anonymous Tor visitors. Those pages are ADMIN_ACCESS-gated at dispatch
-     * regardless; this closes the RECON leak that bypassed the app's own
-     * admin-hiding (page_robots index=0, robots.txt disallowing the admin
-     * prefix).
+     * The /js artifacts are served without a session, so the whole admin subtree
+     * (the 'admin' page and everything under it) is left out: nothing there may
+     * list admin slugs, titles or API URLs. Those pages are permission-gated
+     * anyway; this keeps them from being enumerated.
      *
-     * ONE query, shared by the manifest and the template bundle, so a page can
-     * never be private to one artifact and public to another —
-     * which is exactly how /js/templates.js ended up shipping admin.html,
-     * admin_content.html and bot_trap.html while the manifest hid those pages.
+     * The manifest and the template bundle share this one query, so a page can't
+     * be hidden from one and visible in the other.
      *
      * @return list<array<string,mixed>>
      */
@@ -1492,40 +1486,25 @@ JS;
     /**
      * The template names the guest bundle may contain.
      *
-     * Derived from the page rows this caller is allowed to see, NOT from a list
-     * of directory prefixes to skip. The prefix list is what failed: it skipped
-     * `admin/`, so the four admin templates that sat at the template ROOT
-     * (admin.html, admin_content.html, admin_language.html, admin_themes.html)
-     * sailed straight into a bundle that `curl http://host/en/js/templates.js`
-     * fetches with no session and no gate.
+     * They come from the page rows this caller may see, not from a list of
+     * directories to skip, so a template is never bundled just because of where
+     * the file happens to sit. A name gets in by one of three routes:
      *
-     * A name enters the bundle by one of three routes:
+     *   1. A visible page's include path, computed the way
+     *      DefaultTemplateContext::buildIncludePath() does ('login' under the
+     *      'user' root is 'user/login'). A page added under the admin root is
+     *      left out automatically.
      *
-     *   1. A visible page row's include path — the same ancestors-then-file_name
-     *      path DefaultTemplateContext::buildIncludePath() computes, so 'login'
-     *      under the 'user' root resolves to 'user/login'. Adding a page under
-     *      the admin root now REMOVES its template from the bundle, instead of
-     *      the two having to be kept in sync by hand.
+     *   2. The layouts the runtime renders itself: ContentManager's
+     *      default_template (the shell) and js_fragment.
      *
-     *   2. The outer layouts the runtime itself renders: ContentManager's
-     *      default_template (the shell the JS runtime renders client-side — the
-     *      runtime throws "Template cache does not contain default.html"
-     *      without it) and js_fragment (the fragment layout it transplants).
+     *   3. partials/: shared chrome (nav, footer, comments, captcha). The slots
+     *      that use them pick the name at runtime, so they can't be derived from
+     *      page rows, and none of them is an admin surface.
      *
-     *   3. partials/ — shared layout fragments, not pages, so there is no page
-     *      row to authorise them against, and the slots that pull them in
-     *      ({{#nav_partials}}{{> .}}{{/nav_partials}}, {{> captcha}}) resolve
-     *      their name from a RUNTIME context value, so they cannot be derived
-     *      statically. They are nav/footer/comment/captcha chrome; none is an
-     *      admin surface.
-     *
-     * noindex pages are excluded on top of that. Concretely: bot_trap.html is
-     * the honeypot maze's markup. With it in the bundle a crawler fetches
-     * /en/js/templates.js once and can fingerprint and avoid the trap forever
-     * without ever visiting /en/trap — the honeypot's entire value. Its page row
-     * is deliberately hidden=0 (a hidden page never reaches its controller, so
-     * the trap would never fire), and page_robots marks it index=0 — the site's
-     * own statement that the page is not for enumeration.
+     * noindex pages are excluded as well. That matters for bot_trap.html: with
+     * the trap's markup in a public bundle, a crawler could learn to avoid the
+     * trap without ever visiting it.
      *
      * @return array<string,true>
      */
@@ -1694,8 +1673,7 @@ JS;
                 }
                 $rel  = str_replace('\\', '/', substr($path, strlen($root)));
                 $name = substr($rel, 0, -5);
-                // The allowlist subsumes the old cache/, email/ and admin/ prefix
-                // skips: no page row resolves to a name under any of them.
+                // No page row resolves to a name under cache/, email/ or admin/.
                 if (!isset($allowed[$name]) || isset($out[$name])) {
                     continue;
                 }

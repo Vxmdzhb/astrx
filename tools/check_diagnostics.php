@@ -2,32 +2,23 @@
 declare(strict_types=1);
 
 /**
- * AstrX diagnostic catalog check — `php tools/check_diagnostics.php`
+ * Diagnostic catalog check, `php tools/check_diagnostics.php`.
  *
- * Every diagnostic AstrX emits carries a stable id ('astrx.i18n/lang_write_failed').
- * DiagnosticRenderer turns that id into a sentence via a per-locale catalog under
- * resources/lang/{locale}/Diagnostics/. With no entry it falls back to a stamp —
+ * Every diagnostic has a stable id ('astrx.i18n/lang_write_failed') that
+ * DiagnosticRenderer turns into a sentence using the catalogs under
+ * resources/lang/{locale}/Diagnostics/. Without an entry, the page shows
  *
  *     [FALLBACK:ERROR] astrx.i18n/lang_write_failed
  *
- * — and DefaultTemplateContext renders that literal string into the page. 28 ids
- * had no entry in EITHER locale, so whole subsystems (the language editor, the
- * search indexer, the media library, the invite system) showed their internal
- * identifiers to users instead of a message.
+ * check_lang_parity.php can't catch that when the entry is missing from
+ * every locale, so this checks that every diagnostic id written as a string
+ * literal in the code has an entry in every installed locale.
  *
- * check_lang_parity.php cannot see this: it compares en against it, and a
- * message missing from BOTH locales is perfectly symmetric.
+ * Ids built at runtime ('astrx.imageboard/' . $slug) can't be listed. Their
+ * prefix is recorded instead, every entry under it counts as reachable, and
+ * the prefixes are printed so nothing goes unchecked unnoticed.
  *
- * What this checks: every diagnostic id that appears as a string literal in
- * src/, public/ or tools/ has a catalog entry in EVERY installed locale.
- *
- * Dynamic ids — `'astrx.imageboard/' . $slug` — cannot be enumerated statically.
- * Their prefix is recorded and every catalog entry under that prefix is treated
- * as reachable, so the check neither misses a static id nor invents failures for
- * a computed one. The prefixes it found are printed, so a subsystem that goes
- * fully dynamic is visible rather than silently unchecked.
- *
- * Exit 0 when every emitted id resolves in every locale; exit 1 otherwise.
+ * Exit 0 when every id resolves in every locale, 1 otherwise.
  */
 
 if (PHP_SAPI !== 'cli') {

@@ -87,7 +87,7 @@ final class UserController extends AbstractController
                         $_SESSION['_pw_reset_until'] = time() + 900;
                     }
                 } elseif (!$this->session->isLoggedIn() && $tokenType === UserService::TOKEN_RECOVER) {
-                    // Logged-out password recovery. SECURITY (R3-11): a valid
+                    // Logged-out password recovery. SECURITY: a valid
                     // single-use token proves control of the recovery address, but
                     // clicking the link must NOT establish a session for whoever
                     // opened it — otherwise an attacker who mails their OWN valid
@@ -156,10 +156,9 @@ final class UserController extends AbstractController
             return;
         }
 
-        // Captcha requirement is driven by a per-session failure counter, NOT a
-        // DB lookup on the username — otherwise the captcha appearing only for
-        // real accounts is an account-existence oracle (this path previously used
-        // shouldShowCaptcha('login', $username), which had exactly that leak).
+        // The captcha depends on a per-session failure counter, not on the
+        // username: showing it only for real accounts would tell an attacker which
+        // accounts exist.
         $showCaptchaResult = $this->userService->shouldShowLoginCaptcha($this->loginFailCount());
         if ($showCaptchaResult->isOk() && (bool) $showCaptchaResult->unwrap()) {
             $captchaResult = $this->captchaService->verify($captchaId, $captchaText);
@@ -220,7 +219,7 @@ final class UserController extends AbstractController
 
         $captchaId = ''; $captchaB64 = '';
         if ($showCaptcha) {
-            // R11: tryFrom()+fallback (not from(), which throws a ValueError → 500)
+            // tryFrom()+fallback (not from(), which throws a ValueError → 500)
             // so a bad persisted difficulty degrades to MEDIUM instead of 500ing login.
             $loginDifficulty = CaptchaType::tryFrom(
                 $this->config->getConfigInt('CaptchaRenderer', 'login_captcha_difficulty', CaptchaType::MEDIUM->value)

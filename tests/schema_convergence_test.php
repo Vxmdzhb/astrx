@@ -2,124 +2,66 @@
 declare(strict_types=1);
 
 /**
- * Schema convergence — the fresh install and the upgraded install must be the
- * same database. NEEDS A DATABASE; skips (exit 0) when it cannot reach one.
+ * Schema convergence: a fresh install and an upgraded install must end up as
+ * the same database. Needs a database; skips (exit 0) without one.
  *
- * WHY
- * ---
- * The base schema is a set of ordered pieces — src/setup/schema/NNNN_*.sql and
- * each installed module's resources/sql/schema/NNNN_*.sql, the former
- * tables.sql with its folded-in migrations — and migrate_*.sql files (core's
- * and the modules') are applied afterwards (see AstrX\Database\SchemaFiles).
- * So there are two ways to arrive at "the current schema":
+ * The base schema is a set of ordered pieces (src/setup/schema/NNNN_*.sql
+ * and each module's resources/sql/schema/), and the migrate_*.sql files run
+ * after it (see AstrX\Database\SchemaFiles). There are two ways to reach "the
+ * current schema":
  *
- *   A. a fresh `tools/install.php` run — every schema piece, then every
- *      migration;
- *   B. a database that already existed, which the same installer upgrades —
- *      the schema pieces RE-applied over live tables (every `CREATE TABLE`
- *      there fails with 42S01 and runSQL() swallows it as benign, so an
- *      existing table is never touched), then the migrations it has not
- *      recorded yet.
+ *   A. a fresh `tools/install.php`: every schema piece, then every migration;
+ *   B. an existing database upgraded by the same installer: the schema pieces
+ *      re-applied over live tables (CREATE TABLE fails with 42S01, which is
+ *      ignored), then the migrations it hasn't recorded yet.
  *
- * Nothing checked that A and B agree. A column added by a migration but never
- * added to the base DDL — or added to the base DDL and never migrated — a
- * differing default, collation, sub-part, ON DELETE rule or AUTO_INCREMENT flag
- * silently produces two databases that both call themselves current.
+ * A column added by a migration but not by the base DDL, or the other way
+ * round, or a differing default, collation, index or foreign key, gives two
+ * databases that both claim to be current. This test catches that.
  *
- * WHAT THIS ACTUALLY PROVES, AND WHAT IT CANNOT
- * ---------------------------------------------
- * The literal "oldest base schema, then every migration in order" is NOT
- * reconstructible from this repository, and no test should pretend otherwise:
- *
- *   * tables.sql has been rewritten in place across 54 commits. There is no
- *     artifact for "the base DDL as some installed site received it" — the file
- *     is one mutable document, and the migrations folded into its tail (the
- *     `CONSOLIDATED MIGRATIONS` section) were DELETED as standalone files, so
- *     the sequence that produced an existing install cannot be replayed.
- *   * Applied migrations have themselves been edited in place afterwards
- *     (migrate_zz_totp.sql, migrate_zz_invites.sql, migrate_zz_media.sql and
- *     migrate_zz_tipline.sql were all modified after shipping). runMigration()
- *     keys on sha256, so for a site that ran the earlier bytes those files can
- *     never run again — it aborts the installer instead. The historical B is
- *     therefore not merely unavailable, it is unreachable.
- *   * Nothing records WHICH tables.sql an install came from. The `migration`
- *     ledger tracks migrate_*.sql only.
- *
- * So B is reconstructed as far as the repo honestly permits: a database built
- * by the real installer with the migration set empty (today's base DDL alone,
- * which is the state of a site installed before any current migration existed),
- * which the real installer then upgrades. The base is today's base, not the
- * historical one — that is the limit. Within it the test is exact: it drives
- * `tools/install.php` itself, so migration discovery, ordering, the checksum
- * ledger and the benign-error rules are the shipped ones, not a copy.
- *
- * BE CLEAR ABOUT THE BLIND SPOT this leaves. Because B starts from TODAY's
- * base schema, the default run cannot see a change made to the base DDL of an
- * ALREADY-EXISTING table with no migration behind it — a new UNIQUE KEY on
- * `keyword`, a new column on `session`, a rewritten `resolved_navbar` body. On
- * a real upgrade those never arrive: runSQL() swallows `CREATE TABLE` and
- * `CREATE VIEW` on an existing object as SQLSTATE 42S01, so only ALTER,
- * DROP VIEW + CREATE VIEW, INSERT IGNORE and `CREATE TABLE IF NOT EXISTS` reach
- * a live database. To see that class, hand this test a real historical base:
+ * Limits. The base schema has been edited in place over time, and some
+ * migrations were too, so the exact history of an old install can't be
+ * replayed. B is therefore built from today's base schema with no
+ * migrations, then upgraded by the real installer. That means the default run
+ * can't see a change to the base DDL of an existing table with no migration
+ * behind it: on a real upgrade such a change never arrives, because only
+ * ALTER, DROP VIEW + CREATE VIEW, INSERT IGNORE and CREATE TABLE IF NOT
+ * EXISTS reach a live database. To check that too, start from a real old
+ * schema:
  *
  *     ASTRX_SCHEMA_BASELINE_REV=<git-rev> php tests/schema_convergence_test.php
  *
- * which builds the "before" database from that revision's base schema (its
- * src/setup/tables.sql, or for later revisions its schema pieces, via
- * `git show`) and upgrades it with today's installer. It is opt-in because
- * it needs git history that `actions/checkout` does not fetch by default, and
- * because which revision represents "an install in the field" is a judgement
- * call, not something a test can assume.
+ * This builds the "before" database from that revision's base schema (via
+ * `git show`) and upgrades it with today's installer. It's opt-in because it
+ * needs full git history, and which revision stands for "an install in the
+ * field" is a judgement call.
  *
- * Three assertions:
- *   1. fresh == upgraded, across the whole of information_schema.
- *   2. re-applying every migration to an already-current database changes
- *      nothing (each one is idempotent at the schema level) — the property the
- *      upgrade path depends on and the one thing that IS checkable about it.
- *   3. neither path is vacuous: floors on table/column/migration counts, so a
- *      comparison of two empty databases cannot pass.
- * It also prints the base-only vs fully-migrated delta: exactly what the
- * migrations add on top of the base schema, i.e. what a future "fold them in" commit
- * has to reproduce.
+ * Assertions:
+ *   1. fresh == upgraded, across the whole of information_schema;
+ *   2. re-applying every migration to a current database changes nothing;
+ *   3. neither side is empty (floors on table, column and migration counts).
+ * It also prints what the migrations add on top of the base schema, which is
+ * what folding them into the base would have to reproduce.
  *
- * NOT covered: row data (seed pages, navbar entries) — only information_schema
- * is compared; and the historical divergence described above.
+ * Not covered: row data (seed pages, navbar entries).
  *
- * WHAT IS NORMALISED, AND WHY
- * ---------------------------
- * A normaliser that hides a real difference is worse than no test, so this list
- * is deliberately short. Both snapshots come from THE SAME server in the same
- * run, which removes most environment dependence by construction: server
- * version, the default collation (utf8mb4_general_ci on MariaDB 10.11 vs
- * utf8mb4_uca1400_ai_ci on MariaDB 11), row_format and information_schema value
- * casing are identical on both sides and cancel out. Nothing is compared
- * against a hardcoded expectation, which is what makes this run unchanged on
- * 10.11 and 11.
+ * What is normalised (both snapshots come from the same server in the same
+ * run, so version, default collation and row format cancel out):
  *
- *   * The database NAME, everywhere it appears in a value — the two databases
- *     must have different names, and VIEW_DEFINITION embeds it
- *     (`db`.`page`). Replaced with %DB%.
- *   * TABLES.AUTO_INCREMENT (the counter's CURRENT value) — a function of how
- *     many rows were inserted, not of the schema. The per-column
- *     EXTRA='auto_increment' flag IS compared, which is the real property.
- *   * TABLES.TABLE_ROWS / AVG_ROW_LENGTH / DATA_LENGTH / MAX_DATA_LENGTH /
- *     INDEX_LENGTH / DATA_FREE / CHECKSUM / CREATE_TIME / UPDATE_TIME /
- *     CHECK_TIME / VERSION — size, timing and row counts.
- *   * STATISTICS.CARDINALITY — a sampled row-count estimate.
- *   * VIEWS.DEFINER, TRIGGERS.DEFINER, ROUTINES.CREATED/LAST_ALTERED — the
- *     account that ran the installer and when.
- *   * information_schema COLUMN NAMES are upper-cased before use, so the array
- *     keys do not depend on the server's own casing convention. VALUES are left
- *     exactly as the server reports them.
+ *   * the database name, wherever it appears in a value (views embed it),
+ *     replaced with %DB%;
+ *   * TABLES.AUTO_INCREMENT, the counter's current value (the per-column
+ *     auto_increment flag is still compared);
+ *   * table sizes, row counts, checksums and timestamps;
+ *   * STATISTICS.CARDINALITY, a sampled estimate;
+ *   * DEFINER and created/altered times of views, triggers and routines;
+ *   * information_schema column names are upper-cased; values are left as
+ *     the server reports them.
  *
- * Everything else is compared verbatim: column name, ordinal position, data
- * type, length, precision/scale, nullability, default, EXTRA (auto_increment /
- * on update), per-column charset and collation, generation expression, comment;
- * index name, uniqueness, column order, sub-part, packing, nullability, type
- * and comment; foreign key name, column order, referenced table/column and
- * ON UPDATE / ON DELETE rules; view definition and its client charset; triggers;
- * stored routines; CHECK constraints; the storage engine, row format, and both
- * the table's and the database's own charset and collation.
+ * Everything else is compared as is: columns (type, length, nullability,
+ * default, extra, charset, collation, generation expression, comment),
+ * indexes, foreign keys and their rules, views, triggers, routines, CHECK
+ * constraints, engine, row format, and table and database charsets.
  *
  * Run:  php tests/schema_convergence_test.php
  * With: ASTRX_TEST_DB_HOST / _PORT / _USER / _PASS, else resources/config/
@@ -339,16 +281,15 @@ function installer(string $installerRoot, string $host, int $port, string $db, s
 }
 
 /**
- * A throwaway installer root: the SAME tools/install.php and a copy of src/
- * and of the packages — packages/ in this repository, vendor/astrx/ where
- * Composer installed them (the installer reads the installed-module list and
- * every module's SQL from them) — with every migrate_*.sql removed, so the shipped installer applies the
- * base schema and nothing else. This is how the "before" database is built
- * without hand-rolling a second SQL runner: install.php resolves everything
- * from dirname(__DIR__), so such a directory is a complete installer root.
+ * A throwaway installer root: the same tools/install.php, plus copies of src/
+ * and of the installed packages (vendor/astrx/; the installer reads the
+ * module list and every module's SQL from them), with every migrate_*.sql
+ * removed, so the real installer applies the base schema and nothing else.
+ * install.php resolves everything from dirname(__DIR__), so this directory is
+ * a complete installer root.
  *
  * $legacySchema replaces the base schema with one piece holding that SQL
- * (used by the baseline-revision mode).
+ * (for the baseline-revision mode).
  */
 function baseOnlyRoot(string $realRoot, ?string $legacySchema = null): string
 {
@@ -411,20 +352,15 @@ function sqlFilesUnder(string $dir): array
 
 /**
  * The base schema an install from $rev received, or null when git or the
- * revision is unavailable (a shallow CI checkout has no history to show).
+ * revision isn't available (a shallow CI checkout has no history).
  *
- * Up to the split, that is the revision's src/setup/tables.sql. After it, the
- * revision's schema pieces — src/setup/schema/ and every module's
- * resources/sql/schema/ — concatenated in file-name order, which is the order
- * the installer applies them in.
+ * For older revisions that is src/setup/tables.sql; for newer ones the schema
+ * pieces (src/setup/schema/ and every module's resources/sql/schema/),
+ * concatenated in file-name order, the order the installer applies them in.
  *
- * ONE edit is made to a historical tables.sql: a leading `USE <database>;` is
- * removed. Revisions before 2026-08 opened with a hardcoded `USE
- * content_manager`, which cannot run against a scratch database of any other
- * name — the current schema dropped that line for exactly this reason, and
- * the installer connects with a DSN already scoped to the target database, so
- * removing it reproduces what an install with db_name=content_manager got.
- * Nothing else in the historical schema is touched.
+ * One edit is made to an old tables.sql: a leading `USE <database>;` is
+ * removed. It can't run against a scratch database with another name, and the
+ * installer's DSN already selects the database.
  */
 function baseSchemaAtRevision(string $root, string $rev): ?string
 {
@@ -824,8 +760,8 @@ try {
     check("fresh install created a real schema ({$tableCount} tables/views, expected >= 40)", $tableCount >= 40);
     check("fresh install has a real column set ({$columnCount} columns, expected >= 300)", $columnCount >= 300);
 
-    // Every migration on disk must be in the ledger: a migration that silently
-    // did not run would make both paths equally wrong, and equally green.
+    // Every migration on disk must be in the ledger: one that silently didn't run
+    // would make both sides equally wrong and equally green.
     require_once $ROOT . '/src/autoload.php';
     $onDisk = count((new AstrX\Database\SchemaFiles(
         [$ROOT . '/src/setup'],

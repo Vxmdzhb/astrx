@@ -2,18 +2,16 @@
 declare(strict_types=1);
 
 /**
- * Site\PrgIntake — parked upload copies do not outlive their request.
+ * Site\PrgIntake: parked upload copies don't outlive their request.
  *
  * A POST's uploads are moved to <tmp>/astrx_upload_* and restored into the
- * settling GET's FileBag. Controllers often read and re-encode the bytes
- * instead of moving the file, and once the payload is pulled the PRG GC can
- * no longer find it — so the original upload used to stay in the temp dir
- * forever. Each scenario runs in a child PHP process, because the cleanup
- * happens at request shutdown:
+ * settling GET's FileBag. Controllers often re-encode the bytes rather than
+ * move the file, so the request deletes what is left. Each case runs in a
+ * child PHP process, because the cleanup happens at shutdown:
  *
- *   1. payload consumed (the normal case)   → temp copy deleted
- *   2. payload still pending (not pulled)   → kept; the PRG GC owns it
- *   3. a controller moved the file away     → nothing to delete, no error
+ *   1. payload consumed (the normal case)  → temp copy deleted
+ *   2. payload still pending               → kept; the PRG GC owns it
+ *   3. a controller moved the file away    → nothing to delete, no error
  *   4. deleteTemps() never touches a file without the astrx_upload_ prefix
  *
  * Standalone: no bootstrap, no database.

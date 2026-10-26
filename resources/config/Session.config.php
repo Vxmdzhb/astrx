@@ -30,8 +30,8 @@ return [
         // only via the installer, never by committing a literal here.
         'server_secret' => '',
 
-        // cipher: AES-256-CTR, HMAC: SHA-256 — hardcoded, not configurable
-        // (changing these would silently corrupt existing encrypted sessions)
+        // Cipher AES-256-CTR, HMAC SHA-256. Not configurable: changing them would
+        // make existing sessions unreadable.
 
         // PRG
         'prg_token_key' => 'prg',
@@ -53,8 +53,8 @@ return [
             'ADMIN'   => 900,    // 15 minutes
         ],
 
-        // Seconds the old session row remains valid after regeneration.
-        // Protects slow/Tor connections where two requests may be in-flight.
+        // How long the replaced session row stays valid after the id is
+        // regenerated, for slow (Tor) connections with two requests in flight.
         'regenerate_grace_period' => 30,
     ],
 ];

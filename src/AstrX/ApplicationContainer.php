@@ -121,9 +121,8 @@ final class ApplicationContainer
         $injector->setClass($moduleLoader);
         $injector->setClass($injector);
 
-        // The installed modules, explicitly: the registry is built here, never
-        // autowired, so no part of the application can get one that silently
-        // knows about a different (or empty) set of modules.
+        // The installed modules are passed in explicitly, never autowired, so every
+        // part of the application sees the same set.
         $injector->setClass(new ModuleRegistry($config, $injector, ApplicationModules::INSTALLED, $paths->root));
 
         return $injector;

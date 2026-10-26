@@ -332,10 +332,8 @@ final class DefaultTemplateContext implements TemplateVars
         if ($sid !== '' && $this->config->getConfigBool('Routing', 'url_rewrite', true)) {
             $titleUrl = $this->config->getConfigString('ContentManager', 'title_url', '/');
             if (str_starts_with($titleUrl, '/') && !str_starts_with($titleUrl, '//')) {
-                // Prepend [locale]/<sid> so the logo link keeps BOTH the session
-                // AND the current locale (matches UrlGenerator's segment order);
-                // injecting only the sid silently reverted the user to the
-                // default locale on a logo click.
+                // Prepend [locale]/<sid> so the logo link keeps both the session and the
+                // current locale, in UrlGenerator's segment order.
                 $loc    = $this->t->getLocale();
                 $prefix = '/' . ($loc !== '' ? $loc . '/' : '') . $sid;
                 $this->vars['title_url'] = $prefix . ($titleUrl === '/' ? '' : $titleUrl);

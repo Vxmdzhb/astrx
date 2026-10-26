@@ -2,19 +2,18 @@
 declare(strict_types=1);
 
 /**
- * Composer packaging contract.
+ * Composer packaging.
  *
- *   1. PSR-4: every class-like declaration in the application (src/AstrX) and
- *      its packages (packages/…) lives at the path its fully-qualified name
- *      implies under that package's composer.json map (AstrX\Chat\ChatModule →
- *      packages/modules/chat/ChatModule.php), one per file. src/sources.php,
- *      generated from those maps by tools/packages.php, says where to look.
- *   2. When vendor/autoload.php exists (`composer dump-autoload`), Composer's
- *      autoloader resolves every one of those classes.
- *   3. Including vendor/autoload.php is inert: no output, no session, no
- *      headers, no application constants, nothing booted.
+ *   1. PSR-4: every class in the application (src/AstrX) and its packages
+ *      lives at the path its name implies under that package's composer.json
+ *      map, one per file. src/sources.php, generated from those maps by
+ *      tools/packages.php, says where to look.
+ *   2. When vendor/autoload.php exists, Composer's autoloader finds every one
+ *      of those classes.
+ *   3. Including vendor/autoload.php has no side effects: no output, session,
+ *      headers or constants.
  *
- * Part 1 needs nothing; parts 2–3 are skipped with a note when vendor/ is absent.
+ * Part 1 needs nothing; parts 2 and 3 are skipped when vendor/ is missing.
  * Standalone: no bootstrap, no database.
  */
 

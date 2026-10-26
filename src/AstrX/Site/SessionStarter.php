@@ -64,7 +64,7 @@ final class SessionStarter
             unset($_COOKIE[session_name()]);
         }
 
-        // R10: exclude bearer requests from URL-sid adoption too. In cookieless
+        // Exclude bearer requests from URL-sid adoption too. In cookieless
         // mode the sid rides in the URL; without this guard a bearer call would
         // adopt a victim-supplied sid and loginFromApiKey() would then overwrite
         // THAT session with the API-key identity — poisoning the victim's session.
@@ -107,10 +107,8 @@ final class SessionStarter
             // uninitialised/attacker-supplied session ID is never adopted.
             // This activates SecureSessionHandler::validateId() on the incoming ID.
             ini_set('session.use_strict_mode', '1');
-            // Genuinely honour a cookieless deployment (php.ini ships
-            // use_cookies=1, so the mode was silently still emitting cookies), and
-            // force cookieless for stateless bearer requests — no Set-Cookie is
-            // emitted in either case.
+            // php.ini ships use_cookies=1, so cookieless mode has to switch cookies off
+            // explicitly. Bearer requests are stateless too: no Set-Cookie either way.
             if (!$sessionUseCookies || $bearerPresent) {
                 ini_set('session.use_cookies', '0');
                 ini_set('session.use_only_cookies', '0');
@@ -142,7 +140,7 @@ final class SessionStarter
         $oldSid      = (string) session_id();
         $oldHashedId = $handler->hashIdPublic($oldSid);
 
-        // Keep the old row so in-flight requests can still find it.
+        // Keep the old row, so requests already in flight can still find it.
         session_regenerate_id(false);
 
         $newSid      = (string) session_id();
@@ -152,9 +150,8 @@ final class SessionStarter
 
         $_SESSION['_regen_at'] = time();
 
-        // Preserve an active remember-me expiry across regeneration — otherwise the
-        // regenerated cookie reverts to a session-lifetime cookie and remember-me
-        // is silently lost on the request after login (R3-13).
+        // Keep an active remember-me expiry across regeneration; otherwise the new
+        // cookie becomes a session cookie and remember-me is lost.
         $rememberUntil = $_SESSION['_remember_until'] ?? 0;
         if (is_int($rememberUntil) && $rememberUntil > time()) {
             $params = session_get_cookie_params();

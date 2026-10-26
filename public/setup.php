@@ -144,9 +144,8 @@ function checkReqs(): array
         if (!is_dir($dir)) { @mkdir($dir, 0775, true); }
         $c[] = ["$label writable", is_writable($dir), $dir];
     }
-    // Fix 10.5: PHP session save path must be writable for the wizard to
-    // persist state between steps. Failure here means step 2 → step 3 loses
-    // the DB credentials silently in some container environments.
+    // The wizard keeps its state between steps in the PHP session, so the
+    // session save path has to be writable.
     $sessionPath = session_save_path() ?: sys_get_temp_dir();
     $c[] = ['session save path writable', is_writable($sessionPath), $sessionPath];
     return $c;
@@ -251,7 +250,7 @@ function sessionConn(): PDO|string
 }
 function runSQL(PDO $pdo, string $file): string
 {
-    // Fix: surface missing files instead of silently returning success.
+    // Report a missing file instead of treating it as success.
     if (!file_exists($file)) {
         return "Schema file not found: $file";
     }
@@ -285,20 +284,15 @@ function runSQL(PDO $pdo, string $file): string
 /**
  * Is this error the harmless "it is already there" that makes a re-run safe?
  *
- * The same rule as tools/install.php's sqlErrorIsBenign(), for the same reason.
- * SQLSTATE alone is too coarse: '23000' is "integrity constraint violation" and
- * covers BOTH the duplicate key a re-run should ignore (1062) AND failures that
- * mean the statement did not do its job —
+ * Same rule as tools/install.php's sqlErrorIsBenign(): this wizard runs the
+ * same migration files through its own runner. SQLSTATE alone is too coarse:
+ * '23000' covers the duplicate key a re-run should ignore (1062), but also
+ * failures that mean the statement did not do its job:
  *
  *   1451 / 1452  foreign key constraint fails
  *   1048         column cannot be null
  *
- * Swallowing those made runMigration() record the migration as applied, with its
- * checksum, so it could never run again — while the rows it was supposed to
- * insert (e.g. the Content module's navbar entry) were permanently missing and
- * the wizard printed "ok". The CLI installer was fixed; this wizard runs the
- * very same migration files through its own copy of the runner, so it needs the
- * very same rule.
+ * Treating those as benign would record a half-applied migration as done.
  */
 function sqlErrorIsBenign(\PDOException $e): bool
 {
@@ -528,7 +522,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$tokenValid) {
             if ($lockBytes === false) {
                 $errors[] = "Cannot write lock file at {$configDir}.setup_complete";
             } else {
-                // Setup done — the one-time token is no longer needed.
+                // Setup is done; the one-time token is not needed any more.
                 @unlink($configDir . '.setup_token');
                 $step = 5;
             }

@@ -14,23 +14,19 @@ final class SecurityHeaders
     public function __construct(private readonly Config $config) {}
 
     /**
-     * Emit the baseline security headers.
+     * Send the baseline security headers.
      *
-     * ContentManager calls this ONCE at the top of its response phase, and
+     * ContentManager calls this once at the start of its response phase;
      * PanicLockdown and ErrorResponder call it for the responses they produce
-     * without reaching that point. Every branch below the call site
-     * inherits these; a branch that needs a different value overrides that single
-     * header rather than opting in, so an early `return` added later cannot ship
-     * a document with no CSP the way the JS-fragment branch used to.
+     * themselves. A branch that needs a different value replaces that one header.
      *
-     * The canonical site is designed to run with JavaScript OFF, so a strict
-     * Content-Security-Policy (default-src 'none') is safe and neutralises any
-     * injected script/frame. The CSP is config-driven
-     * (ContentManager.content_security_policy) so operators can relax it per
-     * deployment without editing code; a hard-coded strict default is used when
-     * the config key is absent or empty.
+     * The site runs with JavaScript off, so a strict Content-Security-Policy
+     * (default-src 'none') costs nothing and neutralises injected script or
+     * frames. Operators can relax it per deployment through
+     * ContentManager.content_security_policy; the strict default applies when
+     * that key is empty.
      *
-     * No-op if headers have already been sent (e.g. a controller streamed bytes).
+     * Does nothing if headers were already sent (a controller streamed bytes).
      */
     public function emit(SiteFlags $flags): void
     {
@@ -54,7 +50,7 @@ final class SecurityHeaders
         header('Referrer-Policy: no-referrer');
         header('X-Content-Type-Options: nosniff');
         header('X-Frame-Options: DENY');
-        // R13: advertise the canonical .onion on the PRIMARY (no-JS) HTML
+        // Advertise the canonical .onion on the PRIMARY (no-JS) HTML
         // response. Tor Browser reads Onion-Location from the ordinary page, and
         // AstrX's audience is no-JS — so this path (not only the JS-fragment copy)
         // is where the anti-phishing auto-upgrade must be emitted. Validated to a
