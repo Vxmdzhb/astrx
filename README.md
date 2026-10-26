@@ -9,11 +9,13 @@ It is also the PHP framework the site is built on, split into small packages
 you can use on their own.
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="49%" alt="The home page with news and comments, in the Dracula theme">
-  <img src="docs/screenshots/chat.png" width="49%" alt="The chat, with messages and the list of people online">
-  <img src="docs/screenshots/board.png" width="49%" alt="A thread on the imageboard, in the Sepia theme">
-  <img src="docs/screenshots/admin.png" width="49%" alt="The admin panel's theme picker">
+  <img src="docs/screenshots/home-default.png" width="49%" alt="The home page with news and comments">
+  <img src="docs/screenshots/chat-default.png" width="49%" alt="The chat, with messages and the list of people online">
+  <img src="docs/screenshots/board-default.png" width="49%" alt="A thread on the imageboard">
+  <img src="docs/screenshots/admin-users.png" width="49%" alt="User management in the admin panel">
 </p>
+
+<p align="center"><a href="docs/screenshots/README.md">More screenshots, including the admin panel</a></p>
 
 ## What's in it
 
