@@ -1,37 +1,57 @@
 # Connecting the Rust engines
 
-Seven modules turn the [astrx-suite](https://github.com/Vxmdzhb/astrx-suite)
-engines into ordinary pages of the site. Each is a small PHP client for an
-engine's HTTP API: the engine does the crawling and indexing, and the site
-makes a short HTTP request, cleans every field and renders the result with its
-own templates. None of them adds database tables of its own.
+Six modules turn the [astrx-suite](https://github.com/Vxmdzhb/astrx-suite)
+engines into parts of the site. Each is a small PHP client for an engine's
+HTTP API: the engine does the crawling and indexing, and the site makes a short
+HTTP request, cleans every field and renders the result with its own templates.
+None of them adds database tables of its own.
 
-| Module          | What it adds                                 | Talks to                         | Default address          |
-|-----------------|----------------------------------------------|----------------------------------|--------------------------|
-| `websearch`     | clear-web search page                        | websearch                        | `http://127.0.0.1:8803`  |
-| `onionsearch`   | onion search page                            | onioncrawler                     | `http://127.0.0.1:8802`  |
-| `torrentsearch` | torrent search page, with magnet links       | torrentds                        | `http://127.0.0.1:8804`  |
-| `fedsearch`     | one search box with a tab per source         | the three above, plus site search | per source              |
-| `gitbrowse`     | a link-through page to the git browser       | gitweb                           | `http://127.0.0.1:8801`  |
-| `suiteadmin`    | admin panel: engine status, add onion seeds  | every engine's health/metrics    | per engine               |
-| `blocklist`     | admin page: push blocklist entries           | onioncrawler, torrentds          | per engine               |
+| Module          | What it adds                                          | Talks to                      | Default address          |
+|-----------------|-------------------------------------------------------|-------------------------------|--------------------------|
+| `websearch`     | a *Web* tab on the Search page, and its own page      | websearch                     | `http://127.0.0.1:8803`  |
+| `onionsearch`   | an *Onion* tab on the Search page, and its own page   | onioncrawler                  | `http://127.0.0.1:8802`  |
+| `torrentsearch` | a *Torrents* tab, and a page with each torrent's files | torrentds                    | `http://127.0.0.1:8804`  |
+| `gitbrowse`     | *Code*: the repositories, files, history and commits  | gitweb (its JSON API)         | `http://127.0.0.1:8801`  |
+| `suiteadmin`    | admin panel: engine status, add onion seeds           | every engine's health/metrics | per engine               |
+| `blocklist`     | admin page: push blocklist entries                    | onioncrawler, torrentds       | per engine               |
 
-The site's own search (module `search`) is separate and needs no engine.
+## One Search page
 
-Each page is its own module, so you can switch any of them off (or purge it)
-without touching the others: `php tools/module.php disable websearch`. A page
-whose engine is down shows a friendly "unavailable" message; it never breaks
-the site.
+The site has one Search page (module `search`). Its first tab, *This site*,
+searches the site's own content and needs no engine. Each engine module that is
+switched on adds a tab next to it — *Web*, *Onion*, *Torrents* — by answering
+the `Search\Tab\SearchTab` extension point, so a tab appears and disappears with
+its module. Only the visible tab is searched. Torrent results are listed the
+way BTDigg lists them: the name, the first files with their sizes, then the
+size, the file count, when the index first saw it, and the magnet and .torrent
+links.
 
-The installer creates each page and its navbar link. *Search All* (fedsearch)
-and *Git* (gitbrowse) appear in the public navbar, *Engines* and *Blocklist*
-in the admin panel. The three single-engine pages get a link too, switched
-off, because *Search All* already has a tab for each; switch them on in
-Admin → Navbar to list them on their own. On a site installed before these
-pages existed, `php tools/install.php --schema-only` adds them.
+The engine modules keep their own pages, for the options a tab leaves out (the
+web search's verticals and ordering, a torrent's full file list); each tab
+links to its page under *More options*. Those pages have navbar links too,
+switched off; switch them on in Admin → Navbar to list them on their own.
 
-[Screenshots](screenshots/README.md#the-search-engines) show the pages with
-the engines running.
+## Code
+
+The git module shows the repositories of a gitweb server inside the site: the
+list of repositories, each one's files and README, the code with line numbers,
+the history and each commit's diff. It reads them through gitweb's JSON API
+(`/repos.json`, `/<repo>/tree.json`, …) and prints everything escaped.
+**Admin → Git server** says where gitweb is: its address as the *site* reaches
+it (`http://gitweb:8801` in Docker), its address as *visitors* reach it (for
+the `git clone` command; empty hides it), and an account when gitweb runs
+with `--auth`. The page checks the connection when it opens.
+
+## Switching them off
+
+Each part is its own module, so you can switch any of them off (or purge it)
+without touching the others: `php tools/module.php disable torrentsearch`. A
+page or tab whose engine is down says so; it never breaks the site. The
+installer creates each module's pages and navbar links; on a site installed
+before they existed, `php tools/install.php --schema-only` adds them.
+
+Screenshots of [the Search page](screenshots/README.md#search) and of
+[the Code page](screenshots/README.md#code) show them with the engines running.
 
 ## Running the engines
 
@@ -81,8 +101,7 @@ admin pages.
 | `WebSearch.config.php`        | `base_url`, `timeout_seconds` (1–5), `per_page` (1–50) |
 | `OnionSearch.config.php`      | `base_url`, `timeout_seconds` (1–5), `per_page` (1–50) |
 | `TorrentSearch.config.php`    | `base_url`, `timeout_seconds` (1–5), `per_page` (1–100) |
-| `FederatedSearch.config.php`  | `websearch_base_url`, `onioncrawler_base_url`, `torrentds_base_url`, `timeout_seconds`, `per_page` |
-| `GitBrowse.config.php`        | `service_url`: where visitors are sent, so it must be an address *they* can reach (an onion address, or a public URL) |
+| `GitBrowse.config.php`        | `api_url` (as the site reaches gitweb), `public_url` (as visitors reach it, for `git clone`), `auth_user`, `auth_password`, `timeout_seconds` (1–10); set from Admin → Git server |
 | `SuiteAdmin.config.php`       | one `*_base_url` per engine, `timeout_seconds` |
 | `Blocklist.config.php`        | `onioncrawler_base_url`, `onioncrawler_admin_token`, `torrentds_base_url`, `torrentds_admin_token`, `timeout_seconds` |
 
