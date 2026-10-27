@@ -1,6 +1,7 @@
 {
     "name": "astrx/site",
     "description": "AstrX: a modular, JavaScript-free PHP web framework and the website built on it",
+    "license": "LicenseRef-DoWhatever",
     "type": "project",
     "keywords": [
         "framework",

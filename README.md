@@ -115,8 +115,8 @@ There are no version numbers: every repository moves forward on `main`, and
 lockfiles pin the exact commits a build uses. APIs can still change between
 commits, and the code hasn't had an independent security audit.
 
-The license is still being written. Until it is published, please ask before
-reusing the code.
+AstrX is released under the [Do Whatever License](LICENSE), with a code of
+conduct in the same spirit: [CODE_OF_CONDUCT](CODE_OF_CONDUCT).
 
 [suite]: https://github.com/Vxmdzhb/astrx-suite
 [framework]: https://github.com/Vxmdzhb/framework

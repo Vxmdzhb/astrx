@@ -58,8 +58,7 @@ jobs:
 
       # Validates composer.json. The autoloader Composer generated is
       # exercised by tests/composer_autoload_test.php (every class resolves;
-      # loading it has no side effects). The license warning is expected until
-      # a license is chosen.
+      # loading it has no side effects).
       - name: Composer metadata + autoloader
         run: |
           composer validate --no-check-publish
