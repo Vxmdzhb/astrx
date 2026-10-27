@@ -271,8 +271,20 @@ check('chat: purge forgets the core migration that tags its pages',
 check('chat: and no migration of another module',
     array_filter(migrationsFor('chat'), static fn(string $m): bool => str_contains($m, 'canary') || str_contains($m, 'content')) === []);
 
-check('a module with no tables, pages or migrations forgets nothing',
-    migrationsFor('blocklist') === []);
+// The engine modules own no tables, only their pages: purge forgets exactly
+// the migrations that created them, so the restore brings the pages back, and
+// nothing of another module.
+foreach (['blocklist'     => ['migrate_zzzzz_blocklist_pages.sql'],
+          'onionsearch'   => ['migrate_zzzzz_onionsearch_pages.sql'],
+          'suiteadmin'    => ['migrate_zzzzz_suiteadmin_pages.sql'],
+          'torrentsearch' => ['migrate_zzzzz_torrentsearch_pages.sql'],
+          'websearch'     => ['migrate_zzzzz_websearch_pages.sql'],
+          'gitbrowse'     => ['migrate_zzzzz_gitbrowse_pages.sql', 'migrate_zzzzzz_gitbrowse_admin.sql'],
+         ] as $module => $expected) {
+    $got = migrationsFor($module);
+    sort($got);
+    check("{$module}: purge forgets exactly its page migrations", $got === $expected);
+}
 
 check('the restore path the tool prints exists',
     str_contains((string) file_get_contents($ROOT . '/tools/install.php'), "hasFlag(\$args, 'schema-only')"));
