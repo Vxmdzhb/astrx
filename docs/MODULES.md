@@ -106,6 +106,7 @@ final class ImageboardModule implements Module
                 \AstrX\Retention\RetentionSource::class => [\AstrX\Imageboard\ImageboardRetention::class],
             ],
             'layout'       => ['nav' => ['partials/board_nav']], // layout slot => partials
+            'nav_section'  => [],                            // own page => menu entry it sits under
         ];
     }
 }
@@ -188,6 +189,7 @@ the module's own services as constructor arguments.
 | `User\MailboxNaming` | the registration form | whether a new account's mailbox is its username, so the form does not ask for one |
 | `User\UserHomeSection` | the user home page | tiles: page url_id => label key |
 | `Admin\AdminDashboardSection` | the admin dashboard | tiles: page url_id => label key |
+| `Search\Tab\SearchTab` (module `search`) | the Search page | a tab: key, label, order, and one page of results (`SearchTabPage` of `SearchHit`s) |
 
 ```php
 'extensions' => [
@@ -253,6 +255,14 @@ final class BotTrapNavContributor implements NavContributor
 
 A module whose only navigation is a main-nav entry needs neither — that entry
 is a DB `navbar_entry` row, and `NavbarHandler` drops it when the module is off.
+
+A page that belongs under **another section's menu entry** says so with
+`nav_section`: own page file_name => the entry page's file_name. The torrent
+search's page lights *Search* while it is open:
+
+```php
+'nav_section' => ['torrent_search' => 'site_search'],
+```
 
 ### Page guard (optional)
 
@@ -414,8 +424,8 @@ class, `Controller/`, `resources/` side by side):
 ```
 
 It requires the packages whose namespaces its code uses — almost always
-`astrx/framework` and `astrx/cms`, often `astrx/library`; the federated search
-also requires `astrx/module-search` — and `tools/packages.php` checks that list
+`astrx/framework` and `astrx/cms`, often `astrx/library`; the engine modules
+also require `astrx/module-search`, whose Search page they add tabs to — and `tools/packages.php` checks that list
 against the code. The site's `composer.json` lists each package's repository,
 `composer install` puts them in `vendor/` (at the commits `composer.lock`
 pins), and `src/classloader.php` loads classes from `src/sources.php`, which

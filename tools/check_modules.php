@@ -270,6 +270,24 @@ foreach (cm_installed() as $class) {
         }
     }
 
+    // nav_section: one of the module's own pages => the menu entry (page
+    // file_name) it sits under
+    if (isset($raw['nav_section'])) {
+        if (!is_array($raw['nav_section'])) {
+            $errors[] = "{$key}: 'nav_section' must be an array of page file_name => entry file_name";
+        } else {
+            $own = isset($raw['controllers']) && is_array($raw['controllers']) ? $raw['controllers'] : [];
+            foreach ($raw['nav_section'] as $page => $entry) {
+                if (!is_string($page) || !isset($own[$page])) {
+                    $errors[] = "{$key}: nav_section names " . (is_string($page) ? "'{$page}'" : gettype($page))
+                        . ', which is not one of the module\'s pages';
+                } elseif (!is_string($entry) || preg_match('/^[a-z][a-z0-9_]*$/', $entry) !== 1) {
+                    $errors[] = "{$key}: nav_section for '{$page}' must be a page file_name";
+                }
+            }
+        }
+    }
+
     // layout: slot => partials, each a template in the module's own resources
     if (isset($raw['layout'])) {
         if (!is_array($raw['layout'])) {
