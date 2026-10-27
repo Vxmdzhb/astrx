@@ -14,3 +14,4 @@ parameters:
             - public/compile/index.php
             - public/setup.php
             - tools/verify-compiled.php
+            - tools/demo/*
