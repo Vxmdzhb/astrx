@@ -1,0 +1,358 @@
+{
+  "_comment": [
+    "Every screenshot in the READMEs, in the order shots.js takes them.",
+    "path: the page, logged in as DEMO_USER (admin). height (optional): a taller window, for long pages.",
+    "click: follow this link first (a Playwright selector). to: where the PNG goes, relative to the",
+    "folder given to shots.js (the folder that holds the repository checkouts)."
+  ],
+  "viewport": {
+    "width": 1280,
+    "height": 860
+  },
+  "theme": "default",
+  "shots": [
+    {
+      "name": "home",
+      "path": "/en/main",
+      "to": [
+        "astrx/docs/screenshots/home.png"
+      ]
+    },
+    {
+      "name": "chat",
+      "path": "/en/chat",
+      "to": [
+        "astrx/docs/screenshots/chat.png",
+        "module-chat/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "board",
+      "path": "/en/board/g/thread/1",
+      "to": [
+        "astrx/docs/screenshots/board.png",
+        "module-imageboard/docs/screenshot.png"
+      ],
+      "height": 1560
+    },
+    {
+      "name": "profile",
+      "path": "/en/profile/nova",
+      "to": [
+        "astrx/docs/screenshots/profile.png"
+      ]
+    },
+    {
+      "name": "user-home",
+      "path": "/en/user-home",
+      "to": [
+        "astrx/docs/screenshots/user-home.png"
+      ]
+    },
+    {
+      "name": "settings",
+      "path": "/en/settings",
+      "to": [
+        "astrx/docs/screenshots/settings.png"
+      ]
+    },
+    {
+      "name": "wiki-page",
+      "path": "/en/pages/about",
+      "to": [
+        "astrx/docs/screenshots/wiki-page.png",
+        "module-content/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "webmail-inbox",
+      "path": "/en/webmail?folder=INBOX",
+      "to": [
+        "astrx/docs/screenshots/webmail-inbox.png",
+        "module-webmail/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "webmail-message",
+      "path": "/en/webmail?folder=INBOX&uid=11",
+      "to": [
+        "astrx/docs/screenshots/webmail-message.png"
+      ]
+    },
+    {
+      "name": "webmail-images-blocked",
+      "path": "/en/webmail?folder=INBOX&uid=8",
+      "to": [
+        "astrx/docs/screenshots/webmail-images-blocked.png"
+      ]
+    },
+    {
+      "name": "webmail-reply",
+      "path": "/en/webmail?compose=1&reply_uid=12&folder=INBOX",
+      "to": [
+        "astrx/docs/screenshots/webmail-reply.png"
+      ]
+    },
+    {
+      "name": "search-site",
+      "path": "/en/search?q=onion",
+      "to": [
+        "astrx/docs/screenshots/search-site.png",
+        "module-search/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "search-web",
+      "path": "/en/search?source=web&q=onion+service",
+      "to": [
+        "astrx/docs/screenshots/search-web.png",
+        "module-websearch/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "search-onion",
+      "path": "/en/search?source=onion&q=tor",
+      "to": [
+        "astrx/docs/screenshots/search-onion.png",
+        "module-onionsearch/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "search-torrents",
+      "path": "/en/search?source=torrents&q=linux",
+      "to": [
+        "astrx/docs/screenshots/search-torrents.png",
+        "module-torrentsearch/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "torrent-detail",
+      "path": "/en/search?source=torrents&q=sintel",
+      "click": "text=Sintel (2010) 4K",
+      "to": [
+        "astrx/docs/screenshots/torrent-detail.png"
+      ]
+    },
+    {
+      "name": "admin-engines",
+      "path": "/en/admin-suite",
+      "to": [
+        "astrx/docs/screenshots/admin-engines.png",
+        "module-suiteadmin/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "git-repos",
+      "path": "/en/gitbrowse",
+      "to": [
+        "astrx/docs/screenshots/git-repos.png"
+      ]
+    },
+    {
+      "name": "git-tree",
+      "path": "/en/gitbrowse?repo=astrx-suite.git",
+      "to": [
+        "astrx/docs/screenshots/git-tree.png",
+        "module-gitbrowse/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "git-file",
+      "path": "/en/gitbrowse?repo=gitweb.git&view=blob&path=src/lib.rs",
+      "to": [
+        "astrx/docs/screenshots/git-file.png"
+      ]
+    },
+    {
+      "name": "git-commit",
+      "path": "/en/gitbrowse?repo=astrx-suite.git&view=log",
+      "click": ".gb-commits td.gb-sha a >> nth=0",
+      "to": [
+        "astrx/docs/screenshots/git-commit.png"
+      ]
+    },
+    {
+      "name": "admin-git",
+      "path": "/en/admin-config-git",
+      "to": [
+        "astrx/docs/screenshots/admin-git.png"
+      ]
+    },
+    {
+      "name": "trust-canary",
+      "path": "/en/canary",
+      "to": [
+        "astrx/docs/screenshots/trust-canary.png",
+        "module-canary/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "trust-downloads",
+      "path": "/en/downloads",
+      "to": [
+        "astrx/docs/screenshots/trust-downloads.png",
+        "module-downloads/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "trust-mirrors",
+      "path": "/en/mirrors",
+      "to": [
+        "astrx/docs/screenshots/trust-mirrors.png",
+        "module-mirrors/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "trust-tipline",
+      "path": "/en/tipline",
+      "to": [
+        "astrx/docs/screenshots/trust-tipline.png",
+        "module-tipline/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "admin-dashboard",
+      "path": "/en/admin",
+      "to": [
+        "astrx/docs/screenshots/admin-dashboard.png",
+        "cms/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "admin-users",
+      "path": "/en/admin-users",
+      "to": [
+        "astrx/docs/screenshots/admin-users.png"
+      ]
+    },
+    {
+      "name": "admin-config-access",
+      "path": "/en/admin-config-access",
+      "to": [
+        "astrx/docs/screenshots/admin-config-access.png"
+      ]
+    },
+    {
+      "name": "admin-audit-log",
+      "path": "/en/admin-audit-log",
+      "to": [
+        "astrx/docs/screenshots/admin-audit-log.png"
+      ]
+    },
+    {
+      "name": "admin-config-system",
+      "path": "/en/admin-config-system",
+      "to": [
+        "astrx/docs/screenshots/admin-config-system.png"
+      ]
+    },
+    {
+      "name": "admin-themes",
+      "path": "/en/admin-themes",
+      "to": [
+        "astrx/docs/screenshots/admin-themes.png"
+      ]
+    },
+    {
+      "name": "admin-pages",
+      "path": "/en/admin-pages",
+      "to": [
+        "astrx/docs/screenshots/admin-pages.png"
+      ]
+    },
+    {
+      "name": "admin-navbar",
+      "path": "/en/admin-navbar",
+      "to": [
+        "astrx/docs/screenshots/admin-navbar.png"
+      ]
+    },
+    {
+      "name": "admin-news",
+      "path": "/en/admin-news",
+      "to": [
+        "astrx/docs/screenshots/admin-news.png"
+      ]
+    },
+    {
+      "name": "admin-comments",
+      "path": "/en/admin-comments",
+      "to": [
+        "astrx/docs/screenshots/admin-comments.png"
+      ]
+    },
+    {
+      "name": "admin-config-chat",
+      "path": "/en/admin-config-chat",
+      "to": [
+        "astrx/docs/screenshots/admin-config-chat.png"
+      ]
+    },
+    {
+      "name": "admin-config-captcha",
+      "path": "/en/admin-config-captcha",
+      "to": [
+        "astrx/docs/screenshots/admin-config-captcha.png"
+      ]
+    },
+    {
+      "name": "admin-banlist",
+      "path": "/en/admin-banlist",
+      "to": [
+        "astrx/docs/screenshots/admin-banlist.png"
+      ]
+    },
+    {
+      "name": "admin-trap",
+      "path": "/en/admin-trap",
+      "to": [
+        "astrx/docs/screenshots/admin-trap.png",
+        "module-bottrap/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "admin-retention",
+      "path": "/en/admin-retention",
+      "to": [
+        "astrx/docs/screenshots/admin-retention.png"
+      ]
+    },
+    {
+      "name": "admin-panic",
+      "path": "/en/admin-panic",
+      "to": [
+        "astrx/docs/screenshots/admin-panic.png"
+      ]
+    },
+    {
+      "name": "admin-language",
+      "path": "/en/admin-language",
+      "to": [
+        "astrx/docs/screenshots/admin-language.png"
+      ]
+    },
+    {
+      "name": "admin-invites",
+      "path": "/en/admin-invites",
+      "to": [
+        "astrx/docs/screenshots/admin-invites.png"
+      ]
+    },
+    {
+      "name": "admin-blocklist",
+      "path": "/en/admin-blocklist",
+      "to": [
+        "astrx/docs/screenshots/admin-blocklist.png",
+        "module-blocklist/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "admin-media",
+      "path": "/en/admin-media",
+      "to": [
+        "astrx/docs/screenshots/admin-media.png",
+        "module-media/docs/screenshot.png"
+      ]
+    }
+  ]
+}

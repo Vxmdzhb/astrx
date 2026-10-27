@@ -1,0 +1,15 @@
+# Writes a torrentds index of public-domain and free-software torrents for the
+# screenshots (the names, sizes and file lists are made up; the infohashes are
+# the SHA-1 of each name, so they point at nothing).
+#
+#   cargo run --release --manifest-path tools/demo/torrents/Cargo.toml -- demo-data/torrentds.db
+[package]
+name = "demo-torrents"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+torrentds = { git = "https://github.com/Vxmdzhb/torrentds", rev = "c4f5f454119717afd9e9a7f7fbd0fb70bc31954f" }
+
+[workspace]
