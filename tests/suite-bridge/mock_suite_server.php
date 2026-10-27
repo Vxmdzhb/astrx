@@ -107,7 +107,14 @@ if ($path === '/api/search') {
                 'host'       => 'example.com',
                 'snippet_html' => 'the <mark>ubuntu</mark> release &amp; notes',
                 'snippet'    => 'the ubuntu release &amp; <b>notes</b>',
-            ],
+            ] + (isset($_GET['files']) ? [
+                // Only when the client asks for files=N, as torrentds does.
+                'first_seen' => 1700000000,
+                'files'      => [
+                    ['path' => 'ubuntu/ubuntu-24.04.iso', 'length' => 1610612000],
+                    ['path' => 'ubuntu/<script>x</script>notes.txt', 'length' => 736],
+                ],
+            ] : []),
             [
                 'infohash'   => $IH2,
                 'name'       => 'Debian &lt;b&gt;netinst&lt;/b&gt;',
@@ -141,6 +148,57 @@ if ($path === '/api/search') {
             ],
         ],
     ]);
+    return true;
+}
+
+// ── gitweb JSON API (module gitbrowse) ───────────────────────────────────────
+// Hostile on purpose: a repository name the client must refuse, markup and
+// control characters in text, an entry path that climbs out of the tree.
+if ($path === '/repos.json') {
+    send_json(['repos' => [
+        ['name' => 'site.git', 'description' => "The site <script>x</script>\u{7}", 'bare' => true, 'last_commit_ts' => 1700000100],
+        ['name' => '../etc', 'description' => 'escape', 'bare' => true, 'last_commit_ts' => 1],
+        ['name' => 'old.git', 'description' => 'Old', 'bare' => true, 'last_commit_ts' => 1600000000],
+    ]]);
+    return true;
+}
+if (preg_match('#^/site\.git/(summary|tree|blob|log|commit)\.json$#', $path, $gm) === 1) {
+    $commit = ['sha' => str_repeat('c', 40), 'short' => 'ccccccc', 'author' => 'ann', 'ts' => 1700000100, 'subject' => "Fix <b>it</b>\nnow"];
+    switch ($gm[1]) {
+        case 'summary':
+            send_json(['name' => 'site.git', 'description' => 'The site', 'default_branch' => 'main',
+                       'branches' => ['main', '--upload-pack=x'], 'tags' => ['v1'], 'commit_count' => 7, 'commits' => [$commit]]);
+            return true;
+        case 'tree':
+            if (($_GET['path'] ?? '') === 'README.md') {
+                send_json(['error' => 'not a directory'], 400);
+                return true;
+            }
+            send_json(['ref' => 'main', 'commit' => str_repeat('c', 40), 'path' => '', 'total' => 3, 'truncated' => false,
+                       'entries' => [
+                           ['name' => 'src', 'path' => 'src', 'type' => 'tree', 'mode' => '040000', 'size' => null],
+                           ['name' => 'README.md', 'path' => 'README.md', 'type' => 'blob', 'mode' => '100644', 'size' => 12],
+                           ['name' => 'up', 'path' => '../up', 'type' => 'blob', 'mode' => '100644', 'size' => 1],
+                       ],
+                       'readme' => ['name' => 'README.md', 'text' => "# Site\n<script>alert(1)</script>\u{1}", 'truncated' => false]]);
+            return true;
+        case 'blob':
+            send_json(['ref' => 'main', 'path' => 'README.md', 'size' => 30, 'binary' => false, 'truncated' => false,
+                       'text' => "line one\n\t<script>two</script>\u{8}\n"]);
+            return true;
+        case 'log':
+            send_json(['ref' => 'main', 'page' => 1, 'has_more' => true, 'commits' => [$commit, ['sha' => 'zz', 'subject' => 'bad sha']]]);
+            return true;
+        default:
+            send_json(['sha' => str_repeat('c', 40), 'short' => 'ccccccc', 'author_name' => 'ann', 'author_email' => 'a@x',
+                       'author_date' => '2026-10-27T10:00:00+01:00', 'parents' => [str_repeat('d', 40), 'nope'],
+                       'subject' => 'Fix it', 'body' => '', 'signed' => true, 'signature_verified' => true,
+                       'diff' => "diff --git a/x b/x\n-old\n+new\n", 'diff_truncated' => false]);
+            return true;
+    }
+}
+if (preg_match('#^/[^/]+/(summary|tree|blob|log|commit)\.json$#', $path) === 1) {
+    send_json(['error' => 'no such repository'], 404);
     return true;
 }
 

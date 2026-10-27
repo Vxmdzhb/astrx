@@ -48,8 +48,8 @@ namespace {
     use AstrX\SuiteAdmin\SuiteAdminConfig;
     use AstrX\SuiteAdmin\SuiteAdminClient;
     use AstrX\GitBrowse\GitBrowseConfig;
-    use AstrX\FederatedSearch\FederatedSearchConfig;
-    use AstrX\FederatedSearch\FederatedSearchClient;
+    use AstrX\GitBrowse\GitBrowseClient;
+    use AstrX\Search\Tab\SearchHit;
     use AstrX\Blocklist\BlocklistConfig;
     use AstrX\Blocklist\BlocklistClient;
 
@@ -352,79 +352,74 @@ namespace {
         eq('suite timeout clamped', $scx->timeoutSeconds(), SuiteAdminConfig::MAX_TIMEOUT);
 
         $gbx = new GitBrowseConfig();
-        $gbx->setServiceUrl('javascript:alert(1)');
-        eq('gitbrowse non-http rejected', $gbx->serviceUrl(), GitBrowseConfig::DEFAULT_SERVICE_URL);
-        $gbx->setServiceUrl('https://git.example.onion/repos/');
-        eq('gitbrowse https kept + trimmed', $gbx->serviceUrl(), 'https://git.example.onion/repos');
+        $gbx->setApiUrl('javascript:alert(1)');
+        eq('gitbrowse api non-http rejected', $gbx->apiUrl(), GitBrowseConfig::DEFAULT_API_URL);
+        $gbx->setApiUrl('http://gitweb:8801/');
+        eq('gitbrowse api kept + trimmed', $gbx->apiUrl(), 'http://gitweb:8801');
+        $gbx->setPublicUrl('file:///etc');
+        eq('gitbrowse public non-http rejected', $gbx->publicUrl(), '');
+        $gbx->setPublicUrl('https://git.example.onion/');
+        eq('gitbrowse public kept + trimmed', $gbx->publicUrl(), 'https://git.example.onion');
+        $gbx->setTimeoutSeconds(999);
+        eq('gitbrowse timeout clamped', $gbx->timeoutSeconds(), 10);
 
         // ===================================================================
-        // 10. federated search: fan-out parse + sanitise, graceful degrade
+        // 10. The Search page's engine tabs: torrent results carry their
+        //     files and first-seen time, and a hit's view keeps every optional
+        //     part a list (no flag sections inside the result loop).
         // ===================================================================
-        echo "[fedsearch] client: fan-out parse + sanitise via mock\n";
-        $fc = new FederatedSearchConfig();
-        $fc->setWebsearchBaseUrl($mockBase);
-        $fc->setOnioncrawlerBaseUrl($mockBase);
-        $fc->setTorrentdsBaseUrl($mockBase);
-        $fed = new FederatedSearchClient($fc);
+        echo "[search tabs] torrent results carry file previews\n";
+        $tcf = new TorrentSearchConfig();
+        $tcf->setBaseUrl($mockBase);
+        $tr10 = (new TorrentSearchClient($tcf))->search('ubuntu', 1);
+        eq('files: first result has 2 files', count($tr10['results'][0]['files']), 2);
+        noMarkup('files: hostile path', $tr10['results'][0]['files'][1]['path']);
+        eq('files: first seen kept', $tr10['results'][0]['first_seen_ts'], 1700000000);
+        eq('files: rows without them stay empty', $tr10['results'][1]['files'], []);
 
-        // torrent tab: bogus-infohash row dropped, name sanitised, links rebuilt
-        $ft = $fed->searchTorrent('linux');
-        eq('fed torrent ok',                 $ft['ok'], true);
-        eq('fed torrent 2 results (bogus dropped)', count($ft['results']), 2);
-        noMarkup('fed torrent name', $ft['results'][0]['name']);
-        check('fed torrent magnet rebuilt', str_starts_with($ft['results'][0]['magnet'], 'magnet:?xt=urn:btih:' . $IH1));
-        eq('fed torrent .torrent url', $ft['results'][0]['torrent_url'], $mockBase . '/torrent/' . $IH1 . '.torrent');
+        $hit = new SearchHit(title: 'T', url: '/t', meta: ['Size: 1 GiB', 'Files: 3'],
+                             files: [['path' => 'a', 'size' => '1 B']], moreFiles: 2, external: false);
+        $v = $hit->view();
+        eq('hit view: no snippet → empty list', $v['snippet'], []);
+        eq('hit view: meta joined', $v['meta'], [['text' => 'Size: 1 GiB · Files: 3']]);
+        eq('hit view: more files', $v['more_files'], [['count' => 2]]);
+        eq('hit view: internal link rel', $v['rel'], 'nofollow');
 
-        // web tab: link rows, titles/snippets tag-free, hostile url → '#'
-        $fw = $fed->searchWeb('linux');
-        eq('fed web ok', $fw['ok'], true);
-        check('fed web has results', count($fw['results']) >= 1);
-        noMarkup('fed web title', $fw['results'][0]['title']);
-        check('fed web title has no "script"', !str_contains($fw['results'][0]['title'], 'script'));
-        noMarkup('fed web snippet', $fw['results'][0]['snippet']);
-        $hostileHref = null;
-        foreach ($fw['results'] as $row) { if ($row['host'] === 'evil') { $hostileHref = $row['href']; } }
-        eq('fed web javascript: url neutralised', $hostileHref, '#');
-
-        // onion tab: uses the 'snippet' field
-        $fo = $fed->searchOnion('linux');
-        eq('fed onion ok', $fo['ok'], true);
-        noMarkup('fed onion snippet', $fo['results'][0]['snippet']);
-
-        // down backend → ok=false, no crash
-        echo "[fedsearch] client: down source degrades to ok=false\n";
-        $fcDead = new FederatedSearchConfig();
-        $fcDead->setWebsearchBaseUrl('http://127.0.0.1:1');
-        $fw2 = (new FederatedSearchClient($fcDead))->searchWeb('x');
-        eq('fed web down ok=false', $fw2['ok'], false);
-        eq('fed web down empty',    count($fw2['results']), 0);
-
-        // direct parser units (no network)
-        echo "[fedsearch] parsers: direct sanitise units\n";
-        $link = FederatedSearchClient::parseLinkResults([
-            ['title' => 'a <script>alert(1)</script> b', 'url' => 'http://ok.example/x', 'host' => 'ok.example', 'snippet' => 'hi <b>there</b>'],
-            ['title' => 'js', 'url' => 'javascript:alert(1)', 'host' => 'x', 'snippet' => 'y'],
-            'not-an-array',
-        ], 'snippet');
-        eq('parseLink drops non-array row', count($link), 2);
-        noMarkup('parseLink title', $link[0]['title']);
-        eq('parseLink safe href kept',  $link[0]['href'], 'http://ok.example/x');
-        eq('parseLink hostile href → #', $link[1]['href'], '#');
-
-        $tor = FederatedSearchClient::parseTorrentResults([
-            ['infohash' => $IH1, 'name' => 'X <script>y</script>', 'total_size' => 1610612736, 'seeders' => 4, 'leechers' => 1],
-            ['infohash' => 'nope', 'name' => 'bad', 'magnet' => 'javascript:alert(1)'],
-        ], $mockBase);
-        eq('parseTorrent drops bad infohash', count($tor), 1);
-        noMarkup('parseTorrent name', $tor[0]['name']);
-        check('parseTorrent magnet safe', str_starts_with($tor[0]['magnet'], 'magnet:?xt=urn:btih:' . $IH1));
-        eq('parseTorrent has_swarm', $tor[0]['has_swarm'], true);
-
-        $fcx = new FederatedSearchConfig();
-        $fcx->setWebsearchBaseUrl('file:///etc/passwd');
-        eq('fed web file:// rejected', $fcx->websearchBaseUrl(), FederatedSearchConfig::DEFAULT_WEBSEARCH_BASE_URL);
-        $fcx->setPerPage(9999);
-        eq('fed per_page clamped', $fcx->perPage(), FederatedSearchConfig::MAX_PER_PAGE);
+        // ===================================================================
+        // 10b. The git browser's client against a hostile gitweb API
+        // ===================================================================
+        echo "[gitbrowse] client: repositories, trees, files, log, commits\n";
+        $gc = new GitBrowseConfig();
+        $gc->setApiUrl($mockBase);
+        $git = new GitBrowseClient($gc);
+        $repos = $git->repos();
+        eq('git repos ok', $repos['ok'], true);
+        eq('git repos: bad name dropped, newest first', array_column($repos['repos'], 'name'), ['site.git', 'old.git']);
+        check('git repos: description has no control chars', preg_match('/[\x00-\x1f]/', $repos['repos'][0]['description']) === 0);
+        $sum = $git->summary('site.git');
+        eq('git summary: option-like branch dropped', $sum['branches'], ['main']);
+        eq('git summary: commit subject is one line', $sum['commits'][0]['subject'], 'Fix <b>it</b> now');
+        $tree = $git->tree('site.git', '', '');
+        eq('git tree: climbing entry dropped', array_column($tree['entries'], 'path'), ['src', 'README.md']);
+        check('git tree: README has no control chars', !str_contains($tree['readme'], "\x01"));
+        eq('git tree: a file path is reported as a file', $git->tree('site.git', '', 'README.md')['is_file'], true);
+        $blob = $git->blob('site.git', '', 'README.md');
+        eq('git blob: text kept (escaped later), tab kept, controls dropped', $blob['text'], "line one\n\t<script>two</script>\n");
+        $log = $git->log('site.git', '', 1);
+        eq('git log: bad sha dropped', count($log['commits']), 1);
+        eq('git log: has more', $log['has_more'], true);
+        $com = $git->commit('site.git', str_repeat('c', 40));
+        eq('git commit: bad parent dropped', $com['parents'], [str_repeat('d', 40)]);
+        eq('git commit: verified', $com['verified'], true);
+        // Refused before any request: hostile repository, path, ref, id.
+        eq('git: ../ repo refused',  $git->summary('../etc')['found'], false);
+        eq('git: ../ path refused',  $git->tree('site.git', '', '../x')['found'], false);
+        eq('git: option ref refused', $git->tree('site.git', '--upload-pack=x', '')['found'], false);
+        eq('git: bad commit id refused', $git->commit('site.git', 'HEAD;rm')['found'], false);
+        eq('git: unknown repo is "not found", not "down"', $git->summary('nope.git'), ['ok' => true] + $git->summary('../etc'));
+        $gcDead = new GitBrowseConfig();
+        $gcDead->setApiUrl('http://127.0.0.1:1');
+        eq('git: server down → ok=false', (new GitBrowseClient($gcDead))->repos()['ok'], false);
 
         // ===================================================================
         // 11. blocklist editor: POST /blocklist + /api/block, auth shapes
@@ -497,76 +492,70 @@ namespace {
         eq('block token trimmed', $bcx->onioncrawlerAdminToken(), 'spaced');
 
         // ===================================================================
-        // 12. A torrent row keeps its .torrent link, seeders/leechers and category.
-        //     The values sit at loop level rather than inside {{#flag}} sections,
-        //     which don't see the loop row; checked against the real TemplateEngine
-        //     when it is available.
+        // 12. The templates, rendered by the real TemplateEngine when it is
+        //     available: a torrent result keeps its magnet and .torrent links
+        //     and lists its files; the Search page shows tabs and hits; the
+        //     git file view escapes code. The per-result parts are lists, which
+        //     keep the loop row (a {{#flag}} section would lose it).
         // ===================================================================
-        echo "[fedsearch+torrentsearch] template: torrent row renders links + swarm/category (F1)\n";
-        $torUrl  = $mockBase . '/torrent/' . $IH1 . '.torrent';
-        // The repository root (this file is tests/suite-bridge/). The two
-        // templates belong to the FederatedSearch and TorrentSearch modules,
-        // so the engine gets the modules' template roots, as in the app.
-        $fwRoot  = dirname(__DIR__, 2);
-        $renderedFed = null;
-        $renderedTor = null;
+        echo "[templates] torrent results, Search page, git file view\n";
+        $torUrl = $mockBase . '/torrent/' . $IH1 . '.torrent';
+        $torHit = (new SearchHit(
+            title: 'Ubuntu', url: '/torrentsearch?ih=' . $IH1,
+            meta: ['Size: 1.5 GiB', 'Files: 3', 'Found 2 days ago', 'Seed/Leech: 12/3'],
+            links: [['label' => 'Magnet', 'url' => 'magnet:?xt=urn:btih:' . $IH1], ['label' => 'Download .torrent', 'url' => $torUrl]],
+            files: [['path' => 'ubuntu/ubuntu.iso', 'size' => '1.5 GiB']], moreFiles: 2, external: false,
+        ))->view();
+        $webHit = (new SearchHit(title: 'A <b>page</b>', url: 'http://example.com/', displayUrl: 'http://example.com/', snippet: 'x'))->view();
+        $rendered = [];
         if (class_exists(\AstrX\Template\TemplateEngine::class)) {
             try {
-                require_once $fwRoot . '/src/support.php';
-                $engine = new \AstrX\Template\TemplateEngine(
-                    null,
-                    \AstrX\ApplicationContainer::resourceRoots(),
-                );
-                $engine->setTemplateDir($fwRoot . '/resources/template/');
+                $root = dirname(__DIR__, 2);
+                require_once $root . '/src/support.php';
+                $engine = new \AstrX\Template\TemplateEngine(null, \AstrX\ApplicationContainer::resourceRoots());
+                $engine->setTemplateDir($root . '/resources/template/');
                 $engine->setTemplateExtension('.html');
                 $engine->setCacheTemplates(false);
-
-                // Federated torrent tab — rows straight from the client.
-                $frows = FederatedSearchClient::parseTorrentResults([
-                    ['infohash' => $IH1, 'name' => 'Ubuntu', 'total_size' => 1610612736,
-                     'category' => 'software', 'seeders' => 12, 'leechers' => 3],
-                ], $mockBase);
-                $rf = $engine->renderTemplate('federated_search', [
-                    'searched' => true, 'backend_unavailable' => false, 'has_results' => true,
-                    'src_torrent' => true, 'torrent_results' => $frows,
-                    'lbl_swarm' => 'Seed/Leech', 'lbl_torrent' => 'Download .torrent',
-                ]);
-                $renderedFed = $rf->isOk() ? $rf->unwrap() : null;
-
-                // Dedicated torrent page — controller-shaped row (adds has_torrent + detail_url).
-                $tr    = $r['results'][0];
-                $tsRow = $tr + ['has_torrent' => $tr['torrent_url'] !== '', 'detail_url' => '/torrents?ih=' . $tr['infohash']];
-                $rt = $engine->renderTemplate('torrent_search', [
+                $render = static function (string $name, array $vars) use ($engine): ?string {
+                    $r = $engine->renderTemplate($name, $vars);
+                    return $r->isOk() ? $r->unwrap() : null;
+                };
+                $rendered['torrent'] = $render('torrent_search', [
                     'is_detail' => false, 'searched' => true, 'backend_unavailable' => false,
-                    'has_results' => true, 'torrent_results' => [$tsRow],
-                    'lbl_swarm' => 'Seed/Leech', 'lbl_torrent' => 'Download .torrent',
+                    'has_results' => true, 'torrent_results' => [$torHit], 'lbl_more_files' => 'more files',
                 ]);
-                $renderedTor = $rt->isOk() ? $rt->unwrap() : null;
+                $rendered['search'] = $render('site_search', [
+                    'searched' => true, 'backend_unavailable' => false, 'has_results' => true, 'has_tabs' => true,
+                    'search_tabs' => [['label' => 'This site', 'url' => '/s', 'active' => false], ['label' => 'Torrents', 'url' => '/s?source=torrents', 'active' => true]],
+                    'search_hits' => [$torHit, $webHit], 'lbl_more_files' => 'more files',
+                ]);
+                $rendered['git'] = $render('git_browse', [
+                    'view_blob' => true, 'is_binary' => false,
+                    'lines' => [['n' => 1, 'text' => '<script>alert(1)</script>'], ['n' => 2, 'text' => "\tindented"]],
+                ]);
             } catch (\Throwable $e) {
-                $renderedFed = null;
-                $renderedTor = null;
+                $rendered = [];
             }
         }
-
-        if (is_string($renderedFed) && is_string($renderedTor)) {
-            check('fed render: .torrent href non-empty',     str_contains($renderedFed, 'href="' . $torUrl . '"'));
-            check('fed render: no empty href',               !str_contains($renderedFed, 'href=""'));
-            check('fed render: seeders/leechers shown (12/3)', str_contains($renderedFed, '12/3'));
-            check('fed render: category shown',              str_contains($renderedFed, 'software'));
-            check('torrent render: .torrent href non-empty', str_contains($renderedTor, 'href="' . $torUrl . '"'));
-            check('torrent render: no empty href',           !str_contains($renderedTor, 'href=""'));
-            check('torrent render: seeders/leechers shown',  str_contains($renderedTor, '12/3'));
-            check('torrent render: category shown',          str_contains($renderedTor, 'software'));
+        if (count(array_filter($rendered, 'is_string')) === 3) {
+            [$rt, $rs, $rg] = [$rendered['torrent'], $rendered['search'], $rendered['git']];
+            check('torrent: .torrent link',            str_contains($rt, 'href="' . $torUrl . '"'));
+            check('torrent: magnet link',              str_contains($rt, 'href="magnet:?xt=urn:btih:' . $IH1 . '"'));
+            check('torrent: file listed with size',    str_contains($rt, 'ubuntu/ubuntu.iso<span class="file-size">1.5 GiB</span>'));
+            check('torrent: more files',               str_contains($rt, '+ 2 more files'));
+            check('torrent: facts line',               str_contains($rt, 'Seed/Leech: 12/3'));
+            check('torrent: no empty href',            !str_contains($rt, 'href=""'));
+            check('search: active tab marked',         str_contains($rs, 'class="active">Torrents</a>'));
+            check('search: torrent hit lists its file', str_contains($rs, 'ubuntu/ubuntu.iso'));
+            check('search: web hit title escaped',     str_contains($rs, 'A &lt;b&gt;page&lt;/b&gt;'));
+            check('search: external link rel',         str_contains($rs, 'rel="noopener noreferrer nofollow"'));
+            check('git: code escaped',                 str_contains($rg, '&lt;script&gt;alert(1)&lt;/script&gt;') && !str_contains($rg, '<script>alert'));
+            check('git: line numbers',                 str_contains($rg, '<span class="gb-ln">2</span>'));
         } else {
-            // Framework engine not reachable (test run outside the merged tree):
-            // assert the loop-level view model the fixed templates depend on.
-            $frows = FederatedSearchClient::parseTorrentResults([
-                ['infohash' => $IH1, 'name' => 'Ubuntu', 'total_size' => 1,
-                 'category' => 'software', 'seeders' => 12, 'leechers' => 3],
-            ], $mockBase);
-            check('view-model: torrent_url non-empty', $frows[0]['torrent_url'] !== '');
-            eq('view-model: swarm == 12/3',            $frows[0]['swarm'], '12/3');
-            check('view-model: category non-empty',    $frows[0]['category'] !== '');
+            // The framework's engine isn't reachable (run outside the merged
+            // tree): check the view model the templates depend on instead.
+            eq('view-model: links kept', count($torHit['links']), 2);
+            eq('view-model: files kept', count($torHit['files']), 1);
         }
 
     } finally {
