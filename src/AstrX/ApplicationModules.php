@@ -9,7 +9,6 @@ use AstrX\Canary\CanaryModule;
 use AstrX\Chat\ChatModule;
 use AstrX\Content\ContentModule;
 use AstrX\Downloads\DownloadsModule;
-use AstrX\FederatedSearch\FederatedSearchModule;
 use AstrX\GitBrowse\GitBrowseModule;
 use AstrX\Imageboard\ImageboardModule;
 use AstrX\Media\MediaModule;
@@ -45,7 +44,6 @@ final class ApplicationModules
         ChatModule::class,
         ContentModule::class,
         DownloadsModule::class,
-        FederatedSearchModule::class,
         GitBrowseModule::class,
         ImageboardModule::class,
         MediaModule::class,

@@ -43,7 +43,6 @@ return [
 
         // Search back ends and admin panels.
         'blocklist'     => true,
-        'fedsearch'     => true,
         'gitbrowse'     => true,
         'onionsearch'   => true,
         'suiteadmin'    => true,

@@ -24,7 +24,6 @@
         "astrx/module-chat": "*@dev",
         "astrx/module-content": "*@dev",
         "astrx/module-downloads": "*@dev",
-        "astrx/module-fedsearch": "*@dev",
         "astrx/module-gitbrowse": "*@dev",
         "astrx/module-imageboard": "*@dev",
         "astrx/module-media": "*@dev",
@@ -76,10 +75,6 @@
         {
             "type": "vcs",
             "url": "https://github.com/Vxmdzhb/module-downloads"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/Vxmdzhb/module-fedsearch"
         },
         {
             "type": "vcs",

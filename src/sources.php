@@ -32,7 +32,6 @@ return [
     'AstrX\\Database\\' => [__DIR__ . '/../vendor/astrx/library/Database'],
     'AstrX\\Downloads\\' => [__DIR__ . '/../vendor/astrx/module-downloads'],
     'AstrX\\ErrorHandler\\' => [__DIR__ . '/../vendor/astrx/framework/ErrorHandler'],
-    'AstrX\\FederatedSearch\\' => [__DIR__ . '/../vendor/astrx/module-fedsearch'],
     'AstrX\\GitBrowse\\' => [__DIR__ . '/../vendor/astrx/module-gitbrowse'],
     'AstrX\\Http\\' => [__DIR__ . '/../vendor/astrx/framework/Http'],
     'AstrX\\I18n\\' => [__DIR__ . '/../vendor/astrx/framework/I18n'],
