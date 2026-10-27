@@ -9,10 +9,10 @@ It is also the PHP framework the site is built on, split into small packages
 you can use on their own.
 
 <p align="center">
-  <img src="docs/screenshots/home-default.png" width="49%" alt="The home page with news and comments">
-  <img src="docs/screenshots/chat-default.png" width="49%" alt="The chat, with messages and the list of people online">
-  <img src="docs/screenshots/board-default.png" width="49%" alt="A thread on the imageboard">
-  <img src="docs/screenshots/admin-users.png" width="49%" alt="User management in the admin panel">
+  <img src="docs/screenshots/home.png" width="49%" alt="The home page with news and comments">
+  <img src="docs/screenshots/chat.png" width="49%" alt="The chat, with messages and the list of people online">
+  <img src="docs/screenshots/search-torrents.png" width="49%" alt="The Search page, on its torrents tab">
+  <img src="docs/screenshots/git-tree.png" width="49%" alt="A repository on the Code page">
 </p>
 
 <p align="center"><a href="docs/screenshots/README.md">More screenshots, including the admin panel</a></p>
@@ -28,18 +28,19 @@ you can use on their own.
   images until you trust the sender ([screenshots](docs/screenshots/README.md#webmail)).
 - **Tip line**: anonymous tips, sealed with a public key the moment they
   arrive and only readable offline, with the private key.
-- **Search**: the site's own full-text search, plus web, onion and torrent
-  search when you run the engines from [astrx-suite][suite]
-  ([screenshots](docs/screenshots/README.md#the-search-engines)).
+- **Search**: one search box, with a tab for the site's own content and,
+  when you run the engines from [astrx-suite][suite], tabs for the web, onion
+  services and torrents ([screenshots](docs/screenshots/README.md#search)).
+- **Code**: your git repositories, browsable on the site: files, code,
+  history and diffs ([screenshots](docs/screenshots/README.md#code)).
 - **Trust pages**: a warrant canary, signed downloads and a signed list of
   onion mirrors.
 - **The basics**: accounts with two-factor login, an admin panel, themes,
   comments, invites, captchas, a bot trap and data retention rules.
 
-Ten themes ship with it, from plain black-and-white to amber terminal and
-synthwave, and each visitor can pick their own:
-
-<p align="center"><img src="docs/screenshots/themes.png" alt="The same page in six of the bundled themes"></p>
+Ten themes ship with it, from plain black-and-white (the one in every
+screenshot) to amber terminal and synthwave, and each visitor can pick their
+own.
 
 Every feature is a module. Switch off the ones you don't want and their pages
 and menu entries disappear; their data stays until you purge it.

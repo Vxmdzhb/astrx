@@ -1,19 +1,25 @@
 # Screenshots
 
-All taken on a local install filled with made-up content (the people, posts
-and pictures are invented). Most use the default theme; the last few show
-some of the others.
+All taken on a local install filled with made-up content: the people, posts,
+mail and pictures are invented, and the keys are throwaway. Every module is
+on, every page is seen by the same administrator ("Ash"), and every one uses
+the default theme. [tools/demo](../../tools/demo/README.md) builds the same
+site and retakes them all.
 
 ## The site
 
 | | |
 |---|---|
-| ![Home page with news and comments](home-default.png) | ![The chat](chat-default.png) |
+| ![Home page with news and comments](home.png) | ![The chat](chat.png) |
 | Home: news and comments | Chat: messages, people online, moderation |
-| ![A thread on the imageboard](board-default.png) | ![A user's profile](profile-default.png) |
-| A thread on the imageboard | A profile |
-| ![The user area](user-home-default.png) | ![Account settings](settings-default.png) |
+| ![A profile](profile.png) | ![A wiki page](wiki-page.png) |
+| A profile | A wiki page, with its backlinks |
+| ![The user area](user-home.png) | ![Account settings](settings.png) |
 | The user area | Account settings |
+
+![A thread on the imageboard](board.png)
+
+A thread on the imageboard.
 
 ## Webmail
 
@@ -24,22 +30,38 @@ some of the others.
 | ![Remote images blocked](webmail-images-blocked.png) | ![Replying](webmail-reply.png) |
 | A newsletter: its remote images are blocked until you trust the sender | Replying |
 
-<p align="center"><img src="webmail-themes.png" alt="The inbox in Dracula, Light, Terminal and Synthwave"></p>
+## Search
 
-The inbox in Dracula, Light, Terminal and Synthwave.
-
-## The search engines
-
-The Rust engines from [astrx-suite](https://github.com/Vxmdzhb/astrx-suite),
-as the site shows them. The indexes were filled by crawling a few made-up
-sites and onion services, and with public-domain and free-software torrents.
+One search box, with a tab for the site and one per engine. The web, onion
+and torrent tabs show the Rust engines from
+[astrx-suite](https://github.com/Vxmdzhb/astrx-suite), whose indexes were
+filled by crawling a few made-up sites and onion services, and with
+public-domain and free-software torrents.
 
 | | |
 |---|---|
-| ![Federated search, clear-web tab](search-web.png) | ![Federated search, torrents tab](search-torrents.png) |
-| One search box: the clear-web tab | The same box: the torrents tab |
-| ![Onion search](search-onion.png) | ![Engine status in the admin panel](admin-engines.png) |
-| Onion search | Engine status and onion seeds, in the admin panel |
+| ![This site](search-site.png) | ![The web](search-web.png) |
+| This site: news, pages, comments and posts | The web |
+| ![Onion services](search-onion.png) | ![Torrents](search-torrents.png) |
+| Onion services | Torrents: the first files, size, age and links |
+| ![A torrent](torrent-detail.png) | ![Engine status in the admin panel](admin-engines.png) |
+| A torrent: its facts and all its files | The engines' status, in the admin panel |
+
+## Code
+
+The site's git browser, reading a [gitweb](https://github.com/Vxmdzhb/gitweb)
+server that holds the project's own repositories.
+
+| | |
+|---|---|
+| ![The repositories](git-repos.png) | ![A repository](git-tree.png) |
+| The repositories | A repository: files, README, latest commit, `git clone` |
+| ![A file](git-file.png) | ![A commit](git-commit.png) |
+| A file | A commit and its diff |
+
+![Admin, Git server](admin-git.png)
+
+Admin → Git server: which server to read, and the address visitors clone from.
 
 ## Trust pages
 
@@ -72,16 +94,5 @@ sites and onion services, and with public-domain and free-software torrents.
 | Data retention | Panic lockdown |
 | ![Languages](admin-language.png) | ![Invitations](admin-invites.png) |
 | Languages and translations | Invitations |
-| ![Blocklist](admin-blocklist.png) | ![A wiki page](wiki-page.png) |
-| The engines' blocklist | A wiki page, with its backlinks |
-
-## Other themes
-
-| | |
-|---|---|
-| ![Home in Dracula](home.png) | ![Chat in Dracula](chat.png) |
-| Dracula | Dracula |
-| ![A thread in Sepia](board.png) | ![A profile in Reader](profile.png) |
-| Sepia | Reader |
-| ![The theme picker in Light](admin.png) | ![Six themes](themes.png) |
-| Light | Amber, Cyber Mono, Light, Newsprint, Synthwave, Terminal |
+| ![Blocklist](admin-blocklist.png) | ![Media library](admin-media.png) |
+| The engines' blocklist | The media library |
