@@ -62,3 +62,5 @@ astrx-suite.bak.*
 /installrustsuite.sh
 /removepython.sh
 *.patch
+__pycache__/
+*.py[cod]

@@ -1,0 +1,21 @@
+{
+  "warning": "PUBLIC TEST VECTOR. x=1 and r=2 are not production secrets. Never use fixed nonces.",
+  "challenge": {
+    "v": 1,
+    "suite": "ristretto255-sha512",
+    "action": "login",
+    "origin": "https://blackhost.xyz",
+    "nonce": "abababababababababababababababababababababababababababababababab",
+    "expires": 2000000000
+  },
+  "proof": {
+    "v": 1,
+    "nonce": "abababababababababababababababababababababababababababababababab",
+    "username": "alice",
+    "public_key": "e2f2ae0a6abc4e71a884a961c500515f58e30b6aa582dd8db6a65945e08d2d76",
+    "commitment": "6a493210f7499cd17fecb510ae0cea23a110e8d5b901f8acadd3095c73a3b919",
+    "response": "afee1d69338734baa03c70bc0a0f8b6eb42ec68dabb5c84bbaf8637e93dc610a"
+  },
+  "proof_token": "eyJ2IjoxLCJub25jZSI6ImFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWIiLCJ1c2VybmFtZSI6ImFsaWNlIiwicHVibGljX2tleSI6ImUyZjJhZTBhNmFiYzRlNzFhODg0YTk2MWM1MDA1MTVmNThlMzBiNmFhNTgyZGQ4ZGI2YTY1OTQ1ZTA4ZDJkNzYiLCJjb21taXRtZW50IjoiNmE0OTMyMTBmNzQ5OWNkMTdmZWNiNTEwYWUwY2VhMjNhMTEwZThkNWI5MDFmOGFjYWRkMzA5NWM3M2EzYjkxOSIsInJlc3BvbnNlIjoiYWZlZTFkNjkzMzg3MzRiYWEwM2M3MGJjMGEwZjhiNmViNDJlYzY4ZGFiYjVjODRiYmFmODYzN2U5M2RjNjEwYSJ9",
+  "challenge_token": "eyJ2IjoxLCJzdWl0ZSI6InJpc3RyZXR0bzI1NS1zaGE1MTIiLCJhY3Rpb24iOiJsb2dpbiIsIm9yaWdpbiI6Imh0dHBzOi8vYmxhY2tob3N0Lnh5eiIsIm5vbmNlIjoiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYiIsImV4cGlyZXMiOjIwMDAwMDAwMDB9"
+}
