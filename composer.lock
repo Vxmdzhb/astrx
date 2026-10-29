@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/cms.git",
-                "reference": "0349fd33b368c00567cc44621d0233d0d23e99f5"
+                "reference": "eabcf201f877db35a1ff2b3fee2ae2362e6bb4f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/cms/zipball/0349fd33b368c00567cc44621d0233d0d23e99f5",
-                "reference": "0349fd33b368c00567cc44621d0233d0d23e99f5",
+                "url": "https://api.github.com/repos/Vxmdzhb/cms/zipball/eabcf201f877db35a1ff2b3fee2ae2362e6bb4f2",
+                "reference": "eabcf201f877db35a1ff2b3fee2ae2362e6bb4f2",
                 "shasum": ""
             },
             "require": {
@@ -66,7 +66,7 @@
                 "source": "https://github.com/Vxmdzhb/cms/tree/main",
                 "issues": "https://github.com/Vxmdzhb/cms/issues"
             },
-            "time": "2026-10-27T13:44:46+00:00"
+            "time": "2026-10-29T21:04:48+00:00"
         },
         {
             "name": "astrx/framework",
