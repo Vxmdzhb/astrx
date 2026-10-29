@@ -114,6 +114,21 @@ try {
     check('untrusted Host is rejected', $zkp->origin() === null);
     $zkp->setOrigins(['https://blackhost.xyz']);
     check('configured origin works', $zkp->origin() === 'https://blackhost.xyz');
+    $view = new class implements AstrX\Template\TemplateVars {
+        public array $values = [];
+        public function set(string $key, mixed $value, AstrX\Template\ContextScope $scope = AstrX\Template\ContextScope::WEB_ONLY): void { $this->values[$key] = $value; }
+        public function setShared(string $key, mixed $value): void { $this->values[$key] = $value; }
+    };
+    $roots = new AstrX\Support\ResourceRoots([dirname(__DIR__) . '/vendor/astrx/cms/resources']);
+    $zkp->present($view, new AstrX\I18n\Translator(roots: $roots), 'login');
+    check('presentation registers its partial path', ($view->values['zkp_auth'] ?? '') === 'partials/zkp_auth');
+    $renderer = new AstrX\Template\TemplateEngine(roots: $roots);
+    $renderer->setCacheTemplates(false);
+    $html = $renderer->renderTemplate('user/login', $view->values)->unwrap();
+    check('actual login template includes the proof field', str_contains($html, 'name="zkp_proof"') && str_contains($html, 'Local key (Schnorr proof)'));
+    $zkp->present($view, new AstrX\I18n\Translator(roots: $roots), 'register');
+    $html = $renderer->renderTemplate('user/register', $view->values)->unwrap();
+    check('actual registration template includes the proof field', str_contains($html, 'name="zkp_proof"'));
     $_SESSION['_zkp_binding'] = str_repeat('12',32);
     $sessionBinding = hash('sha256',$_SESSION['_zkp_binding']);
     $secret = sodium_crypto_core_ristretto255_scalar_random();
