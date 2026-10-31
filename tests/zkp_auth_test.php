@@ -125,7 +125,7 @@ try {
     $renderer = new AstrX\Template\TemplateEngine(roots: $roots);
     $renderer->setCacheTemplates(false);
     $html = $renderer->renderTemplate('user/login', $view->values)->unwrap();
-    check('actual login template includes the proof field', str_contains($html, 'name="zkp_proof"') && str_contains($html, 'Local key (Schnorr proof)'));
+    check('actual login template includes the proof field', str_contains($html, 'name="zkp_proof"') && str_contains($html, 'Or log in with a key'));
     $zkp->present($view, new AstrX\I18n\Translator(roots: $roots), 'register');
     $html = $renderer->renderTemplate('user/register', $view->values)->unwrap();
     check('actual registration template includes the proof field', str_contains($html, 'name="zkp_proof"'));
@@ -166,18 +166,35 @@ try {
     check('key signup has no usable password', $repo->findPasswordHash($uid)->unwrap() === UserService::KEY_ONLY_PASSWORD);
     check('duplicate credential fails atomically', !$users->register('duplicate','','',null,null,null,null,null,null,$key)->isOk());
     check('failed credential insert leaves no account', $repo->findByUsername('duplicate')->unwrap() === null);
+    $called = false;
+    $users->setRequireDisplayName(true);
+    $later = function () use (&$called, $key): \AstrX\Result\Result { $called = true; return \AstrX\Result\Result::ok($key); };
+    check('a form error comes before the proof', !$users->register('bob','','',null,null,null,null,null,null,$later)->isOk());
+    check('a form error does not spend the proof', $called === false);
+    $users->setRequireDisplayName(false);
+    $both = bin2hex(sodium_crypto_scalarmult_ristretto255_base(sodium_crypto_core_ristretto255_scalar_random()));
+    $carol = $users->register('carol','a long enough password','a long enough password',null,null,null,null,null,null,
+        fn(): \AstrX\Result\Result => \AstrX\Result\Result::ok($both));
+    check('the proof is checked last and the account is created', $carol->isOk() && $repo->findZkpKey($carol->unwrap())->unwrap() === $both);
+    check('a password typed with a key is kept', $carol->isOk() && $users->verifyPassword($carol->unwrap(), 'a long enough password'));
+    check('a refused proof creates no account', !$users->register('dave','','',null,null,null,null,null,null,
+        fn(): \AstrX\Result\Result => \AstrX\Result\Result::err(null))->isOk() && $repo->findByUsername('dave')->unwrap() === null);
     check('password path cannot use sentinel', !$users->login('alice',UserService::KEY_ONLY_PASSWORD,false)->isOk());
     check('wrong key cannot authenticate account', !$users->loginWithPublicKey('alice',$p['public_key'],false)->isOk());
     $users->setAllowLoginNonVerified(false);
     check('key path keeps verification requirement', !$users->loginWithPublicKey('alice',$key,false)->isOk());
     $repo->setVerified($uid);
-    $pdo->exec("UPDATE user SET deletion_mode = 'keep_visible'");
+    $pdo->exec("UPDATE user SET deletion_mode = 'keep_visible' WHERE username = 'alice'");
     check('closed account cannot key-login', !$users->loginWithPublicKey('alice',$key,false)->isOk());
-    $pdo->exec("UPDATE user SET deletion_mode = 'none', login_locked_until = ".(time()+300));
-    check('account lockout applies to key login', !$users->loginWithPublicKey('alice',$key,false)->isOk());
-    $pdo->exec("UPDATE user SET login_locked_until = NULL, totp_enabled = 1, totp_secret = 'enc:v1:broken'");
+    $pdo->exec("UPDATE user SET deletion_mode = 'none'");
+    for ($i = 0; $i < 12; $i++) { $users->login('alice', 'guess number ' . $i, false); }
+    check('wrong passwords never count against a key-only account',
+        (int) $pdo->query("SELECT login_attempts FROM user WHERE username = 'alice'")->fetchColumn() === 0);
+    $pdo->exec("UPDATE user SET login_locked_until = ".(time()+300)." WHERE username = 'alice'");
+    check('the password lockout does not block key login', $users->loginWithPublicKey('alice',$key,false)->isOk());
+    $pdo->exec("UPDATE user SET login_locked_until = NULL, totp_enabled = 1, totp_secret = 'enc:v1:broken' WHERE username = 'alice'");
     check('broken second factor fails closed', !$users->loginWithPublicKey('alice',$key,false)->isOk());
-    $pdo->exec('UPDATE user SET totp_enabled = 0');
+    $pdo->exec("UPDATE user SET totp_enabled = 0 WHERE username = 'alice'");
     $accepted = $users->loginWithPublicKey('alice',$key,false);
     check('key login returns first-factor identity', $accepted->isOk());
     check('service does not bypass controller second-factor gate', !$session->isLoggedIn());
@@ -187,9 +204,9 @@ try {
     check('credential still exists after refused removal', $repo->findZkpKey($uid)->unwrap() === $key);
     $password='a real existing account password';
     $repo->updatePassword($uid,password_hash($password,PASSWORD_ARGON2ID));
-    $before=(int)$pdo->query('SELECT session_epoch FROM user')->fetchColumn();
+    $before=(int)$pdo->query("SELECT session_epoch FROM user WHERE username = 'alice'")->fetchColumn();
     check('password reauthentication permits key removal', $users->changePublicKey($uid,$password,null)->isOk());
-    check('removal revokes other sessions atomically', (int)$pdo->query('SELECT session_epoch FROM user')->fetchColumn() === $before+1);
+    check('removal revokes other sessions atomically', (int)$pdo->query("SELECT session_epoch FROM user WHERE username = 'alice'")->fetchColumn() === $before+1);
     check('removal signs out acting session', !$session->isLoggedIn());
     check('revoked key no longer authenticates', !$users->loginWithPublicKey('alice',$key,false)->isOk());
     $session->login($accepted->unwrap()); // Simulates an old proof finishing TOTP after revocation.
