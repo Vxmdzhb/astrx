@@ -10,7 +10,8 @@
 // goes to ~/src/screenshots-html/<name>.html (outside every repository: it
 // holds session tokens), or to HTML_DIR.
 //
-// Logs in as DEMO_USER (default admin), so every page has the same navigation.
+// Logs in as DEMO_USER (default admin), so every page has the same navigation;
+// shots marked "guest" (the login and sign-up pages) are taken logged out.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -24,12 +25,15 @@ const OUT = path.resolve(outArg);
 (async () => {
   const b = await chromium.launch();
   const ctx = await b.newContext({ viewport: manifest.viewport, deviceScaleFactor: 1 });
-  const p = await ctx.newPage();
-  await login(p);
+  const user = await ctx.newPage();
+  await login(user);
+  // Pages only a visitor sees (login, sign-up) use a second, logged-out window.
+  const guest = await (await b.newContext({ viewport: manifest.viewport, deviceScaleFactor: 1 })).newPage();
   const htmlDir = path.resolve(process.env.HTML_DIR || path.join(OUT, 'screenshots-html'));
   fs.mkdirSync(htmlDir, { recursive: true });
   for (const shot of manifest.shots) {
     if (only.length && !only.includes(shot.name)) continue;
+    const p = shot.guest ? guest : user;
     await p.setViewportSize({ width: manifest.viewport.width, height: shot.height || manifest.viewport.height });
     let resp = await p.goto(BASE + shot.path, { waitUntil: 'networkidle' });
     if (shot.click) {
@@ -38,7 +42,7 @@ const OUT = path.resolve(outArg);
     await p.waitForTimeout(300);
     const first = path.join(OUT, shot.to[0]);
     fs.mkdirSync(path.dirname(first), { recursive: true });
-    await p.screenshot({ path: first });
+    await p.screenshot({ path: first, fullPage: !!shot.fullPage });
     for (const copy of shot.to.slice(1)) {
       fs.mkdirSync(path.dirname(path.join(OUT, copy)), { recursive: true });
       fs.copyFileSync(first, path.join(OUT, copy));

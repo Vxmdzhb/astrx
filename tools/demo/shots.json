@@ -1,7 +1,7 @@
 {
   "_comment": [
     "Every screenshot in the READMEs, in the order shots.js takes them.",
-    "path: the page, logged in as DEMO_USER (admin). height (optional): a taller window, for long pages.",
+    "path: the page, logged in as DEMO_USER (admin), or logged out with \"guest\". height: a taller window; fullPage: the whole page.",
     "click: follow this link first (a Playwright selector). to: where the PNG goes, relative to the",
     "folder given to shots.js (the folder that holds the repository checkouts)."
   ],
@@ -62,6 +62,24 @@
       "to": [
         "astrx/docs/screenshots/wiki-page.png",
         "module-content/docs/screenshot.png"
+      ]
+    },
+    {
+      "name": "login",
+      "path": "/en/login",
+      "guest": true,
+      "fullPage": true,
+      "to": [
+        "astrx/docs/screenshots/login.png"
+      ]
+    },
+    {
+      "name": "register",
+      "path": "/en/register",
+      "guest": true,
+      "fullPage": true,
+      "to": [
+        "astrx/docs/screenshots/register.png"
       ]
     },
     {

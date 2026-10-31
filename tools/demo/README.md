@@ -89,8 +89,15 @@ The engines listen where the site's defaults expect them, so no engine
 setting needs changing. `fill.js` logs in as the admin and fills, through the
 admin forms, what the seed cannot: the warrant canary, the signed downloads
 manifest, the mirror list, the tip-line key, four wiki pages, three pictures
-in the media library, and Admin → Git server (gitweb at
-`http://127.0.0.1:8801`, cloned from `http://git.example.onion`).
+in the media library, the captcha's "New captcha" link (Admin → Captcha), and
+Admin → Git server (gitweb at `http://127.0.0.1:8801`, cloned from
+`http://git.example.onion`).
+
+Key login is off by default; turn it on for the login and sign-up pictures:
+
+```sh
+cp tools/demo/config/User.config.php resources/config/User.config.php
+```
 
 Then rebuild the site search, so it finds the wiki pages too:
 
@@ -113,7 +120,8 @@ node tools/demo/shots.js ~/src chat board  # or just some of them
 Each repository's `docs/screenshot.png` is a copy of one of the gallery
 pictures in `astrx/docs/screenshots`. All of them are taken logged in as the
 admin, in a 1280×860 window (the board thread uses a taller one), so every
-page shows the same navigation. The HTML the site sent for each page is saved
+page shows the same navigation; only the login and sign-up pages are taken
+logged out, as whole pages. The HTML the site sent for each page is saved
 to `~/src/screenshots-html/` (outside the repositories: it carries session
 tokens).
 
@@ -126,6 +134,7 @@ on another address, `BASE_URL`.
 |---|---|
 | `seed.php` | people, news, comments, boards, chat, audit log |
 | `captcha.php` | reads a login captcha's answer from the database, for the scripts |
+| `config/User.config.php` | turns key login on for the demo |
 | `mail/dovecot.conf`, `mail/users`, `mail/seed_mail.py` | the IMAP server and its mail |
 | `web/fakeweb.py` | the made-up web the crawlers index |
 | `torrents/` | writes the torrent index |

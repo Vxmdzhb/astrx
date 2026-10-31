@@ -1,6 +1,6 @@
-// Fills what the seed cannot: the trust pages, the wiki, the media library and
-// the git server setting, all through the admin forms (so they are saved the
-// way an operator would save them).
+// Fills what the seed cannot: the trust pages, the wiki, the media library,
+// the captcha's reload link and the git server setting, all through the admin
+// forms (so they are saved the way an operator would save them).
 //
 //   node tools/demo/fill.js demo-data/trust
 //
@@ -75,6 +75,8 @@ Try them all from the *Search* page: one box, a tab per engine. See also [[tor-g
   for (const f of bySize.slice(0, 3)) {
     await submit(p, 'admin-media', action('upload'), {}, { file: path.join(up, f) });
   }
+  // Every captcha gets its "New captcha" link.
+  await submit(p, 'admin-config-captcha', 'input[name=reload_enabled]', { reload_enabled: true });
   await submit(p, 'admin-config-git', 'input[name=api_url]', {
     api_url: process.env.GITWEB_URL || 'http://127.0.0.1:8801',
     public_url: process.env.GIT_PUBLIC_URL || 'http://git.example.onion',
