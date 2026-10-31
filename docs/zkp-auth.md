@@ -36,8 +36,8 @@ key for this account, **before** opening the registration page:
 umask 077
 mkdir -p "$HOME/.config/astrx"
 python3 tools/zkp_client.py keygen \
-  --key "$HOME/.config/astrx/blackhost.key" \
-  --origin https://blackhost.xyz \
+  --key "$HOME/.config/astrx/astrx.key" \
+  --origin https://example.org \
   --username alice
 ```
 
@@ -52,29 +52,31 @@ placeholder onion address. Both origins must also appear in the server allowlist
 Origins have no path or trailing slash. Ordinary HTTP is refused except for v3
 onion addresses and explicit localhost/127.0.0.1 development origins.
 
-1. Open registration, enter the same username and select **Local key**.
-2. Leave password fields empty. Run the following command and paste the page's
-   challenge when prompted:
+1. Open registration, enter the same username and use the **Or sign up with a
+   key** section. Leave the password fields empty for a key-only account, or fill
+   them in to keep a password as well. Run the following command and paste the
+   page's challenge when prompted:
 
 ```bash
 python3 tools/zkp_client.py prove \
-  --key "$HOME/.config/astrx/blackhost.key" --action register
+  --key "$HOME/.config/astrx/astrx.key" --action register
 ```
 
-3. Check the action, account and origin displayed by the client. Confirm only
+2. Check the action, account and origin displayed by the client. Confirm only
    an action you started. Paste its output into the form's **Proof** field, then
    complete CAPTCHA, invitation, consent and other required fields normally.
-4. Complete email verification if the installation requires it.
-5. On each subsequent login, select Local key and use the login page's fresh
-   challenge with:
+3. Complete email verification if the installation requires it.
+4. On each later login, use the login page's **Or log in with a key** section
+   and its fresh challenge with:
 
 ```bash
 python3 tools/zkp_client.py prove \
-  --key "$HOME/.config/astrx/blackhost.key" --action login
+  --key "$HOME/.config/astrx/astrx.key" --action login
 ```
 
 The proof expires with its five-minute challenge and can be submitted once.
-Refresh the form for a new challenge after expiry or a failed submission. An
+Refresh the form for a new challenge after expiry or a failed submission. A
+filled-in proof box is what selects key login: leave it empty to use a password. An
 existing TOTP requirement still follows a successful key proof. The local
 passphrase unlocks the key file; it is not a second factor verified by the site.
 
@@ -177,7 +179,7 @@ Enable the feature by merging this section into the development site's
 ```
 
 Use the actual test origin in both this configuration and the client's key file.
-For production, the allowlist would contain `https://blackhost.xyz` and the exact
+For production, the allowlist would contain `https://example.org` and the exact
 onion origin. Behind your existing nginx proxy, keep the correct `HTTPS` and
 `SERVER_PORT` FastCGI values from the production runbook. The new service declares
 its `User.config.php` configuration domain explicitly.
