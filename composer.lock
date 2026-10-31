@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/cms.git",
-                "reference": "eabcf201f877db35a1ff2b3fee2ae2362e6bb4f2"
+                "reference": "71b77f9c60f35052a3becc2e465ca564d7b0e5e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/cms/zipball/eabcf201f877db35a1ff2b3fee2ae2362e6bb4f2",
-                "reference": "eabcf201f877db35a1ff2b3fee2ae2362e6bb4f2",
+                "url": "https://api.github.com/repos/Vxmdzhb/cms/zipball/71b77f9c60f35052a3becc2e465ca564d7b0e5e8",
+                "reference": "71b77f9c60f35052a3becc2e465ca564d7b0e5e8",
                 "shasum": ""
             },
             "require": {
@@ -66,7 +66,7 @@
                 "source": "https://github.com/Vxmdzhb/cms/tree/main",
                 "issues": "https://github.com/Vxmdzhb/cms/issues"
             },
-            "time": "2026-10-29T21:04:48+00:00"
+            "time": "2026-10-31T22:53:10+00:00"
         },
         {
             "name": "astrx/framework",
@@ -145,12 +145,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/library.git",
-                "reference": "194dd0d4b8935d2a8e71f8b5d4874ffb22425aa7"
+                "reference": "966a01af450da8b5d58e58097fcdc058de16c73e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/library/zipball/194dd0d4b8935d2a8e71f8b5d4874ffb22425aa7",
-                "reference": "194dd0d4b8935d2a8e71f8b5d4874ffb22425aa7",
+                "url": "https://api.github.com/repos/Vxmdzhb/library/zipball/966a01af450da8b5d58e58097fcdc058de16c73e",
+                "reference": "966a01af450da8b5d58e58097fcdc058de16c73e",
                 "shasum": ""
             },
             "require": {
@@ -194,7 +194,7 @@
                 "source": "https://github.com/Vxmdzhb/library/tree/main",
                 "issues": "https://github.com/Vxmdzhb/library/issues"
             },
-            "time": "2026-10-27T13:44:39+00:00"
+            "time": "2026-10-31T22:53:06+00:00"
         },
         {
             "name": "astrx/module-blocklist",
@@ -528,12 +528,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-imageboard.git",
-                "reference": "cf716d7b9b316518a4409313c8702783a51ea110"
+                "reference": "92969f8b700e217a877f3e8cad2407885ef798c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-imageboard/zipball/cf716d7b9b316518a4409313c8702783a51ea110",
-                "reference": "cf716d7b9b316518a4409313c8702783a51ea110",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-imageboard/zipball/92969f8b700e217a877f3e8cad2407885ef798c4",
+                "reference": "92969f8b700e217a877f3e8cad2407885ef798c4",
                 "shasum": ""
             },
             "require": {
@@ -569,7 +569,7 @@
                 "source": "https://github.com/Vxmdzhb/module-imageboard/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-imageboard/issues"
             },
-            "time": "2026-10-27T13:45:39+00:00"
+            "time": "2026-10-31T22:53:14+00:00"
         },
         {
             "name": "astrx/module-media",
@@ -804,12 +804,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-tipline.git",
-                "reference": "262a88fef0aebd1d0b2250ead69c4804a022d725"
+                "reference": "4318569e26c1aa2099f623e81850b7120407a15b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-tipline/zipball/262a88fef0aebd1d0b2250ead69c4804a022d725",
-                "reference": "262a88fef0aebd1d0b2250ead69c4804a022d725",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-tipline/zipball/4318569e26c1aa2099f623e81850b7120407a15b",
+                "reference": "4318569e26c1aa2099f623e81850b7120407a15b",
                 "shasum": ""
             },
             "require": {
@@ -845,7 +845,7 @@
                 "source": "https://github.com/Vxmdzhb/module-tipline/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-tipline/issues"
             },
-            "time": "2026-10-27T13:46:14+00:00"
+            "time": "2026-10-31T22:53:19+00:00"
         },
         {
             "name": "astrx/module-torrentsearch",
