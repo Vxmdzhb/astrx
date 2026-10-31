@@ -2,8 +2,8 @@
 
 All taken on a local install filled with made-up content: the people, posts,
 mail and pictures are invented, and the keys are throwaway. Every module is
-on, every page is seen by the same administrator ("Ash"), and every one uses
-the default theme. [tools/demo](../../tools/demo/README.md) builds the same
+on, every page is seen by the same administrator ("Ash") except the login and
+sign-up pages, which only visitors see, and every one uses the default theme. [tools/demo](../../tools/demo/README.md) builds the same
 site and retakes them all.
 
 ## The site
@@ -16,6 +16,8 @@ site and retakes them all.
 | A profile | A wiki page, with its backlinks |
 | ![The user area](user-home.png) | ![Account settings](settings.png) |
 | The user area | Account settings |
+| ![Logging in](login.png) | ![Signing up](register.png) |
+| Logging in, with a password or a key | Signing up |
 
 ![A thread on the imageboard](board.png)
 
