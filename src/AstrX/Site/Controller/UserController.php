@@ -239,6 +239,7 @@ final class UserController extends AbstractController
         $this->ctx->set('show_captcha',       $showCaptcha);
         $this->ctx->set('captcha_id',         $captchaId);
         $this->ctx->set('captcha_image',      $captchaB64);
+        $this->captchaService->presentReload($this->ctx, $this->urlGen, $this->t, $captchaId);
         $this->ctx->set('register_url',       $this->urlGen->toPage($this->t->t('WORDING_REGISTER')));
         $this->ctx->set('recover_url',        $this->urlGen->toPage($this->t->t('WORDING_RECOVER')));
         $this->ctx->set('show_recover',       $this->userService->requireRecoveryEmail());
