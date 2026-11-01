@@ -197,9 +197,10 @@ foreach ($chat as $i => [$nick, $color, $msg]) {
     $pdo->prepare("INSERT INTO chat_message (room_id, user_id, nick, color, type, content, created_at, expires_at) VALUES (1, UNHEX(?), ?, ?, 'user', ?, ?, ?)")
         ->execute([$users[$nick], $nick, $color, $msg, at(($t - $i) * 2 . ' minutes'), date('Y-m-d H:i:s', time() + 86400)]);
 }
+// The chat's role is the site group: 0 user, 1 admin, 2 moderator (Saffi).
 foreach (['kestrel' => '#7fd1ff', 'nova' => '#ffb86c', 'otto' => '#a6e22e', 'mirelle' => '#ff79c6', 'juniper' => '#bd93f9', 'saffi' => '#f1fa8c'] as $nick => $color) {
     $pdo->prepare('INSERT INTO chat_presence (ident, is_member, user_id, nick, color, role, status, joined_at, last_seen) VALUES (?, 1, UNHEX(?), ?, ?, ?, 1, ?, NOW())')
-        ->execute([substr(hash('sha256', $nick), 0, 32), $users[$nick], $nick, $color, $nick === 'saffi' ? 1 : 0, at('1 hour')]);
+        ->execute([substr(hash('sha256', $nick), 0, 32), $users[$nick], $nick, $color, $nick === 'saffi' ? 2 : 0, at('1 hour')]);
 }
 
 // ── audit log ────────────────────────────────────────────────────────────────
