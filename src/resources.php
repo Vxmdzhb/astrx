@@ -14,7 +14,19 @@ declare(strict_types=1);
  * @return list<list<string>>
  */
 return [
-    [__DIR__ . '/../vendor/astrx/framework/resources'], // astrx/framework
-    [__DIR__ . '/../vendor/astrx/library/resources'], // astrx/library
+    [__DIR__ . '/../vendor/astrx/config/resources'], // astrx/config
+    [__DIR__ . '/../vendor/astrx/api/resources'], // astrx/api
+    [__DIR__ . '/../vendor/astrx/http/resources'], // astrx/http
+    [__DIR__ . '/../vendor/astrx/i18n/resources'], // astrx/i18n
+    [__DIR__ . '/../vendor/astrx/routing/resources'], // astrx/routing
+    [__DIR__ . '/../vendor/astrx/template/resources'], // astrx/template
+    [__DIR__ . '/../vendor/astrx/captcha/resources'], // astrx/captcha
+    [__DIR__ . '/../vendor/astrx/csrf/resources'], // astrx/csrf
+    [__DIR__ . '/../vendor/astrx/error-handler/resources'], // astrx/error-handler
+    [__DIR__ . '/../vendor/astrx/identicon/resources'], // astrx/identicon
+    [__DIR__ . '/../vendor/astrx/image/resources'], // astrx/image
+    [__DIR__ . '/../vendor/astrx/mail/resources'], // astrx/mail
+    [__DIR__ . '/../vendor/astrx/injector/resources'], // astrx/injector
     [__DIR__ . '/../vendor/astrx/cms/resources'], // astrx/cms
+    [__DIR__ . '/../vendor/astrx/database/resources'], // astrx/database
 ];

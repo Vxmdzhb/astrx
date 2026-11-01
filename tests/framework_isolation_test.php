@@ -9,9 +9,9 @@ declare(strict_types=1);
  * higher layer, but it can't see string class names, constants, assumed file
  * paths, or the autoloader quietly finding application code. So this test:
  *
- *   1. copies only the framework package and the class loader (mapped from
- *      the package's composer.json) into an empty directory, next to a copy
- *      of examples/minimal;
+ *   1. copies only the framework packages (astrx/result, astrx/http, ...) and
+ *      the class loader (mapped from their composer.json files) into an
+ *      empty directory, next to a copy of examples/minimal;
  *   2. checks that tree cannot load a feature or application class;
  *   3. serves the example from it with PHP's built-in server and tries every
  *      route: HTML (escaping, security headers), POST/redirect/GET, JSON, 404.
@@ -101,24 +101,52 @@ $framework = array_values(array_filter(array_map(
 )));
 $tmp = rtrim(sys_get_temp_dir(), '/') . '/astrx-isolation-' . bin2hex(random_bytes(6));
 mkdir($tmp . '/src', 0o700, true);
-// The framework package exactly as published (packages/framework here,
-// vendor/astrx/framework where Composer installed it), and the application's
-// class loader pointed at it alone: the package's own composer.json says which
-// namespaces it provides and which files it loads.
+// The framework packages exactly as published (one per framework namespace:
+// astrx/result, astrx/http, ...; vendor/astrx/<name> where Composer installed
+// them), and the application's class loader pointed at them alone: each
+// package's composer.json says which namespaces it provides and which files
+// it loads.
 require_once __DIR__ . '/lib/packages.php';
-$fwSource = AstrX\TestSupport\packageDir('astrx/framework');
-copyTree($fwSource, $tmp . '/packages/framework');
-/** @var array{autoload: array{psr-4: array<string,string>, files?: list<string>}} $fwJson */
-$fwJson = json_decode((string) file_get_contents($fwSource . '/composer.json'), true);
+/** @var array<string, array{dir: string, json: array<string, mixed>}> $all */
+$all = AstrX\Tools\packages($root);
+/** @var array<string, string> $owner namespace => package that declares it */
+$owner = [];
+foreach ($all as $name => $pkg) {
+    $psr4 = $pkg['json']['autoload']['psr-4'] ?? [];
+    foreach (is_array($psr4) ? array_keys($psr4) : [] as $prefix) {
+        $owner[substr((string) $prefix, 6, -1)] = $name;
+    }
+}
+$fwPackages = [];
+foreach ($framework as $ns) {
+    if (isset($owner[$ns])) { $fwPackages[$owner[$ns]] = true; }
+}
+ksort($fwPackages);
 $map = '';
-foreach ($fwJson['autoload']['psr-4'] as $prefix => $dir) {
-    $map .= '    ' . var_export($prefix, true) . " => [__DIR__ . '/../packages/framework/" . rtrim($dir, '/') . "'],\n";
+$support = '';
+/** @var list<string> $declared */
+$declared = [];
+foreach (array_keys($fwPackages) as $name) {
+    $short = substr($name, 6);
+    $source = AstrX\TestSupport\packageDir($name);
+    copyTree($source, $tmp . '/packages/' . $short);
+    /** @var array{autoload: array{psr-4: array<string,string>, files?: list<string>}, require?: array<string,string>} $json */
+    $json = json_decode((string) file_get_contents($source . '/composer.json'), true);
+    foreach ($json['autoload']['psr-4'] as $prefix => $dir) {
+        $declared[] = substr($prefix, 6, -1);
+        $path = rtrim("/../packages/{$short}/" . $dir, '/');
+        $map .= '    ' . var_export($prefix, true) . " => [__DIR__ . '{$path}'],\n";
+    }
+    foreach ($json['autoload']['files'] ?? [] as $file) {
+        $support .= "require_once __DIR__ . '/../packages/{$short}/{$file}';\n";
+    }
+    foreach (array_keys($json['require'] ?? []) as $dep) {
+        if (str_starts_with($dep, 'astrx/') && !isset($fwPackages[$dep])) {
+            $fwOutside[] = "{$name} requires {$dep}";
+        }
+    }
 }
 file_put_contents($tmp . '/src/sources.php', "<?php\nreturn [\n{$map}];\n");
-$support = '';
-foreach ($fwJson['autoload']['files'] ?? [] as $file) {
-    $support .= "require_once __DIR__ . '/../packages/framework/{$file}';\n";
-}
 file_put_contents($tmp . '/src/support.php', "<?php\n{$support}");
 foreach (['autoload', 'classloader'] as $loader) {
     copy($root . '/src/' . $loader . '.php', $tmp . '/src/' . $loader . '.php');
@@ -127,20 +155,14 @@ copyTree($root . '/examples/minimal', $tmp . '/app');
 
 echo "1. Isolated tree\n";
 check('framework layers listed by the architecture gate (expected 10+)', count($framework) >= 10, implode(', ', $framework));
-$present = array_values(array_filter(
-    array_diff(scandir($tmp . '/packages/framework') ?: [], ['.', '..']),
-    // Namespace directories; resources/ holds the package's catalogs.
-    // Dot-directories are not namespaces: a package Composer cloned carries
-    // .git, and its own repository has .github.
-    static fn(string $e): bool => is_dir($tmp . '/packages/framework/' . $e) && $e !== 'resources' && $e[0] !== '.',
-));
-sort($present);
+$missing = array_values(array_diff($framework, array_keys($owner)));
+check('every framework namespace comes from a package', $missing === [], implode(', ', $missing));
+check('one package per framework namespace', count($fwPackages) === count($framework), implode(', ', array_keys($fwPackages)));
+sort($declared);
 $expected = $framework;
 sort($expected);
-check('the framework package holds exactly the framework namespaces', $present === $expected, implode(', ', $present));
-$declared = array_map(static fn(string $p): string => substr($p, 6, -1), array_keys($fwJson['autoload']['psr-4']));
-sort($declared);
-check('and its composer.json declares exactly those', $declared === $expected, implode(', ', $declared));
+check('and those packages declare exactly the framework namespaces', $declared === $expected, implode(', ', $declared));
+check('they require no package outside the framework', ($fwOutside ?? []) === [], implode('; ', $fwOutside ?? []));
 
 // ── 2. Application code is unreachable from it ──────────────────────────────
 echo "\n2. Nothing above the framework is reachable\n";

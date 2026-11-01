@@ -42,9 +42,10 @@ if (PHP_SAPI !== 'cli') {
 /**
  * Layers, lowest first. A namespace may depend on its own layer or any lower
  * one, never a higher one; cycles are rejected everywhere. They are the
- * Composer packages: foundation + component = astrx/framework, library =
- * astrx/library, feature = astrx/cms plus every module package, application =
- * this website (src/AstrX).
+ * Composer packages: every foundation, component and library namespace is a
+ * package of its own (Result = astrx/result, ErrorHandler =
+ * astrx/error-handler, ...), feature = astrx/cms plus every module package,
+ * application = this website (src/AstrX).
  *
  * The modules are not listed here: every namespace a package of type
  * astrx-module provides (one astrx/module-<key> each) joins the feature layer.

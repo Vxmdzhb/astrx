@@ -4,8 +4,9 @@ declare(strict_types=1);
 /**
  * AstrX package check: `php tools/packages.php [--write]`
  *
- * The site's code comes in Composer packages (astrx/framework, astrx/library,
- * astrx/cms and one astrx/module-<key> per module), installed under vendor/.
+ * The site's code comes in Composer packages (one per framework and library
+ * component, such as astrx/result, astrx/http and astrx/auth; astrx/cms; and
+ * one astrx/module-<key> per module), installed under vendor/.
  * This tool keeps the pieces that describe them in agreement:
  *
  *   - every package has a name, a type and a PSR-4 map whose directories

@@ -153,7 +153,9 @@ final class AstrXCompiler
             }
 
             $this->sourcePayload[$rel] = $this->stripPhpPreamble($raw);
-            if (str_ends_with($rel, '/Support/constants.php')) {
+            // astrx/support's function file: vendor/astrx/support/constants.php
+            // (Support/constants.php in a checkout that keeps the old layout).
+            if (preg_match('#/(?:support|Support)/constants\.php$#', $rel) === 1) {
                 $this->supportFile = $rel;
             }
 
@@ -170,7 +172,7 @@ final class AstrXCompiler
             throw new RuntimeException('Prelude.php was not included in the bundle.');
         }
         if ($this->supportFile === '') {
-            throw new RuntimeException('Support/constants.php was not included in the bundle.');
+            throw new RuntimeException('astrx/support\'s constants.php was not included in the bundle.');
         }
     }
 

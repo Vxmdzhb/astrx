@@ -91,16 +91,26 @@ $composer = [
     'name'        => $package,
     'description' => "AstrX {$studly} module",
     'type'        => 'astrx-module',
+    // What the generated manifest and controller use. tools/packages.php
+    // checks the list again once the module's own code grows.
     'require'     => [
-        'php'             => '>=8.4',
-        'astrx/cms'       => 'self.version',
-        'astrx/framework' => 'self.version',
+        'php'              => '>=8.4',
+        'astrx/cms'        => 'self.version',
+        'astrx/kernel'     => 'self.version',
+        'astrx/module'     => 'self.version',
+        'astrx/result'     => 'self.version',
+        'astrx/template'   => 'self.version',
     ],
     'autoload'    => ['psr-4' => ["AstrX\\{$studly}\\" => '']],
-    'repositories' => [
-        ['type' => 'vcs', 'url' => 'https://github.com/Vxmdzhb/cms'],
-        ['type' => 'vcs', 'url' => 'https://github.com/Vxmdzhb/framework'],
-    ],
+    'minimum-stability' => 'dev',
+    'prefer-stable'     => true,
+    // Everything the module pulls in, so it installs on its own: astrx/cms
+    // and the framework and library packages under it.
+    'repositories' => array_map(
+        static fn(string $repo): array => ['type' => 'vcs', 'url' => 'https://github.com/Vxmdzhb/' . $repo],
+        ['result', 'support', 'config', 'auth', 'api', 'http', 'i18n', 'session', 'kernel', 'routing', 'template',
+         'captcha', 'csrf', 'error-handler', 'identicon', 'image', 'mail', 'injector', 'module', 'pagination', 'cms'],
+    ),
 ];
 $emit("{$moduleDir}/composer.json", json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n");
 $emit("{$moduleDir}/README.md", <<<MD
@@ -109,7 +119,7 @@ $emit("{$moduleDir}/README.md", <<<MD
 The **{$studly}** module of AstrX.
 
 - Module key: `{$key}` (switch it on in the site's `resources/config/Modules.config.php`)
-- Requires: `astrx/cms`, `astrx/framework`
+- Requires: `astrx/cms`, `astrx/kernel`, `astrx/module`, `astrx/result`, `astrx/template`
 
 It ships its own templates, catalogs (en, it), default configuration and SQL in
 `resources/`; the site overrides any of them from its own `resources/`.
