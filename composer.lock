@@ -339,12 +339,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-chat.git",
-                "reference": "0791f9a7b492f177ee208cb6cb948a963567236f"
+                "reference": "9ffb992722ba21f088e1660346002bccfaa79553"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-chat/zipball/0791f9a7b492f177ee208cb6cb948a963567236f",
-                "reference": "0791f9a7b492f177ee208cb6cb948a963567236f",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-chat/zipball/9ffb992722ba21f088e1660346002bccfaa79553",
+                "reference": "9ffb992722ba21f088e1660346002bccfaa79553",
                 "shasum": ""
             },
             "require": {
@@ -380,7 +380,7 @@
                 "source": "https://github.com/Vxmdzhb/module-chat/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-chat/issues"
             },
-            "time": "2026-10-27T13:45:10+00:00"
+            "time": "2026-11-01T10:31:11+00:00"
         },
         {
             "name": "astrx/module-content",
