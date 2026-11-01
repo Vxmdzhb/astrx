@@ -74,13 +74,15 @@ its own package with its own repository:
 
 | Package | What it gives you |
 |---|---|
-| [framework] | Typed results, configuration, injection, HTTP and routing, templates, translation, sessions |
-| [library] | Database, permissions, captchas, image handling, mail |
+| The framework | One package per component: [result](https://github.com/Vxmdzhb/result), [support](https://github.com/Vxmdzhb/support), [config](https://github.com/Vxmdzhb/config), [injector](https://github.com/Vxmdzhb/injector), [http](https://github.com/Vxmdzhb/http), [routing](https://github.com/Vxmdzhb/routing), [i18n](https://github.com/Vxmdzhb/i18n), [error-handler](https://github.com/Vxmdzhb/error-handler), [template](https://github.com/Vxmdzhb/template), [session](https://github.com/Vxmdzhb/session), [csrf](https://github.com/Vxmdzhb/csrf), [module](https://github.com/Vxmdzhb/module), [pagination](https://github.com/Vxmdzhb/pagination), [kernel](https://github.com/Vxmdzhb/kernel) |
+| The library | Building blocks on top of it: [auth](https://github.com/Vxmdzhb/auth), [api](https://github.com/Vxmdzhb/api), [database](https://github.com/Vxmdzhb/database), [captcha](https://github.com/Vxmdzhb/captcha), [image](https://github.com/Vxmdzhb/image), [identicon](https://github.com/Vxmdzhb/identicon), [mail](https://github.com/Vxmdzhb/mail) |
 | [cms] | Accounts, admin panel, pages, navigation, themes, comments, news |
 | `module-*` | One package per feature above, for example [module-chat] |
 
-`framework` runs an application on its own; [`examples/minimal`](examples/minimal)
-is a small one. None of the packages pulls in third-party PHP code.
+Each package requires only the ones its code uses: `astrx/http` needs nothing
+but `astrx/result`, and the framework packages alone run an application
+([`examples/minimal`](examples/minimal) is a small one). None of them pulls in
+third-party PHP code.
 
 ## The Rust engines
 
@@ -119,7 +121,5 @@ AstrX is released under the [Do Whatever License](LICENSE), with a code of
 conduct in the same spirit: [CODE_OF_CONDUCT](CODE_OF_CONDUCT).
 
 [suite]: https://github.com/Vxmdzhb/astrx-suite
-[framework]: https://github.com/Vxmdzhb/framework
-[library]: https://github.com/Vxmdzhb/library
 [cms]: https://github.com/Vxmdzhb/cms
 [module-chat]: https://github.com/Vxmdzhb/module-chat

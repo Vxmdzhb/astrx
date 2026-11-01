@@ -22,8 +22,27 @@ in a repository of its own (see
 
 | Package | What |
 |---|---|
-| [`astrx/framework`](https://github.com/Vxmdzhb/framework) | results and diagnostics, configuration, injection, HTTP, routing, templates, translation, sessions, the module contract |
-| [`astrx/library`](https://github.com/Vxmdzhb/library) | database connection, authorization gate, API keys, captcha, images, identicons, mail |
+| [`astrx/result`](https://github.com/Vxmdzhb/result) | typed results and diagnostics |
+| [`astrx/support`](https://github.com/Vxmdzhb/support) | paths, resource roots, atomic writes |
+| [`astrx/config`](https://github.com/Vxmdzhb/config) | configuration and `#[InjectConfig]` |
+| [`astrx/injector`](https://github.com/Vxmdzhb/injector) | constructor injection |
+| [`astrx/http`](https://github.com/Vxmdzhb/http) | requests, responses, uploads |
+| [`astrx/routing`](https://github.com/Vxmdzhb/routing) | URL parsing and generation |
+| [`astrx/i18n`](https://github.com/Vxmdzhb/i18n) | translations and diagnostic messages |
+| [`astrx/error-handler`](https://github.com/Vxmdzhb/error-handler) | PHP errors as diagnostics |
+| [`astrx/template`](https://github.com/Vxmdzhb/template) | the template engine |
+| [`astrx/session`](https://github.com/Vxmdzhb/session) | encrypted sessions, flash, POST/redirect/GET |
+| [`astrx/csrf`](https://github.com/Vxmdzhb/csrf) | CSRF tokens |
+| [`astrx/module`](https://github.com/Vxmdzhb/module) | the module contract |
+| [`astrx/pagination`](https://github.com/Vxmdzhb/pagination) | page links |
+| [`astrx/kernel`](https://github.com/Vxmdzhb/kernel) | controllers |
+| [`astrx/auth`](https://github.com/Vxmdzhb/auth) | permissions, policies, TOTP |
+| [`astrx/api`](https://github.com/Vxmdzhb/api) | API keys |
+| [`astrx/database`](https://github.com/Vxmdzhb/database) | the database connection |
+| [`astrx/captcha`](https://github.com/Vxmdzhb/captcha) | captchas |
+| [`astrx/image`](https://github.com/Vxmdzhb/image) | upload checks and re-encoding |
+| [`astrx/identicon`](https://github.com/Vxmdzhb/identicon) | generated avatars |
+| [`astrx/mail`](https://github.com/Vxmdzhb/mail) | SMTP, IMAP, mailboxes |
 | [`astrx/cms`](https://github.com/Vxmdzhb/cms) | accounts, admin panel, pages, navigation, themes, comments, news, invites, data retention |
 | `astrx/module-<key>` | one optional module each (chat, imageboard, search, webmail, …) |
 

@@ -18,18 +18,18 @@ Every top-level AstrX namespace belongs to one layer. A namespace may depend on 
 
 | Layer | Namespaces | Package |
 |---|---|---|
-| foundation | `Result`, `Support` | `astrx/framework` |
-| component | `Config`, `Injector`, `Http`, `Routing`, `ErrorHandler`, `I18n`, `Template`, `Session`, `Csrf`, `Module`, `Pagination`, `Kernel` | `astrx/framework` |
-| library | `Database`, `Image`, `Auth`, `Api`, `Captcha`, `Identicon`, `Mail` | `astrx/library` |
+| foundation | `Result`, `Support` | one each: `astrx/result`, `astrx/support` |
+| component | `Config`, `Injector`, `Http`, `Routing`, `ErrorHandler`, `I18n`, `Template`, `Session`, `Csrf`, `Module`, `Pagination`, `Kernel` | one each: `astrx/config`, `astrx/injector`, `astrx/http`, `astrx/routing`, `astrx/error-handler`, `astrx/i18n`, `astrx/template`, `astrx/session`, `astrx/csrf`, `astrx/module`, `astrx/pagination`, `astrx/kernel` |
+| library | `Database`, `Image`, `Auth`, `Api`, `Captcha`, `Identicon`, `Mail` | one each: `astrx/database`, `astrx/image`, `astrx/auth`, `astrx/api`, `astrx/captcha`, `astrx/identicon`, `astrx/mail` |
 | feature | `User`, `Admin`, `Page`, `Navbar`, `Theme`, `Comment`, `News`, `Invite`, `Retention` | `astrx/cms` |
 | feature | `Chat`, `Imageboard`, `Content`, `Search`, `Webmail`, … (every optional module) | one `astrx/module-<key>` each |
 | application | `Site`, `ContentManager`, `Prelude`, `ApplicationContainer`, `ApplicationPolicies`, `ApplicationPermissions`, `ApplicationModules` | this website (`src/AstrX`, the root `composer.json`) |
 
 ## Packages
 
-Each package has its own `composer.json` naming the packages it requires, and `tools/packages.php` checks in CI that this is exactly the set of packages its code uses — so each one can be installed without the others above it: `astrx/framework` alone runs `examples/minimal` (`tests/framework_isolation_test.php` serves it from a directory holding nothing else), and the site runs with no module package present at all. Modules depend on `astrx/framework`, `astrx/cms` and usually `astrx/library`; no package depends on the application.
+Each package has its own `composer.json` naming the packages it requires, and `tools/packages.php` checks in CI that this is exactly the set of packages its code uses — so each one can be installed without the others above it: `astrx/http` needs only `astrx/result`, the fourteen framework packages alone run `examples/minimal` (`tests/framework_isolation_test.php` serves it from a directory holding nothing else), and the site runs with no module package present at all. Modules depend on `astrx/cms` and the framework and library packages they use (`astrx/auth`, `astrx/http`, `astrx/template`, ...); no package depends on the application.
 
-Packages also carry their resources. A module names its directory in its manifest; `astrx/framework`, `astrx/library` and `astrx/cms` name theirs in `composer.json` (`extra.astrx.resources`): the framework's diagnostic messages and default configuration, the library's captcha partial and catalogs, the CMS's admin and account templates, its catalogs and its defaults. `ApplicationContainer::resourceRoots()` layers them — core packages, then modules — under the site's `resources/`, which overrides a template by name and a catalog or config file key by key ([operations](OPERATIONS.md#site-resources-over-package-defaults)).
+Packages also carry their resources. A module names its directory in its manifest; the framework and library packages and `astrx/cms` name theirs in `composer.json` (`extra.astrx.resources`): each component's diagnostic messages and default configuration (`astrx/routing`'s routes, `astrx/captcha`'s partial and catalog, ...), and the CMS's admin and account templates, its catalogs and its defaults. `ApplicationContainer::resourceRoots()` layers them — core packages, then modules — under the site's `resources/`, which overrides a template by name and a catalog or config file key by key ([operations](OPERATIONS.md#site-resources-over-package-defaults)).
 
 Each package has a repository of its own, and the root `composer.json` installs them from there into `vendor/`; `composer.lock` pins the commit of each. At runtime the site loads classes itself: `src/classloader.php` reads `src/sources.php`, which `php tools/packages.php --write` generates from the packages' PSR-4 maps (CI fails when it is stale).
 

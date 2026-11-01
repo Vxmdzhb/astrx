@@ -415,16 +415,29 @@ class, `Controller/`, `resources/` side by side):
     "type": "astrx-module",
     "require": {
         "php": ">=8.4",
+        "astrx/auth": "self.version",
+        "astrx/captcha": "self.version",
         "astrx/cms": "self.version",
-        "astrx/framework": "self.version",
-        "astrx/library": "self.version"
+        "astrx/config": "self.version",
+        "astrx/csrf": "self.version",
+        "astrx/http": "self.version",
+        "astrx/i18n": "self.version",
+        "astrx/image": "self.version",
+        "astrx/kernel": "self.version",
+        "astrx/module": "self.version",
+        "astrx/result": "self.version",
+        "astrx/routing": "self.version",
+        "astrx/session": "self.version",
+        "astrx/support": "self.version",
+        "astrx/template": "self.version"
     },
     "autoload": { "psr-4": { "AstrX\\Chat\\": "" } }
 }
 ```
 
 It requires the packages whose namespaces its code uses — almost always
-`astrx/framework` and `astrx/cms`, often `astrx/library`; the engine modules
+`astrx/cms`, `astrx/module`, `astrx/kernel` and `astrx/auth`, then whatever else
+it touches (`astrx/captcha`, `astrx/image`, ...); the engine modules
 also require `astrx/module-search`, whose Search page they add tabs to — and `tools/packages.php` checks that list
 against the code. The site's `composer.json` lists each package's repository,
 `composer install` puts them in `vendor/` (at the commits `composer.lock`
