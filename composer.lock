@@ -4,25 +4,187 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e9077cc9423eccf18ddc0956d8f7e33e",
+    "content-hash": "cf86187187c17da040a8ca9633e6aff2",
     "packages": [
+        {
+            "name": "astrx/api",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/api.git",
+                "reference": "28065a31f28dbd62060b68b4fcf373895831aea1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/api/zipball/28065a31f28dbd62060b68b4fcf373895831aea1",
+                "reference": "28065a31f28dbd62060b68b4fcf373895831aea1",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/auth": "self.version",
+                "astrx/result": "self.version",
+                "ext-pdo": "*",
+                "php": ">=8.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "astrx": {
+                    "resources": "resources"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Api\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "API keys: creation, hashing and authentication.",
+            "homepage": "https://github.com/Vxmdzhb/api",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/api/tree/main",
+                "issues": "https://github.com/Vxmdzhb/api/issues"
+            },
+            "time": "2026-11-01T11:27:48+00:00"
+        },
+        {
+            "name": "astrx/auth",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/auth.git",
+                "reference": "b389dd511b61b7e976bf7a91971804a13f5dd078"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/auth/zipball/b389dd511b61b7e976bf7a91971804a13f5dd078",
+                "reference": "b389dd511b61b7e976bf7a91971804a13f5dd078",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/config": "self.version",
+                "ext-mbstring": "*",
+                "php": ">=8.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Auth\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "Authorization: the gate, permissions and policies, the password policy and TOTP.",
+            "homepage": "https://github.com/Vxmdzhb/auth",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/auth/tree/main",
+                "issues": "https://github.com/Vxmdzhb/auth/issues"
+            },
+            "time": "2026-11-01T11:27:40+00:00"
+        },
+        {
+            "name": "astrx/captcha",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/captcha.git",
+                "reference": "ad04b0d04159098debeecf98e225c5e34f26f01a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/captcha/zipball/ad04b0d04159098debeecf98e225c5e34f26f01a",
+                "reference": "ad04b0d04159098debeecf98e225c5e34f26f01a",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/config": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/result": "self.version",
+                "astrx/routing": "self.version",
+                "astrx/support": "self.version",
+                "astrx/template": "self.version",
+                "ext-gd": "*",
+                "ext-pdo": "*",
+                "php": ">=8.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "astrx": {
+                    "resources": "resources"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Captcha\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "Image captchas that work without JavaScript, with an optional reload frame.",
+            "homepage": "https://github.com/Vxmdzhb/captcha",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/captcha/tree/main",
+                "issues": "https://github.com/Vxmdzhb/captcha/issues"
+            },
+            "time": "2026-11-01T11:28:06+00:00"
+        },
         {
             "name": "astrx/cms",
             "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/cms.git",
-                "reference": "71b77f9c60f35052a3becc2e465ca564d7b0e5e8"
+                "reference": "c22a690a6ae986ecbbbb662f2d0404646fca58ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/cms/zipball/71b77f9c60f35052a3becc2e465ca564d7b0e5e8",
-                "reference": "71b77f9c60f35052a3becc2e465ca564d7b0e5e8",
+                "url": "https://api.github.com/repos/Vxmdzhb/cms/zipball/c22a690a6ae986ecbbbb662f2d0404646fca58ed",
+                "reference": "c22a690a6ae986ecbbbb662f2d0404646fca58ed",
                 "shasum": ""
             },
             "require": {
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/api": "self.version",
+                "astrx/auth": "self.version",
+                "astrx/captcha": "self.version",
+                "astrx/config": "self.version",
+                "astrx/csrf": "self.version",
+                "astrx/error-handler": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/identicon": "self.version",
+                "astrx/image": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/mail": "self.version",
+                "astrx/module": "self.version",
+                "astrx/pagination": "self.version",
+                "astrx/result": "self.version",
+                "astrx/routing": "self.version",
+                "astrx/session": "self.version",
+                "astrx/support": "self.version",
+                "astrx/template": "self.version",
                 "ext-ctype": "*",
                 "ext-filter": "*",
                 "ext-mbstring": "*",
@@ -66,33 +228,29 @@
                 "source": "https://github.com/Vxmdzhb/cms/tree/main",
                 "issues": "https://github.com/Vxmdzhb/cms/issues"
             },
-            "time": "2026-10-31T22:53:10+00:00"
+            "time": "2026-11-01T11:28:38+00:00"
         },
         {
-            "name": "astrx/framework",
+            "name": "astrx/config",
             "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Vxmdzhb/framework.git",
-                "reference": "af8ca8e566c6e1eabab19f8d2561f1d35af8ad5b"
+                "url": "https://github.com/Vxmdzhb/config.git",
+                "reference": "a4ddb77fd9610633f8dd0fe229731182a221cc50"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/framework/zipball/af8ca8e566c6e1eabab19f8d2561f1d35af8ad5b",
-                "reference": "af8ca8e566c6e1eabab19f8d2561f1d35af8ad5b",
+                "url": "https://api.github.com/repos/Vxmdzhb/config/zipball/a4ddb77fd9610633f8dd0fe229731182a221cc50",
+                "reference": "a4ddb77fd9610633f8dd0fe229731182a221cc50",
                 "shasum": ""
             },
             "require": {
-                "ext-filter": "*",
-                "ext-mbstring": "*",
-                "ext-openssl": "*",
-                "ext-pdo": "*",
-                "ext-session": "*",
+                "astrx/result": "self.version",
+                "astrx/support": "self.version",
                 "php": ">=8.4"
             },
             "suggest": {
-                "ext-posix": "Lets the server-secret check compare file ownership with the running user",
-                "ext-zend-opcache": "Invalidates cached config and language files immediately after an admin save"
+                "ext-zend-opcache": "Invalidates cached PHP files immediately after a write"
             },
             "default-branch": true,
             "type": "library",
@@ -103,62 +261,89 @@
             },
             "autoload": {
                 "psr-4": {
-                    "AstrX\\Result\\": "Result/",
-                    "AstrX\\Support\\": "Support/",
-                    "AstrX\\Config\\": "Config/",
-                    "AstrX\\Injector\\": "Injector/",
-                    "AstrX\\Http\\": "Http/",
-                    "AstrX\\Routing\\": "Routing/",
-                    "AstrX\\ErrorHandler\\": "ErrorHandler/",
-                    "AstrX\\I18n\\": "I18n/",
-                    "AstrX\\Template\\": "Template/",
-                    "AstrX\\Session\\": "Session/",
-                    "AstrX\\Csrf\\": "Csrf/",
-                    "AstrX\\Module\\": "Module/",
-                    "AstrX\\Pagination\\": "Pagination/",
-                    "AstrX\\Kernel\\": "Kernel/"
-                },
-                "files": [
-                    "Support/constants.php"
-                ]
+                    "AstrX\\Config\\": ""
+                }
             },
             "license": [
                 "LicenseRef-DoWhatever"
             ],
-            "description": "AstrX framework: results and diagnostics, configuration, injection, HTTP, routing, templates, translation, sessions and the module contract",
-            "homepage": "https://github.com/Vxmdzhb/framework",
+            "description": "PHP-array configuration with layered defaults, #[InjectConfig] setters and a writer for admin pages.",
+            "homepage": "https://github.com/Vxmdzhb/config",
             "keywords": [
                 "astrx",
-                "framework",
                 "no-javascript",
                 "server-rendered"
             ],
             "support": {
-                "source": "https://github.com/Vxmdzhb/framework/tree/main",
-                "issues": "https://github.com/Vxmdzhb/framework/issues"
+                "source": "https://github.com/Vxmdzhb/config/tree/main",
+                "issues": "https://github.com/Vxmdzhb/config/issues"
             },
-            "time": "2026-10-27T13:44:34+00:00"
+            "time": "2026-11-01T11:25:49+00:00"
         },
         {
-            "name": "astrx/library",
+            "name": "astrx/csrf",
             "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Vxmdzhb/library.git",
-                "reference": "966a01af450da8b5d58e58097fcdc058de16c73e"
+                "url": "https://github.com/Vxmdzhb/csrf.git",
+                "reference": "14de235a36c49ce5d440bc318b05ebfa670fac61"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/library/zipball/966a01af450da8b5d58e58097fcdc058de16c73e",
-                "reference": "966a01af450da8b5d58e58097fcdc058de16c73e",
+                "url": "https://api.github.com/repos/Vxmdzhb/csrf/zipball/14de235a36c49ce5d440bc318b05ebfa670fac61",
+                "reference": "14de235a36c49ce5d440bc318b05ebfa670fac61",
                 "shasum": ""
             },
             "require": {
-                "astrx/framework": "self.version",
-                "ext-filter": "*",
-                "ext-gd": "*",
-                "ext-iconv": "*",
-                "ext-mbstring": "*",
+                "astrx/config": "self.version",
+                "astrx/result": "self.version",
+                "php": ">=8.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "astrx": {
+                    "resources": "resources"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Csrf\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "CSRF tokens bound to the session and to the form.",
+            "homepage": "https://github.com/Vxmdzhb/csrf",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/csrf/tree/main",
+                "issues": "https://github.com/Vxmdzhb/csrf/issues"
+            },
+            "time": "2026-11-01T11:27:04+00:00"
+        },
+        {
+            "name": "astrx/database",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/database.git",
+                "reference": "eab0744358321fc8da1b3122081f92fa1b08ffa7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/database/zipball/eab0744358321fc8da1b3122081f92fa1b08ffa7",
+                "reference": "eab0744358321fc8da1b3122081f92fa1b08ffa7",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/config": "self.version",
+                "astrx/result": "self.version",
                 "ext-pdo": "*",
                 "php": ">=8.4"
             },
@@ -171,30 +356,452 @@
             },
             "autoload": {
                 "psr-4": {
-                    "AstrX\\Database\\": "Database/",
-                    "AstrX\\Image\\": "Image/",
-                    "AstrX\\Auth\\": "Auth/",
-                    "AstrX\\Api\\": "Api/",
-                    "AstrX\\Captcha\\": "Captcha/",
-                    "AstrX\\Identicon\\": "Identicon/",
-                    "AstrX\\Mail\\": "Mail/"
+                    "AstrX\\Database\\": ""
                 }
             },
             "license": [
                 "LicenseRef-DoWhatever"
             ],
-            "description": "AstrX building blocks: database connection, authorization gate, API keys, captcha, images, identicons and mail",
-            "homepage": "https://github.com/Vxmdzhb/library",
+            "description": "The PDO connection factory and the schema files installers apply.",
+            "homepage": "https://github.com/Vxmdzhb/database",
             "keywords": [
                 "astrx",
                 "no-javascript",
                 "server-rendered"
             ],
             "support": {
-                "source": "https://github.com/Vxmdzhb/library/tree/main",
-                "issues": "https://github.com/Vxmdzhb/library/issues"
+                "source": "https://github.com/Vxmdzhb/database/tree/main",
+                "issues": "https://github.com/Vxmdzhb/database/issues"
             },
-            "time": "2026-10-31T22:53:06+00:00"
+            "time": "2026-11-01T11:27:57+00:00"
+        },
+        {
+            "name": "astrx/error-handler",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/error-handler.git",
+                "reference": "bb11affaaf7c9aa8e30c3de7aa14cb830fcbbf35"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/error-handler/zipball/bb11affaaf7c9aa8e30c3de7aa14cb830fcbbf35",
+                "reference": "bb11affaaf7c9aa8e30c3de7aa14cb830fcbbf35",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/i18n": "self.version",
+                "astrx/result": "self.version",
+                "astrx/support": "self.version",
+                "php": ">=8.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "astrx": {
+                    "resources": "resources"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\ErrorHandler\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "Turns PHP errors and uncaught exceptions into diagnostics.",
+            "homepage": "https://github.com/Vxmdzhb/error-handler",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/error-handler/tree/main",
+                "issues": "https://github.com/Vxmdzhb/error-handler/issues"
+            },
+            "time": "2026-11-01T11:26:36+00:00"
+        },
+        {
+            "name": "astrx/http",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/http.git",
+                "reference": "5815c98ac1247fba0bb72eec63471c489c004052"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/http/zipball/5815c98ac1247fba0bb72eec63471c489c004052",
+                "reference": "5815c98ac1247fba0bb72eec63471c489c004052",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/result": "self.version",
+                "ext-filter": "*",
+                "php": ">=8.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "astrx": {
+                    "resources": "resources"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Http\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "Requests, responses, headers, uploads and URIs.",
+            "homepage": "https://github.com/Vxmdzhb/http",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/http/tree/main",
+                "issues": "https://github.com/Vxmdzhb/http/issues"
+            },
+            "time": "2026-11-01T11:26:08+00:00"
+        },
+        {
+            "name": "astrx/i18n",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/i18n.git",
+                "reference": "9ddc58df418ce9e8301c9ef11695734b04769555"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/i18n/zipball/9ddc58df418ce9e8301c9ef11695734b04769555",
+                "reference": "9ddc58df418ce9e8301c9ef11695734b04769555",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/config": "self.version",
+                "astrx/result": "self.version",
+                "astrx/support": "self.version",
+                "php": ">=8.4"
+            },
+            "suggest": {
+                "ext-zend-opcache": "Invalidates cached PHP files immediately after a write"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "astrx": {
+                    "resources": "resources"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\I18n\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "Translation catalogs, the catalog files the language editor writes, and diagnostic rendering.",
+            "homepage": "https://github.com/Vxmdzhb/i18n",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/i18n/tree/main",
+                "issues": "https://github.com/Vxmdzhb/i18n/issues"
+            },
+            "time": "2026-11-01T11:26:26+00:00"
+        },
+        {
+            "name": "astrx/identicon",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/identicon.git",
+                "reference": "b256664f9f19423e79d8180def6c99ffb6993592"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/identicon/zipball/b256664f9f19423e79d8180def6c99ffb6993592",
+                "reference": "b256664f9f19423e79d8180def6c99ffb6993592",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/config": "self.version",
+                "ext-gd": "*",
+                "php": ">=8.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "astrx": {
+                    "resources": "resources"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Identicon\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "Generated avatars, drawn from a keyed hash.",
+            "homepage": "https://github.com/Vxmdzhb/identicon",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/identicon/tree/main",
+                "issues": "https://github.com/Vxmdzhb/identicon/issues"
+            },
+            "time": "2026-11-01T11:28:25+00:00"
+        },
+        {
+            "name": "astrx/image",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/image.git",
+                "reference": "535b09a06924f4078310b7efac98094344a8e568"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/image/zipball/535b09a06924f4078310b7efac98094344a8e568",
+                "reference": "535b09a06924f4078310b7efac98094344a8e568",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/result": "self.version",
+                "ext-gd": "*",
+                "php": ">=8.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "astrx": {
+                    "resources": "resources"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Image\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "Validates uploaded images and re-encodes them, dropping their metadata.",
+            "homepage": "https://github.com/Vxmdzhb/image",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/image/tree/main",
+                "issues": "https://github.com/Vxmdzhb/image/issues"
+            },
+            "time": "2026-11-01T11:28:15+00:00"
+        },
+        {
+            "name": "astrx/injector",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/injector.git",
+                "reference": "150f6a776d0fd52b9e690ec9acd02734aa8bb2cc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/injector/zipball/150f6a776d0fd52b9e690ec9acd02734aa8bb2cc",
+                "reference": "150f6a776d0fd52b9e690ec9acd02734aa8bb2cc",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/config": "self.version",
+                "astrx/result": "self.version",
+                "php": ">=8.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "astrx": {
+                    "resources": "resources"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Injector\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "Constructor injection with explicit shared instances and config-driven setters.",
+            "homepage": "https://github.com/Vxmdzhb/injector",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/injector/tree/main",
+                "issues": "https://github.com/Vxmdzhb/injector/issues"
+            },
+            "time": "2026-11-01T11:25:58+00:00"
+        },
+        {
+            "name": "astrx/kernel",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/kernel.git",
+                "reference": "04f851283e7dd05b9756ba6d6736f10136bfde7a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/kernel/zipball/04f851283e7dd05b9756ba6d6736f10136bfde7a",
+                "reference": "04f851283e7dd05b9756ba6d6736f10136bfde7a",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/http": "self.version",
+                "astrx/result": "self.version",
+                "astrx/session": "self.version",
+                "php": ">=8.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Kernel\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "The controller contract and the base class controllers extend.",
+            "homepage": "https://github.com/Vxmdzhb/kernel",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/kernel/tree/main",
+                "issues": "https://github.com/Vxmdzhb/kernel/issues"
+            },
+            "time": "2026-11-01T11:27:31+00:00"
+        },
+        {
+            "name": "astrx/mail",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/mail.git",
+                "reference": "3080d55f226e2b981c25b2d324611e46167c5ab4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/mail/zipball/3080d55f226e2b981c25b2d324611e46167c5ab4",
+                "reference": "3080d55f226e2b981c25b2d324611e46167c5ab4",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/config": "self.version",
+                "astrx/result": "self.version",
+                "ext-filter": "*",
+                "ext-iconv": "*",
+                "ext-mbstring": "*",
+                "php": ">=8.4"
+            },
+            "suggest": {
+                "ext-openssl": "TLS for SMTP and IMAP (STARTTLS and implicit TLS)"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "astrx": {
+                    "resources": "resources"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Mail\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "SMTP and IMAP clients, and the mailbox management webmail needs.",
+            "homepage": "https://github.com/Vxmdzhb/mail",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/mail/tree/main",
+                "issues": "https://github.com/Vxmdzhb/mail/issues"
+            },
+            "time": "2026-11-01T11:28:33+00:00"
+        },
+        {
+            "name": "astrx/module",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/module.git",
+                "reference": "b3ab08fd9ba1fd19f1a45b844a6a96578771e69c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/module/zipball/b3ab08fd9ba1fd19f1a45b844a6a96578771e69c",
+                "reference": "b3ab08fd9ba1fd19f1a45b844a6a96578771e69c",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/config": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/injector": "self.version",
+                "astrx/result": "self.version",
+                "astrx/support": "self.version",
+                "php": ">=8.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Module\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "The module contract: manifests, the registry and extension points.",
+            "homepage": "https://github.com/Vxmdzhb/module",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/module/tree/main",
+                "issues": "https://github.com/Vxmdzhb/module/issues"
+            },
+            "time": "2026-11-01T11:27:13+00:00"
         },
         {
             "name": "astrx/module-blocklist",
@@ -202,18 +809,26 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-blocklist.git",
-                "reference": "9110c708ba9e94a6fc97ffb6f4b019cb8e6f0155"
+                "reference": "ab81617ef1a969788f0eec25186a53c9990be2bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-blocklist/zipball/9110c708ba9e94a6fc97ffb6f4b019cb8e6f0155",
-                "reference": "9110c708ba9e94a6fc97ffb6f4b019cb8e6f0155",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-blocklist/zipball/ab81617ef1a969788f0eec25186a53c9990be2bb",
+                "reference": "ab81617ef1a969788f0eec25186a53c9990be2bb",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/config": "self.version",
+                "astrx/csrf": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
+                "astrx/result": "self.version",
+                "astrx/session": "self.version",
+                "astrx/template": "self.version",
                 "ext-filter": "*",
                 "php": ">=8.4"
             },
@@ -239,7 +854,7 @@
                 "source": "https://github.com/Vxmdzhb/module-blocklist/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-blocklist/issues"
             },
-            "time": "2026-10-27T13:44:52+00:00"
+            "time": "2026-11-01T11:28:42+00:00"
         },
         {
             "name": "astrx/module-bottrap",
@@ -247,18 +862,28 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-bottrap.git",
-                "reference": "a767958ca06877fb86f05f97f9de71221160b546"
+                "reference": "553b21b2663fd8285ba894816482ae95d4281f2f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-bottrap/zipball/a767958ca06877fb86f05f97f9de71221160b546",
-                "reference": "a767958ca06877fb86f05f97f9de71221160b546",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-bottrap/zipball/553b21b2663fd8285ba894816482ae95d4281f2f",
+                "reference": "553b21b2663fd8285ba894816482ae95d4281f2f",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/config": "self.version",
+                "astrx/csrf": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
+                "astrx/result": "self.version",
+                "astrx/routing": "self.version",
+                "astrx/session": "self.version",
+                "astrx/support": "self.version",
+                "astrx/template": "self.version",
                 "ext-mbstring": "*",
                 "ext-pdo": "*",
                 "ext-session": "*",
@@ -286,7 +911,7 @@
                 "source": "https://github.com/Vxmdzhb/module-bottrap/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-bottrap/issues"
             },
-            "time": "2026-10-27T13:44:58+00:00"
+            "time": "2026-11-01T11:28:46+00:00"
         },
         {
             "name": "astrx/module-canary",
@@ -294,18 +919,25 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-canary.git",
-                "reference": "93c552719df9260deb17803e578cd6bc137c4889"
+                "reference": "e0953d0a6758e28d50237d0da6325bd8416bce21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-canary/zipball/93c552719df9260deb17803e578cd6bc137c4889",
-                "reference": "93c552719df9260deb17803e578cd6bc137c4889",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-canary/zipball/e0953d0a6758e28d50237d0da6325bd8416bce21",
+                "reference": "e0953d0a6758e28d50237d0da6325bd8416bce21",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/csrf": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
+                "astrx/result": "self.version",
+                "astrx/session": "self.version",
+                "astrx/template": "self.version",
                 "ext-pdo": "*",
                 "php": ">=8.4"
             },
@@ -331,7 +963,7 @@
                 "source": "https://github.com/Vxmdzhb/module-canary/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-canary/issues"
             },
-            "time": "2026-10-27T13:45:04+00:00"
+            "time": "2026-11-01T11:28:50+00:00"
         },
         {
             "name": "astrx/module-chat",
@@ -339,18 +971,30 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-chat.git",
-                "reference": "9ffb992722ba21f088e1660346002bccfaa79553"
+                "reference": "f7de28f731598e74057e1bc1a28c5ba34441ef1a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-chat/zipball/9ffb992722ba21f088e1660346002bccfaa79553",
-                "reference": "9ffb992722ba21f088e1660346002bccfaa79553",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-chat/zipball/f7de28f731598e74057e1bc1a28c5ba34441ef1a",
+                "reference": "f7de28f731598e74057e1bc1a28c5ba34441ef1a",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
+                "astrx/captcha": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/config": "self.version",
+                "astrx/csrf": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/image": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
+                "astrx/result": "self.version",
+                "astrx/routing": "self.version",
+                "astrx/session": "self.version",
+                "astrx/support": "self.version",
+                "astrx/template": "self.version",
                 "ext-ctype": "*",
                 "ext-filter": "*",
                 "ext-mbstring": "*",
@@ -380,7 +1024,7 @@
                 "source": "https://github.com/Vxmdzhb/module-chat/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-chat/issues"
             },
-            "time": "2026-11-01T10:31:11+00:00"
+            "time": "2026-11-01T11:28:55+00:00"
         },
         {
             "name": "astrx/module-content",
@@ -388,18 +1032,27 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-content.git",
-                "reference": "fc3c71a882168d99217e6ccaf818afec232a4250"
+                "reference": "4f9f330c08ad77c55cb913cc7bb5ea8cf764c63b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-content/zipball/fc3c71a882168d99217e6ccaf818afec232a4250",
-                "reference": "fc3c71a882168d99217e6ccaf818afec232a4250",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-content/zipball/4f9f330c08ad77c55cb913cc7bb5ea8cf764c63b",
+                "reference": "4f9f330c08ad77c55cb913cc7bb5ea8cf764c63b",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/config": "self.version",
+                "astrx/csrf": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
+                "astrx/result": "self.version",
+                "astrx/routing": "self.version",
+                "astrx/session": "self.version",
+                "astrx/template": "self.version",
                 "ext-ctype": "*",
                 "ext-mbstring": "*",
                 "ext-pdo": "*",
@@ -427,7 +1080,7 @@
                 "source": "https://github.com/Vxmdzhb/module-content/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-content/issues"
             },
-            "time": "2026-10-27T13:45:15+00:00"
+            "time": "2026-11-01T11:28:59+00:00"
         },
         {
             "name": "astrx/module-downloads",
@@ -435,18 +1088,25 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-downloads.git",
-                "reference": "7ce1191106f0eb0b3c40af18b485543456892284"
+                "reference": "2440a561e0b1d8c25185e239dff40f553a706ed8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-downloads/zipball/7ce1191106f0eb0b3c40af18b485543456892284",
-                "reference": "7ce1191106f0eb0b3c40af18b485543456892284",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-downloads/zipball/2440a561e0b1d8c25185e239dff40f553a706ed8",
+                "reference": "2440a561e0b1d8c25185e239dff40f553a706ed8",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/csrf": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
+                "astrx/result": "self.version",
+                "astrx/session": "self.version",
+                "astrx/template": "self.version",
                 "ext-mbstring": "*",
                 "ext-pdo": "*",
                 "php": ">=8.4"
@@ -476,7 +1136,7 @@
                 "source": "https://github.com/Vxmdzhb/module-downloads/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-downloads/issues"
             },
-            "time": "2026-10-27T13:45:21+00:00"
+            "time": "2026-11-01T11:29:03+00:00"
         },
         {
             "name": "astrx/module-gitbrowse",
@@ -484,18 +1144,27 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-gitbrowse.git",
-                "reference": "a03869af82f4ca1475fb4afcfe74c96efee28cf8"
+                "reference": "bba085d197674382aa72908ca28b3f2f2eab4ede"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-gitbrowse/zipball/a03869af82f4ca1475fb4afcfe74c96efee28cf8",
-                "reference": "a03869af82f4ca1475fb4afcfe74c96efee28cf8",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-gitbrowse/zipball/bba085d197674382aa72908ca28b3f2f2eab4ede",
+                "reference": "bba085d197674382aa72908ca28b3f2f2eab4ede",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/config": "self.version",
+                "astrx/csrf": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
+                "astrx/result": "self.version",
+                "astrx/routing": "self.version",
+                "astrx/session": "self.version",
+                "astrx/template": "self.version",
                 "php": ">=8.4"
             },
             "default-branch": true,
@@ -520,7 +1189,7 @@
                 "source": "https://github.com/Vxmdzhb/module-gitbrowse/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-gitbrowse/issues"
             },
-            "time": "2026-10-27T13:45:32+00:00"
+            "time": "2026-11-01T11:29:07+00:00"
         },
         {
             "name": "astrx/module-imageboard",
@@ -528,18 +1197,30 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-imageboard.git",
-                "reference": "92969f8b700e217a877f3e8cad2407885ef798c4"
+                "reference": "6169e99032f4361aa696d8a26a5fce1bae5b8ba8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-imageboard/zipball/92969f8b700e217a877f3e8cad2407885ef798c4",
-                "reference": "92969f8b700e217a877f3e8cad2407885ef798c4",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-imageboard/zipball/6169e99032f4361aa696d8a26a5fce1bae5b8ba8",
+                "reference": "6169e99032f4361aa696d8a26a5fce1bae5b8ba8",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
+                "astrx/captcha": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/config": "self.version",
+                "astrx/csrf": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/image": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
+                "astrx/result": "self.version",
+                "astrx/routing": "self.version",
+                "astrx/session": "self.version",
+                "astrx/support": "self.version",
+                "astrx/template": "self.version",
                 "ext-ctype": "*",
                 "ext-filter": "*",
                 "ext-mbstring": "*",
@@ -569,7 +1250,7 @@
                 "source": "https://github.com/Vxmdzhb/module-imageboard/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-imageboard/issues"
             },
-            "time": "2026-10-31T22:53:14+00:00"
+            "time": "2026-11-01T11:29:11+00:00"
         },
         {
             "name": "astrx/module-media",
@@ -577,18 +1258,29 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-media.git",
-                "reference": "62d46a6e7b82aab36d19f819adc0d3584dbd6e24"
+                "reference": "f4bef302d822702eaa1aff43a77efb66d9adfd87"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-media/zipball/62d46a6e7b82aab36d19f819adc0d3584dbd6e24",
-                "reference": "62d46a6e7b82aab36d19f819adc0d3584dbd6e24",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-media/zipball/f4bef302d822702eaa1aff43a77efb66d9adfd87",
+                "reference": "f4bef302d822702eaa1aff43a77efb66d9adfd87",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/config": "self.version",
+                "astrx/csrf": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/image": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
+                "astrx/result": "self.version",
+                "astrx/routing": "self.version",
+                "astrx/session": "self.version",
+                "astrx/support": "self.version",
+                "astrx/template": "self.version",
                 "ext-ctype": "*",
                 "ext-pdo": "*",
                 "php": ">=8.4"
@@ -615,7 +1307,7 @@
                 "source": "https://github.com/Vxmdzhb/module-media/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-media/issues"
             },
-            "time": "2026-10-27T13:45:45+00:00"
+            "time": "2026-11-01T11:29:15+00:00"
         },
         {
             "name": "astrx/module-mirrors",
@@ -623,18 +1315,25 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-mirrors.git",
-                "reference": "2b3c29b0205e87079013704dcd67ecf56b2a810c"
+                "reference": "c42b1e0bc57329340c36060c916d642abcfe7da5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-mirrors/zipball/2b3c29b0205e87079013704dcd67ecf56b2a810c",
-                "reference": "2b3c29b0205e87079013704dcd67ecf56b2a810c",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-mirrors/zipball/c42b1e0bc57329340c36060c916d642abcfe7da5",
+                "reference": "c42b1e0bc57329340c36060c916d642abcfe7da5",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/csrf": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
+                "astrx/result": "self.version",
+                "astrx/session": "self.version",
+                "astrx/template": "self.version",
                 "ext-mbstring": "*",
                 "ext-pdo": "*",
                 "php": ">=8.4"
@@ -661,7 +1360,7 @@
                 "source": "https://github.com/Vxmdzhb/module-mirrors/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-mirrors/issues"
             },
-            "time": "2026-10-27T13:45:51+00:00"
+            "time": "2026-11-01T11:29:19+00:00"
         },
         {
             "name": "astrx/module-onionsearch",
@@ -669,19 +1368,26 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-onionsearch.git",
-                "reference": "df480d41f02ac08195d37106d35c2a7b8c718ec1"
+                "reference": "ac1d34145715f79d944a6b20220fb73f72ceb32f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-onionsearch/zipball/df480d41f02ac08195d37106d35c2a7b8c718ec1",
-                "reference": "df480d41f02ac08195d37106d35c2a7b8c718ec1",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-onionsearch/zipball/ac1d34145715f79d944a6b20220fb73f72ceb32f",
+                "reference": "ac1d34145715f79d944a6b20220fb73f72ceb32f",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/config": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
                 "astrx/module-search": "self.version",
+                "astrx/result": "self.version",
+                "astrx/routing": "self.version",
+                "astrx/template": "self.version",
                 "php": ">=8.4"
             },
             "default-branch": true,
@@ -706,7 +1412,7 @@
                 "source": "https://github.com/Vxmdzhb/module-onionsearch/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-onionsearch/issues"
             },
-            "time": "2026-10-27T13:45:57+00:00"
+            "time": "2026-11-01T11:29:27+00:00"
         },
         {
             "name": "astrx/module-search",
@@ -714,18 +1420,27 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-search.git",
-                "reference": "61fb62d361f99aad5820fcf129d80def79fd0866"
+                "reference": "3b6c8ceded3af154907b7dd109e384112fd68efc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-search/zipball/61fb62d361f99aad5820fcf129d80def79fd0866",
-                "reference": "61fb62d361f99aad5820fcf129d80def79fd0866",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-search/zipball/3b6c8ceded3af154907b7dd109e384112fd68efc",
+                "reference": "3b6c8ceded3af154907b7dd109e384112fd68efc",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/csrf": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
+                "astrx/result": "self.version",
+                "astrx/routing": "self.version",
+                "astrx/session": "self.version",
+                "astrx/support": "self.version",
+                "astrx/template": "self.version",
                 "ext-mbstring": "*",
                 "ext-pdo": "*",
                 "php": ">=8.4"
@@ -752,7 +1467,7 @@
                 "source": "https://github.com/Vxmdzhb/module-search/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-search/issues"
             },
-            "time": "2026-10-27T13:46:02+00:00"
+            "time": "2026-11-01T11:29:23+00:00"
         },
         {
             "name": "astrx/module-suiteadmin",
@@ -760,18 +1475,26 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-suiteadmin.git",
-                "reference": "ee6955cd71be095b05c61206da92ddccf40ea656"
+                "reference": "dd4f0dd9645cfad1f73b7246c014d33491fc8bee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-suiteadmin/zipball/ee6955cd71be095b05c61206da92ddccf40ea656",
-                "reference": "ee6955cd71be095b05c61206da92ddccf40ea656",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-suiteadmin/zipball/dd4f0dd9645cfad1f73b7246c014d33491fc8bee",
+                "reference": "dd4f0dd9645cfad1f73b7246c014d33491fc8bee",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/config": "self.version",
+                "astrx/csrf": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
+                "astrx/result": "self.version",
+                "astrx/session": "self.version",
+                "astrx/template": "self.version",
                 "php": ">=8.4"
             },
             "default-branch": true,
@@ -796,7 +1519,7 @@
                 "source": "https://github.com/Vxmdzhb/module-suiteadmin/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-suiteadmin/issues"
             },
-            "time": "2026-10-27T13:46:08+00:00"
+            "time": "2026-11-01T11:29:31+00:00"
         },
         {
             "name": "astrx/module-tipline",
@@ -804,18 +1527,28 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-tipline.git",
-                "reference": "4318569e26c1aa2099f623e81850b7120407a15b"
+                "reference": "358fef03db81dab405a79366489ad27fbe56161d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-tipline/zipball/4318569e26c1aa2099f623e81850b7120407a15b",
-                "reference": "4318569e26c1aa2099f623e81850b7120407a15b",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-tipline/zipball/358fef03db81dab405a79366489ad27fbe56161d",
+                "reference": "358fef03db81dab405a79366489ad27fbe56161d",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
+                "astrx/captcha": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/config": "self.version",
+                "astrx/csrf": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
+                "astrx/result": "self.version",
+                "astrx/routing": "self.version",
+                "astrx/session": "self.version",
+                "astrx/template": "self.version",
                 "ext-mbstring": "*",
                 "ext-pdo": "*",
                 "php": ">=8.4"
@@ -845,7 +1578,7 @@
                 "source": "https://github.com/Vxmdzhb/module-tipline/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-tipline/issues"
             },
-            "time": "2026-10-31T22:53:19+00:00"
+            "time": "2026-11-01T11:29:35+00:00"
         },
         {
             "name": "astrx/module-torrentsearch",
@@ -853,19 +1586,26 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-torrentsearch.git",
-                "reference": "6f79e6a109e53d6d79264100d900ae2d90e3bdbe"
+                "reference": "2015d826a9729efca0aa0fa487c0206ccb3f9250"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-torrentsearch/zipball/6f79e6a109e53d6d79264100d900ae2d90e3bdbe",
-                "reference": "6f79e6a109e53d6d79264100d900ae2d90e3bdbe",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-torrentsearch/zipball/2015d826a9729efca0aa0fa487c0206ccb3f9250",
+                "reference": "2015d826a9729efca0aa0fa487c0206ccb3f9250",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/config": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
                 "astrx/module-search": "self.version",
+                "astrx/result": "self.version",
+                "astrx/routing": "self.version",
+                "astrx/template": "self.version",
                 "php": ">=8.4"
             },
             "default-branch": true,
@@ -890,7 +1630,7 @@
                 "source": "https://github.com/Vxmdzhb/module-torrentsearch/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-torrentsearch/issues"
             },
-            "time": "2026-10-27T13:46:19+00:00"
+            "time": "2026-11-01T11:29:39+00:00"
         },
         {
             "name": "astrx/module-webmail",
@@ -898,18 +1638,28 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-webmail.git",
-                "reference": "694f1c673b9057bbbaef71a97f5386e185544020"
+                "reference": "407c0f4e68b6734dd86dec15e7f03d82a7cdb3b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-webmail/zipball/694f1c673b9057bbbaef71a97f5386e185544020",
-                "reference": "694f1c673b9057bbbaef71a97f5386e185544020",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-webmail/zipball/407c0f4e68b6734dd86dec15e7f03d82a7cdb3b7",
+                "reference": "407c0f4e68b6734dd86dec15e7f03d82a7cdb3b7",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/config": "self.version",
+                "astrx/csrf": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/mail": "self.version",
+                "astrx/module": "self.version",
+                "astrx/result": "self.version",
+                "astrx/routing": "self.version",
+                "astrx/session": "self.version",
+                "astrx/template": "self.version",
                 "ext-dom": "*",
                 "ext-pdo": "*",
                 "php": ">=8.4"
@@ -936,7 +1686,7 @@
                 "source": "https://github.com/Vxmdzhb/module-webmail/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-webmail/issues"
             },
-            "time": "2026-10-27T13:46:25+00:00"
+            "time": "2026-11-01T11:29:43+00:00"
         },
         {
             "name": "astrx/module-websearch",
@@ -944,19 +1694,26 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/module-websearch.git",
-                "reference": "273fe837d5bb4adc228e03052c092f2fa52bb58b"
+                "reference": "69049bdd52b8bb828a57a9bb6e9659264e21f743"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/module-websearch/zipball/273fe837d5bb4adc228e03052c092f2fa52bb58b",
-                "reference": "273fe837d5bb4adc228e03052c092f2fa52bb58b",
+                "url": "https://api.github.com/repos/Vxmdzhb/module-websearch/zipball/69049bdd52b8bb828a57a9bb6e9659264e21f743",
+                "reference": "69049bdd52b8bb828a57a9bb6e9659264e21f743",
                 "shasum": ""
             },
             "require": {
+                "astrx/auth": "self.version",
                 "astrx/cms": "self.version",
-                "astrx/framework": "self.version",
-                "astrx/library": "self.version",
+                "astrx/config": "self.version",
+                "astrx/http": "self.version",
+                "astrx/i18n": "self.version",
+                "astrx/kernel": "self.version",
+                "astrx/module": "self.version",
                 "astrx/module-search": "self.version",
+                "astrx/result": "self.version",
+                "astrx/routing": "self.version",
+                "astrx/template": "self.version",
                 "php": ">=8.4"
             },
             "default-branch": true,
@@ -981,16 +1738,302 @@
                 "source": "https://github.com/Vxmdzhb/module-websearch/tree/main",
                 "issues": "https://github.com/Vxmdzhb/module-websearch/issues"
             },
-            "time": "2026-10-27T13:46:31+00:00"
+            "time": "2026-11-01T11:29:47+00:00"
+        },
+        {
+            "name": "astrx/pagination",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/pagination.git",
+                "reference": "70cf239917dbc49f2dd9f57ed274fc0107b24f48"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/pagination/zipball/70cf239917dbc49f2dd9f57ed274fc0107b24f48",
+                "reference": "70cf239917dbc49f2dd9f57ed274fc0107b24f48",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/http": "self.version",
+                "php": ">=8.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Pagination\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "Page numbers and links for long lists.",
+            "homepage": "https://github.com/Vxmdzhb/pagination",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/pagination/tree/main",
+                "issues": "https://github.com/Vxmdzhb/pagination/issues"
+            },
+            "time": "2026-11-01T11:27:23+00:00"
+        },
+        {
+            "name": "astrx/result",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/result.git",
+                "reference": "88b0ff9b4c24b16167c50e70acf1e92ece4a24ec"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/result/zipball/88b0ff9b4c24b16167c50e70acf1e92ece4a24ec",
+                "reference": "88b0ff9b4c24b16167c50e70acf1e92ece4a24ec",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Result\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "Typed results and diagnostics: Result<T>, Diagnostics and the collector they drain into.",
+            "homepage": "https://github.com/Vxmdzhb/result",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/result/tree/main",
+                "issues": "https://github.com/Vxmdzhb/result/issues"
+            },
+            "time": "2026-11-01T11:25:30+00:00"
+        },
+        {
+            "name": "astrx/routing",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/routing.git",
+                "reference": "f3227b372c39a4847ed94cd10ece4a6cb5b7b3f2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/routing/zipball/f3227b372c39a4847ed94cd10ece4a6cb5b7b3f2",
+                "reference": "f3227b372c39a4847ed94cd10ece4a6cb5b7b3f2",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/config": "self.version",
+                "astrx/http": "self.version",
+                "ext-session": "*",
+                "php": ">=8.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "astrx": {
+                    "resources": "resources"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Routing\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "Parses and generates locale-aware URLs, with or without URL rewriting.",
+            "homepage": "https://github.com/Vxmdzhb/routing",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/routing/tree/main",
+                "issues": "https://github.com/Vxmdzhb/routing/issues"
+            },
+            "time": "2026-11-01T11:26:17+00:00"
+        },
+        {
+            "name": "astrx/session",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/session.git",
+                "reference": "70b48249a2792aa8edab016936c0cb8a5ae2ae89"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/session/zipball/70b48249a2792aa8edab016936c0cb8a5ae2ae89",
+                "reference": "70b48249a2792aa8edab016936c0cb8a5ae2ae89",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/config": "self.version",
+                "astrx/result": "self.version",
+                "astrx/support": "self.version",
+                "ext-mbstring": "*",
+                "ext-openssl": "*",
+                "ext-pdo": "*",
+                "ext-session": "*",
+                "php": ">=8.4"
+            },
+            "suggest": {
+                "ext-posix": "Lets the server-secret check compare file ownership with the running user"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Session\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "Encrypted sessions, flash messages and POST/redirect/GET.",
+            "homepage": "https://github.com/Vxmdzhb/session",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/session/tree/main",
+                "issues": "https://github.com/Vxmdzhb/session/issues"
+            },
+            "time": "2026-11-01T11:26:55+00:00"
+        },
+        {
+            "name": "astrx/support",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/support.git",
+                "reference": "1ed7d639062c99aa67869c2f867b302b1dd368e4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/support/zipball/1ed7d639062c99aa67869c2f867b302b1dd368e4",
+                "reference": "1ed7d639062c99aa67869c2f867b302b1dd368e4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4"
+            },
+            "suggest": {
+                "ext-zend-opcache": "Invalidates cached PHP files immediately after a write"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Support\\": ""
+                },
+                "files": [
+                    "constants.php"
+                ]
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "The installation's paths, the resource roots packages register, and atomic file writes.",
+            "homepage": "https://github.com/Vxmdzhb/support",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/support/tree/main",
+                "issues": "https://github.com/Vxmdzhb/support/issues"
+            },
+            "time": "2026-11-01T11:25:40+00:00"
+        },
+        {
+            "name": "astrx/template",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vxmdzhb/template.git",
+                "reference": "3b29ab233eb4a66714b15d75b4b2b00556c97845"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vxmdzhb/template/zipball/3b29ab233eb4a66714b15d75b4b2b00556c97845",
+                "reference": "3b29ab233eb4a66714b15d75b4b2b00556c97845",
+                "shasum": ""
+            },
+            "require": {
+                "astrx/config": "self.version",
+                "astrx/result": "self.version",
+                "astrx/support": "self.version",
+                "php": ">=8.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "astrx": {
+                    "resources": "resources"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AstrX\\Template\\": ""
+                }
+            },
+            "license": [
+                "LicenseRef-DoWhatever"
+            ],
+            "description": "A Mustache-like template engine compiled to PHP, with a content-addressed cache.",
+            "homepage": "https://github.com/Vxmdzhb/template",
+            "keywords": [
+                "astrx",
+                "no-javascript",
+                "server-rendered"
+            ],
+            "support": {
+                "source": "https://github.com/Vxmdzhb/template/tree/main",
+                "issues": "https://github.com/Vxmdzhb/template/issues"
+            },
+            "time": "2026-11-01T11:26:45+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "astrx/api": 20,
+        "astrx/auth": 20,
+        "astrx/captcha": 20,
         "astrx/cms": 20,
-        "astrx/framework": 20,
-        "astrx/library": 20,
+        "astrx/config": 20,
+        "astrx/csrf": 20,
+        "astrx/database": 20,
+        "astrx/error-handler": 20,
+        "astrx/http": 20,
+        "astrx/i18n": 20,
+        "astrx/identicon": 20,
+        "astrx/image": 20,
+        "astrx/injector": 20,
+        "astrx/kernel": 20,
+        "astrx/mail": 20,
+        "astrx/module": 20,
         "astrx/module-blocklist": 20,
         "astrx/module-bottrap": 20,
         "astrx/module-canary": 20,
@@ -1007,7 +2050,13 @@
         "astrx/module-tipline": 20,
         "astrx/module-torrentsearch": 20,
         "astrx/module-webmail": 20,
-        "astrx/module-websearch": 20
+        "astrx/module-websearch": 20,
+        "astrx/pagination": 20,
+        "astrx/result": 20,
+        "astrx/routing": 20,
+        "astrx/session": 20,
+        "astrx/support": 20,
+        "astrx/template": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
