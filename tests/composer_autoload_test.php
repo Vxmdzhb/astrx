@@ -103,6 +103,8 @@ if (!is_file($autoload)) {
         static fn(string $c): bool => !class_exists($c) && !interface_exists($c) && !trait_exists($c) && !enum_exists($c),
     ));
     check('every class resolves through Composer', $unresolved === [], implode(', ', array_slice($unresolved, 0, 10)));
+    check('installed CMS resolves page URLs for the User Area',
+        method_exists(AstrX\Page\Page::class, 'resolvedUrlId'));
     check('Support functions are loaded', function_exists('AstrX\\Support\\atomicWrite'));
 
     echo "\n3. Loading is inert\n";
