@@ -157,12 +157,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/cms.git",
-                "reference": "a8a6bcfd879582ca9305fa1870b5b62c1e24ec06"
+                "reference": "958717dad031e97162faa0fbaac77dc28ccfba94"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/cms/zipball/a8a6bcfd879582ca9305fa1870b5b62c1e24ec06",
-                "reference": "a8a6bcfd879582ca9305fa1870b5b62c1e24ec06",
+                "url": "https://api.github.com/repos/Vxmdzhb/cms/zipball/958717dad031e97162faa0fbaac77dc28ccfba94",
+                "reference": "958717dad031e97162faa0fbaac77dc28ccfba94",
                 "shasum": ""
             },
             "require": {
@@ -228,7 +228,7 @@
                 "source": "https://github.com/Vxmdzhb/cms/tree/main",
                 "issues": "https://github.com/Vxmdzhb/cms/issues"
             },
-            "time": "2026-11-25T12:03:52+00:00"
+            "time": "2026-11-25T16:59:50+00:00"
         },
         {
             "name": "astrx/config",

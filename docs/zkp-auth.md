@@ -74,7 +74,7 @@ python3 tools/zkp_client.py prove \
   --key "$HOME/.config/astrx/astrx.key" --action login
 ```
 
-The proof expires with its five-minute challenge and can be submitted once.
+The proof can be submitted once and expires with its challenge (five minutes by default).
 Refresh the form for a new challenge after expiry or a failed submission. A
 filled-in proof box is what selects key login: leave it empty to use a password. An
 existing TOTP requirement still follows a successful key proof. The local
@@ -168,7 +168,14 @@ php tools/install.php --schema-only --no-input
 ```
 
 This adds `user_zkp_key` and `user_zkp_challenge`; no existing password is changed.
-Enable the feature by merging this section into the development site's
+In **Admin → Users → Zero-knowledge login (ZKP)**, enable key registration and login.
+Enter each allowed public origin on its own line. The panel shows the origin PHP sees
+on the current request and checks PHP Ristretto support and database schema access.
+The lifetime of newly issued challenges is adjustable from 60 to 600 seconds.
+The optional guide URL controls the help link on the public forms. Save the form
+and visit Login or Register while signed out on an allowed origin.
+
+For a file-based deployment, merge this section into the active site's
 `resources/config/User.config.php`, preserving all existing sections:
 
 ```php
@@ -237,7 +244,7 @@ The fixed vector in `tests/fixtures/zkp-v1.json` is public test data, never a ke
 or nonce to use for an account.
 
 The server records the challenge with a hash of a random browser-session binding,
-the operation, origin and five-minute deadline. A conditional database update
+the operation, origin and configured deadline. A conditional database update
 marks it spent **before** verification; even an invalid attempt spends that
 challenge. Consumed rows remain until expiry, with a best-effort cap of twelve
 live/consumed challenges per binding (concurrent issuance can exceed that cap).

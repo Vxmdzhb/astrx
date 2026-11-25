@@ -114,6 +114,17 @@ try {
     check('untrusted Host is rejected', $zkp->origin() === null);
     $zkp->setOrigins(['https://blackhost.xyz']);
     check('configured origin works', $zkp->origin() === 'https://blackhost.xyz');
+    check('admin readiness checks the selected origin and both tables', $zkp->configurationStatus() === 'ready');
+    $_SERVER['SERVER_PORT'] = 80;
+    $proxied = new ZkpService($challenges, Request::fromGlobals()->unwrap());
+    check('TLS terminator internal port is omitted', $proxied->requestOrigin() === 'https://blackhost.xyz');
+    $_SERVER['HTTP_HOST'] = 'blackhost.xyz:80';
+    $explicit = new ZkpService($challenges, Request::fromGlobals()->unwrap());
+    check('explicit public port is retained', $explicit->requestOrigin() === 'https://blackhost.xyz:80');
+    check('admin accepts a canonical onion origin', ZkpService::validOrigin('http://' . str_repeat('a', 56) . '.onion'));
+    check('admin rejects an HTTP clearnet origin', !ZkpService::validOrigin('http://example.org'));
+    check('admin rejects a URL with a path', !ZkpService::validOrigin('https://example.org/login'));
+    $zkp->setChallengeTtl(90);
     $view = new class implements AstrX\Template\TemplateVars {
         public array $values = [];
         public function set(string $key, mixed $value, AstrX\Template\ContextScope $scope = AstrX\Template\ContextScope::WEB_ONLY): void { $this->values[$key] = $value; }
@@ -121,6 +132,9 @@ try {
     };
     $roots = new AstrX\Support\ResourceRoots([dirname(__DIR__) . '/vendor/astrx/cms/resources']);
     $zkp->present($view, new AstrX\I18n\Translator(roots: $roots), 'login');
+    $displayed = Proof::decode($view->values['zkp_challenge']);
+    check('new challenge uses the configured lifetime', is_array($displayed)
+        && $displayed['expires'] > time() + 85 && $displayed['expires'] <= time() + 90);
     check('presentation registers its partial path', ($view->values['zkp_auth'] ?? '') === 'partials/zkp_auth');
     $renderer = new AstrX\Template\TemplateEngine(roots: $roots);
     $renderer->setCacheTemplates(false);
