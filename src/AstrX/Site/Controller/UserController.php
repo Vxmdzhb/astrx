@@ -3,20 +3,13 @@ declare(strict_types=1);
 
 namespace AstrX\Site\Controller;
 
-use AstrX\Captcha\CaptchaService;
-use AstrX\Captcha\CaptchaType;
-use AstrX\Config\Config;
-use AstrX\Csrf\CsrfHandler;
 use AstrX\Http\Request;
-use AstrX\Page\Page;
-use AstrX\Http\Response;
 use AstrX\I18n\Translator;
 use AstrX\Result\DiagnosticsCollector;
 use AstrX\Result\Result;
 use AstrX\Routing\UrlGenerator;
-use AstrX\Session\PrgHandler;
 use AstrX\Site\DefaultTemplateContext;
-use AstrX\User\LoginNotifier;
+use AstrX\User\Controller\LoginController;
 use AstrX\User\UserService;
 use AstrX\User\UserSession;
 use AstrX\Kernel\AbstractController;
@@ -33,22 +26,15 @@ use AstrX\Kernel\AbstractController;
  */
 final class UserController extends AbstractController
 {
-    private const LOGIN_FORM = 'login';
-
     public function __construct(
         DiagnosticsCollector                   $collector,
         private readonly DefaultTemplateContext $ctx,
-        private readonly Page                   $page,
         private readonly Request               $request,
         private readonly UserSession           $session,
+        private readonly LoginController        $login,
         private readonly UserService           $userService,
-        private readonly CaptchaService        $captchaService,
-        private readonly Config                $config,
-        private readonly CsrfHandler           $csrf,
-        private readonly PrgHandler            $prg,
         private readonly UrlGenerator          $urlGen,
         private readonly Translator            $t,
-        private readonly LoginNotifier         $logins,
     ) {
         parent::__construct($collector);
     }
@@ -117,166 +103,14 @@ final class UserController extends AbstractController
             // Fall through on failed token — show normal page with errors visible
         }
 
-        // --- PRG: login form submitted ----------------------------------------
-        $prgToken = $this->request->query()->get($this->prg->tokenQueryKey());
-        if (is_string($prgToken) && $prgToken !== '' && !$this->session->isLoggedIn()) {
-            $this->processLoginSubmission($prgToken);
-            if ($this->session->isLoggedIn()) {
-                // Redirect to home after successful login
-                header('Location: ' . $this->urlGen->toPage($this->t->t('WORDING_USER_HOME')));
-                exit;
-            }
-            // Failed — fall through to re-render with errors
+        if (!$this->session->isLoggedIn()) {
+            $this->ctx->set('logged_in', false);
+            $this->ctx->set('user_login_form', 'user/login');
+            return $this->login->handle();
         }
 
-        // --- Render -----------------------------------------------------------
-        if ($this->session->isLoggedIn()) {
-            $this->renderHome();
-        } else {
-            $this->renderLoginForm();
-        }
-
+        $this->renderHome();
         return $this->ok();
-    }
-
-    // -------------------------------------------------------------------------
-
-    private function processLoginSubmission(string $prgToken): void
-    {
-        $posted = $this->prg->pull($prgToken) ?? [];
-
-        $username    = is_string($posted['username']    ?? null) ? (string) $posted['username']    : '';
-        $password    = is_string($posted['password']    ?? null) ? (string) $posted['password']    : '';
-        $rememberMe  = self::mBool($posted, 'remember_me');
-        $csrfToken   = is_string($posted['_csrf']       ?? null) ? (string) $posted['_csrf']       : '';
-        $captchaId   = is_string($posted['captcha_id']  ?? null) ? (string) $posted['captcha_id']  : '';
-        $captchaText = is_string($posted['captcha_text']?? null) ? (string) $posted['captcha_text']: '';
-
-        $csrfResult = $this->csrf->verify(self::LOGIN_FORM, $csrfToken);
-        if (!$csrfResult->isOk()) {
-            $csrfResult->drainTo($this->collector);
-            return;
-        }
-
-        // The captcha depends on a per-session failure counter, not on the
-        // username: showing it only for real accounts would tell an attacker which
-        // accounts exist.
-        $showCaptchaResult = $this->userService->shouldShowLoginCaptcha($this->loginFailCount());
-        if ($showCaptchaResult->isOk() && (bool) $showCaptchaResult->unwrap()) {
-            $captchaResult = $this->captchaService->verify($captchaId, $captchaText);
-            if (!$captchaResult->isOk()) {
-                $captchaResult->drainTo($this->collector);
-                return;
-            }
-        }
-
-        $loginResult = $this->userService->login($username, $password, $rememberMe);
-        if (!$loginResult->isOk()) {
-            $loginResult->drainTo($this->collector);
-            // Count every failed attempt, independent of whether the username exists.
-            $this->bumpLoginFailCount();
-            return;
-        }
-
-        $this->resetLoginFailCount();
-
-        /** @var array{id:string,username:string,display_name:string,type:int,verified:bool|int,avatar:bool|int,mailbox?:string,password?:string} $userData */
-        $userData = $loginResult->unwrap();
-
-        // ── Second factor gate (mirror of LoginController) ────────────────────
-        // If the account has TOTP on, defer the session grant to /login-2fa; the
-        // session is not authenticated until session->login() runs there.
-        $uid = is_scalar($userData['id'] ?? null) ? (string) $userData['id'] : '';
-        $factor = $this->userService->isTotpEnabled($uid)->drainTo($this->collector);
-        if (!$factor->isOk()) {
-            unset($_SESSION['astrx_pending_2fa'], $_SESSION['astrx_pending_2fa_data'], $_SESSION['astrx_pending_2fa_ts']);
-            $this->session->forgetSecrets();
-            return;
-        }
-        if ($factor->unwrap()) {
-            unset($userData['password']);
-            $this->logins->passwordAccepted($password, secondFactorPending: true);
-            $_SESSION['astrx_pending_2fa']      = $uid;
-            $_SESSION['astrx_pending_2fa_data'] = $userData;
-            $_SESSION['astrx_pending_2fa_ts']   = time();
-            Response::redirect($this->urlGen->toPage($this->t->t('WORDING_TWOFA')))
-                ->send()->drainTo($this->collector);
-            exit;
-        }
-
-        $this->session->login($userData);
-
-        // Modules that need the password (webmail, for a local IMAP server)
-        // keep what they need — in the AES-encrypted session.
-        $this->logins->passwordAccepted($password, secondFactorPending: false);
-    }
-
-    private function renderLoginForm(string $usernameValue = ''): void
-    {
-        $pageUrl = $this->urlGen->toPage($this->page->resolvedUrlId($this->t));
-        $prgId   = $this->prg->createId($pageUrl);
-
-        $captchaResult = $this->userService->shouldShowLoginCaptcha($this->loginFailCount());
-        $showCaptcha   = $captchaResult->isOk() && (bool) $captchaResult->unwrap();
-
-        $captchaId = ''; $captchaB64 = '';
-        if ($showCaptcha) {
-            // tryFrom()+fallback (not from(), which throws a ValueError → 500)
-            // so a bad persisted difficulty degrades to MEDIUM instead of 500ing login.
-            $loginDifficulty = CaptchaType::tryFrom(
-                $this->config->getConfigInt('CaptchaRenderer', 'login_captcha_difficulty', CaptchaType::MEDIUM->value)
-            ) ?? CaptchaType::MEDIUM;
-            $gen = $this->captchaService->generateWithType($loginDifficulty);
-            $gen->drainTo($this->collector);
-            if ($gen->isOk()) {
-                $captchaId  = $gen->unwrap()['id'];
-                $captchaB64 = $gen->unwrap()['image_b64'];
-            }
-        }
-
-        $this->ctx->set('logged_in',          false);
-        $this->ctx->set('prg_id',             $prgId);
-        $this->ctx->set('csrf_token',         $this->csrf->generate(self::LOGIN_FORM));
-        $this->ctx->set('username_value',     $usernameValue);
-        $this->ctx->set('show_captcha',       $showCaptcha);
-        $this->ctx->set('captcha_id',         $captchaId);
-        $this->ctx->set('captcha_image',      $captchaB64);
-        $this->captchaService->presentReload($this->ctx, $this->urlGen, $this->t, $captchaId);
-        $this->ctx->set('register_url',       $this->urlGen->toPage($this->t->t('WORDING_REGISTER')));
-        $this->ctx->set('recover_url',        $this->urlGen->toPage($this->t->t('WORDING_RECOVER')));
-        $this->ctx->set('show_recover',       $this->userService->requireRecoveryEmail());
-        $this->ctx->set('login_heading',      $this->t->t('user.login.heading'));
-        $this->ctx->set('login_username',     $this->t->t('user.field.username'));
-        $this->ctx->set('login_password',     $this->t->t('user.field.password'));
-        $this->ctx->set('login_remember_me',  $this->t->t('user.login.remember_me'));
-        $this->ctx->set('login_submit',       $this->t->t('user.login.submit'));
-        $this->ctx->set('login_lost_password',$this->t->t('user.login.lost_password'));
-        $this->ctx->set('login_need_account', $this->t->t('user.login.need_account'));
-        $this->ctx->set('login_register',     $this->t->t('user.login.register'));
-        $this->ctx->set('captcha_label',      $this->t->t('user.captcha.label'));
-    }
-
-    // ── Login-failure counter (session) ───────────────────────────────────────
-    // Shares the key with LoginController so the login captcha threshold is
-    // driven by attempts from THIS browser session, independent of whether the
-    // submitted username maps to a real account (closes the enumeration oracle).
-
-    private function loginFailCount(): int
-    {
-        $v = $_SESSION['astrx_login_fail'] ?? 0;
-        return is_int($v) ? $v : (is_numeric($v) ? (int) $v : 0);
-    }
-
-    private function bumpLoginFailCount(): int
-    {
-        $n = $this->loginFailCount() + 1;
-        $_SESSION['astrx_login_fail'] = $n;
-        return $n;
-    }
-
-    private function resetLoginFailCount(): void
-    {
-        $_SESSION['astrx_login_fail'] = 0;
     }
 
     private function renderHome(): void
