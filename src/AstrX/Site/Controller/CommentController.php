@@ -266,7 +266,7 @@ final class CommentController extends AbstractController
                 $dnRaw = $row['user_display_name'] ?? $row['name'] ?? $anonymousName;
                 $displayName = is_scalar($dnRaw) ? (string)$dnRaw : $anonymousName;
                 $avatarSrc   = $this->urlGen->toPage('avatar', ['uid' => (is_scalar($row['user_id']) ? (string)$row['user_id'] : '')]);
-                $profileUrl  = $profileBase . '?uid=' . rawurlencode((is_scalar($row['user_id']) ? (string)$row['user_id'] : ''));
+                $profileUrl  = $profileBase . (str_contains($profileBase, '?') ? '&' : '?') . 'uid=' . rawurlencode((is_scalar($row['user_id']) ? (string)$row['user_id'] : ''));
             } else {
                 $displayName = ($row['name'] ?? '') !== '' ? (is_scalar($row['name']) ? (string)$row['name'] : '') : $anonymousName;
                 $profileUrl  = '';
@@ -299,7 +299,7 @@ final class CommentController extends AbstractController
             // reply_url MUST be set before the section wrappers below.
             // The snapshot [$enriched] is taken by value — any key added after
             // reply_section is assigned will NOT appear inside {{#reply_section}}.
-            $enriched['reply_url'] = $pageBase . '?reply_to=' . (is_int($row['id']) ? $row['id'] : 0) . '#comment_form';
+            $enriched['reply_url'] = $pageBase . (str_contains($pageBase, '?') ? '&' : '?') . 'reply_to=' . (is_int($row['id']) ? $row['id'] : 0) . '#comment_form';
 
             // ── Section wrappers ──────────────────────────────────────────────
             // RULE: no section that reads row fields may be nested inside another.
@@ -396,8 +396,7 @@ final class CommentController extends AbstractController
         $this->ctx->set('captcha_id',            $captchaId);
         // Iframe-reloadable captcha — see LoginController.
         $captchaFrameUrl = $captchaId !== ''
-            ? $this->urlGen->toPage($this->t->t('WORDING_CAPTCHA_FRAME'))
-                . '?cid=' . $captchaId
+            ? $this->urlGen->toPage($this->t->t('WORDING_CAPTCHA_FRAME'), ['cid' => $captchaId])
             : '';
         $this->ctx->set('captcha_frame_url', $captchaFrameUrl);
         // Reload button (iframe) is opt-in; off = a plain single-image captcha.

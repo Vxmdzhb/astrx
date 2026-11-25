@@ -763,6 +763,29 @@ try {
     // Every migration on disk must be in the ledger: one that silently didn't run
     // would make both sides equally wrong and equally green.
     require_once $ROOT . '/src/autoload.php';
+    // SQLite's TEXT fixture cannot catch truncation of the encrypted TOTP envelope.
+    $repo = new AstrX\User\UserRepository($pdoFresh);
+    $paths = new AstrX\Support\Paths();
+    $secret = new AstrX\Session\ServerSecret($paths);
+    $secret->setConfigured(bin2hex(random_bytes(32)));
+    $users = new AstrX\User\UserService(
+        $repo, new AstrX\User\AvatarService($repo, new AstrX\Image\ImageSanitizer(), $secret, $paths),
+        new AstrX\User\UserSession(), $secret
+    );
+    $seed = (new AstrX\Auth\TotpService())->generateSecret();
+    $pdoFresh->beginTransaction();
+    try {
+        $id = AstrX\User\UserRepository::GHOST_HEX_ID;
+        $pdoFresh->prepare('UPDATE user SET totp_last_step = 12345 WHERE id = UNHEX(?)')->execute([$id]);
+        $saved = $users->enableTotp($id, $seed, []);
+        $state = $users->totpInfo($id);
+        check('generated authenticator secret survives encrypted database storage',
+            $saved->isOk() && $saved->unwrap() === true && $state->isOk() && $state->unwrap()['secret'] === $seed);
+        check('new authenticator starts with its own replay history', $state->isOk() && $state->unwrap()['last_step'] === 0);
+    } finally {
+        $pdoFresh->rollBack();
+    }
+
     $onDisk = count((new AstrX\Database\SchemaFiles(
         [$ROOT . '/src/setup'],
         AstrX\ApplicationContainer::resourceRoots()

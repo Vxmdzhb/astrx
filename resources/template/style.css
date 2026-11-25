@@ -43,9 +43,8 @@ h1 a{
     padding:0;
     overflow:hidden;
 }
-#user_nav, #admin_nav li input, .chat_nav, .board_nav{
+#user_nav li input, #admin_nav li input, .chat_nav li input, .board_nav li input{
     border:none;
-    outline:none;
     background:none;
     text-decoration: underline;
     cursor:pointer;
@@ -95,6 +94,7 @@ h1 a{
     }
 
     #nav li:first-child a, #user_nav li:first-child input, #user_nav li:first-child a, #admin_nav li:first-child input, #admin_nav li:first-child a, .chat_nav li:first-child input, .board_nav li:first-child input, .chat_nav li:first-child a, .board_nav li:first-child a{
+        box-sizing: border-box;
         width: 100%;
     }
 
@@ -111,6 +111,7 @@ h1 a{
     #nav.responsive li a, #nav.responsive li a input, #user_nav.responsive li a, #admin_nav.responsive li a, .chat_nav.responsive li a, .board_nav.responsive li a{
         background-color: #000;
         display: block;
+        box-sizing: border-box;
         width: 100%;
     }
 

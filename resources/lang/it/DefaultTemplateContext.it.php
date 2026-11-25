@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 return [
     'generated_in' => 'Generato in:',
+    'table_scroll_label' => 'Tabella dati scorrevole',
+    'skip_content' => 'Vai al contenuto',
     'go_top'       => 'Torna su',
 
     'user.nav.guest'    => 'Accedi',

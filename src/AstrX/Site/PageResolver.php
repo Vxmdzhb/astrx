@@ -87,6 +87,21 @@ final class PageResolver
             }
         }
 
+        // These original settings pages still exist in the shipped schema.
+        // Resolve their replacements before permission checks and dispatch.
+        if ($page !== null && !$page->hidden) {
+            $replacement = match ([$page->urlId, $page->fileName]) {
+                ['WORDING_ADMIN_CONFIG_COMMENTS', 'admin_config_comments'] => 'WORDING_ADMIN_COMMENTS',
+                ['WORDING_ADMIN_CONFIG_CONTENT', 'admin_config_content'] => 'WORDING_ADMIN_CONFIG_SYSTEM',
+                ['WORDING_ADMIN_CONFIG_USERS', 'admin_config_users'] => 'WORDING_ADMIN_USERS',
+                default => null,
+            };
+            if ($replacement !== null) {
+                $id = $pageHandler->getPageIdFromUrlId($replacement);
+                $page = $id !== null ? $pageHandler->getPage($id) : null;
+            }
+        }
+
         if ($page === null) {
             http_response_code(HttpStatus::NOT_FOUND->value);
 

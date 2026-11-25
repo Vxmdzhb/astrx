@@ -43,9 +43,8 @@ h1 a{
     padding:0;
     overflow:hidden;
 }
-#user_nav, #admin_nav li input, .section_nav{
+#user_nav li input, #admin_nav li input, .section_nav li input{
     border:none;
-    outline:none;
     background:none;
     text-decoration: underline;
     cursor:pointer;

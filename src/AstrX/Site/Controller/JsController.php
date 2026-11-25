@@ -1260,6 +1260,8 @@ JS;
             'ip'           => (string) $this->request->ip(),
             'css'          => $css,
             'generated_in' => $this->translator->t('generated_in', fallback: 'Generated in:'),
+            'table_scroll_label' => $this->translator->t('table_scroll_label', fallback: 'Scrollable data table'),
+            'skip_content' => $this->translator->t('skip_content', fallback: 'Skip to content'),
             'go_top'       => $this->translator->t('go_top', fallback: 'Go top'),
             'navbar'       => $pages,
             'has_messages' => false,

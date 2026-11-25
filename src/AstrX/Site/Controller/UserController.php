@@ -8,6 +8,7 @@ use AstrX\Captcha\CaptchaType;
 use AstrX\Config\Config;
 use AstrX\Csrf\CsrfHandler;
 use AstrX\Http\Request;
+use AstrX\Page\Page;
 use AstrX\Http\Response;
 use AstrX\I18n\Translator;
 use AstrX\Result\DiagnosticsCollector;
@@ -37,6 +38,7 @@ final class UserController extends AbstractController
     public function __construct(
         DiagnosticsCollector                   $collector,
         private readonly DefaultTemplateContext $ctx,
+        private readonly Page                   $page,
         private readonly Request               $request,
         private readonly UserSession           $session,
         private readonly UserService           $userService,
@@ -211,7 +213,7 @@ final class UserController extends AbstractController
 
     private function renderLoginForm(string $usernameValue = ''): void
     {
-        $pageUrl = $this->request->uri()->path();
+        $pageUrl = $this->urlGen->toPage($this->page->resolvedUrlId($this->t));
         $prgId   = $this->prg->createId($pageUrl);
 
         $captchaResult = $this->userService->shouldShowLoginCaptcha($this->loginFailCount());

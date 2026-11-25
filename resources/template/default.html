@@ -20,14 +20,26 @@
     <meta name="robots"
           content="{{^index}}no{{/index}}index, {{^follow}}no{{/follow}}follow">
     <meta name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1;">
+          content="width=device-width, initial-scale=1">
     <link rel="icon" type="icon/ico" href="{{icon}}">
-    <style>{{&css}}</style>
+    <style>{{&css}}
+        .skip-content { position: absolute; left: -10000px; }
+        .table-scroll { max-width: 100%; overflow-x: auto; }
+        .skip-content:focus { position: static; }
+        @media screen and (max-width: 640px) {
+            #main fieldset { min-inline-size: 0; }
+            .table-scroll > table { min-width: 42rem; table-layout: auto !important; }
+            .skip-content { position: static; align-self: center; }
+            #nav, #user_nav, #admin_nav { display: flex; flex-wrap: wrap; justify-content: center; }
+            #nav li a, #user_nav li a, #admin_nav li a { box-sizing: border-box; }
+        }
+    </style>
 </head>
 <body>
 <div id="wrap">
     <div id="header">
         <h1 id="title"><a href="{{title_url}}">{{website_name}}</a></h1>
+        <a class="skip-content" href="#main">{{skip_content}}</a>
     </div>
     <div id="top_nav">
         <ul id="nav" class="nav">{{#navbar}}<li><a href="{{url}}"{{#highlight}} class="active"{{/highlight}}>{{name}}</a></li>{{/navbar}}
@@ -63,12 +75,12 @@
         {{#messages}}<p class="{{css_class}}">{{#level_label}}[{{level_label}}] {{/level_label}}{{message}}</p>{{/messages}}
     </div>
     {{/has_messages}}
-    <div id="main">
+    <main id="main" tabindex="-1">
         {{>include}}
         {{#page_comments}}{{&comments_html}}{{/page_comments}}
         <p id="go_top">{{generated_in}} {{time}}s<span class="right"><a
                 href="#">{{go_top}}</a></span></p>
-    </div>
+    </main>
     <div id="footer">
         <p class="left"><a href="">{{ip}}</a></p>
         <p class="right">Copyright &copy; {{year}} - <a

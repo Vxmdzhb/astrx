@@ -287,6 +287,8 @@ final class DefaultTemplateContext implements TemplateVars
             'css'          => $css,
 
             'generated_in' => $this->t->t('generated_in', fallback: 'Generated in:'),
+            'table_scroll_label' => $this->t->t('table_scroll_label', fallback: 'Scrollable data table'),
+            'skip_content' => $this->t->t('skip_content', fallback: 'Skip to content'),
             'go_top'       => $this->t->t('go_top',       fallback: 'Go top'),
 
             'navbar'       => [],
@@ -320,6 +322,19 @@ final class DefaultTemplateContext implements TemplateVars
                 $sidInput = '<input type="hidden" name="'
                     . htmlspecialchars($sessionKey, ENT_QUOTES) . '" value="'
                     . htmlspecialchars($sid, ENT_QUOTES) . '">';
+            }
+        }
+        // Browsers rebuild GET queries from form controls. Preserve the canonical
+        // locale and page on same-page filters, including custom routing key names.
+        $this->vars['route_fields'] = [];
+        if (!$this->config->getConfigBool('Routing', 'url_rewrite', true)) {
+            $slug = $page->resolvedUrlId($this->t);
+            $route = $this->urlGenerator->toPage($slug, includeSid: false);
+            parse_str((string) parse_url($route, PHP_URL_QUERY), $fields);
+            foreach ($fields as $name => $value) {
+                if (is_string($value)) {
+                    $this->vars['route_fields'][] = ['name' => $name, 'value' => $value];
+                }
             }
         }
         $this->vars['sid']       = $sid;

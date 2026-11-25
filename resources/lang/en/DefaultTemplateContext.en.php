@@ -13,6 +13,8 @@ declare(strict_types=1);
  */
 return [
     'generated_in' => 'Generated in:',
+    'table_scroll_label' => 'Scrollable data table',
+    'skip_content' => 'Skip to content',
     'go_top'       => 'Go top',
 
     // User nav — shown in the header on every page
