@@ -15,7 +15,7 @@ import io
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
-spec = importlib.util.spec_from_file_location("zkp_client", ROOT / "tools/zkp_client.py")
+spec = importlib.util.spec_from_file_location("zkp_client", ROOT / "vendor/astrx/cms/resources/zkp/zkp_client.py")
 client = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(client)
 

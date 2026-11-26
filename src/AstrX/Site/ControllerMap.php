@@ -48,6 +48,7 @@ final class ControllerMap
         'twofactor'     => \AstrX\User\Controller\TwofactorController::class,
         'user_home'     => \AstrX\User\Controller\UserHomeController::class,
         'user_settings' => \AstrX\User\Controller\UserSettingsController::class,
+        'zkp_client'    => \AstrX\User\Controller\ZkpClientController::class,
         // Admin shell and site-wide settings
         'admin'                => \AstrX\Admin\Controller\AdminController::class,
         'admin_audit_log'      => \AstrX\Admin\Controller\AdminAuditLogController::class,

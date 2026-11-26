@@ -29,13 +29,16 @@ libsodium. It must point to your trusted installed library, never a file supplie
 with a login challenge. The client is currently exercised on Linux; Windows is
 not a tested target.
 
-Obtain `tools/zkp_client.py` from your reviewed AstrX checkout. Generate a separate
-key for this account, **before** opening the registration page:
+Get the client from the site: the `zkp_client.py` in the command on the login and
+sign-up pages is a download link (it is also `vendor/astrx/cms/resources/zkp/zkp_client.py`
+in an installed checkout, which `tools/zkp_client.py` runs). Review it before use.
+The commands below run it from the current directory. Generate a separate key for
+this account, **before** opening the registration page:
 
 ```bash
 umask 077
 mkdir -p "$HOME/.config/astrx"
-python3 tools/zkp_client.py keygen \
+python3 zkp_client.py keygen \
   --key "$HOME/.config/astrx/astrx.key" \
   --origin https://example.org \
   --username alice
@@ -58,7 +61,7 @@ onion addresses and explicit localhost/127.0.0.1 development origins.
    page's challenge when prompted:
 
 ```bash
-python3 tools/zkp_client.py prove \
+python3 zkp_client.py prove \
   --key "$HOME/.config/astrx/astrx.key" --action register
 ```
 
@@ -70,7 +73,7 @@ python3 tools/zkp_client.py prove \
    and its fresh challenge with:
 
 ```bash
-python3 tools/zkp_client.py prove \
+python3 zkp_client.py prove \
   --key "$HOME/.config/astrx/astrx.key" --action login
 ```
 
@@ -89,7 +92,7 @@ One key per account is supported in this version.
 
 For a renamed account, add `--username NEW_NAME` to `prove`; this explicit local
 override changes the account bound into the proof, not the private key. A public
-key summary is available with `python3 tools/zkp_client.py public --key PATH`.
+key summary is available with `python3 zkp_client.py public --key PATH`.
 
 ## Mail and recovery boundaries
 
