@@ -157,12 +157,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/cms.git",
-                "reference": "97acafa83c0fd484513a98db67de62ebefcf8aa0"
+                "reference": "8d3ae33286e288378ba2b09216c3dc73d590d237"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/cms/zipball/97acafa83c0fd484513a98db67de62ebefcf8aa0",
-                "reference": "97acafa83c0fd484513a98db67de62ebefcf8aa0",
+                "url": "https://api.github.com/repos/Vxmdzhb/cms/zipball/8d3ae33286e288378ba2b09216c3dc73d590d237",
+                "reference": "8d3ae33286e288378ba2b09216c3dc73d590d237",
                 "shasum": ""
             },
             "require": {
@@ -228,7 +228,7 @@
                 "source": "https://github.com/Vxmdzhb/cms/tree/main",
                 "issues": "https://github.com/Vxmdzhb/cms/issues"
             },
-            "time": "2026-11-26T05:10:51+00:00"
+            "time": "2026-11-26T05:29:02+00:00"
         },
         {
             "name": "astrx/config",
@@ -711,12 +711,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/mail.git",
-                "reference": "d3404d4cf7a5ea007cb6d5c19fda6588dfc79465"
+                "reference": "c5228c42f3caf779f7f56ea6a0a25a1fa633802c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/mail/zipball/d3404d4cf7a5ea007cb6d5c19fda6588dfc79465",
-                "reference": "d3404d4cf7a5ea007cb6d5c19fda6588dfc79465",
+                "url": "https://api.github.com/repos/Vxmdzhb/mail/zipball/c5228c42f3caf779f7f56ea6a0a25a1fa633802c",
+                "reference": "c5228c42f3caf779f7f56ea6a0a25a1fa633802c",
                 "shasum": ""
             },
             "require": {
@@ -756,7 +756,7 @@
                 "source": "https://github.com/Vxmdzhb/mail/tree/main",
                 "issues": "https://github.com/Vxmdzhb/mail/issues"
             },
-            "time": "2026-11-26T05:10:47+00:00"
+            "time": "2026-11-26T05:28:58+00:00"
         },
         {
             "name": "astrx/module",
