@@ -200,7 +200,8 @@ try {
     $repo->setVerified($uid);
     $pdo->exec("UPDATE user SET deletion_mode = 'keep_visible' WHERE username = 'alice'");
     check('closed account cannot key-login', !$users->loginWithPublicKey('alice',$key,false)->isOk());
-    $pdo->exec("UPDATE user SET deletion_mode = 'none'");
+    // NULL is what every account has until it is deleted.
+    $pdo->exec("UPDATE user SET deletion_mode = NULL");
     for ($i = 0; $i < 12; $i++) { $users->login('alice', 'guess number ' . $i, false); }
     check('wrong passwords never count against a key-only account',
         (int) $pdo->query("SELECT login_attempts FROM user WHERE username = 'alice'")->fetchColumn() === 0);
