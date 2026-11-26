@@ -157,12 +157,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/cms.git",
-                "reference": "8d3ae33286e288378ba2b09216c3dc73d590d237"
+                "reference": "6600943ff66838a409c8d2e2a5bec9fe681753b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/cms/zipball/8d3ae33286e288378ba2b09216c3dc73d590d237",
-                "reference": "8d3ae33286e288378ba2b09216c3dc73d590d237",
+                "url": "https://api.github.com/repos/Vxmdzhb/cms/zipball/6600943ff66838a409c8d2e2a5bec9fe681753b0",
+                "reference": "6600943ff66838a409c8d2e2a5bec9fe681753b0",
                 "shasum": ""
             },
             "require": {
@@ -228,7 +228,7 @@
                 "source": "https://github.com/Vxmdzhb/cms/tree/main",
                 "issues": "https://github.com/Vxmdzhb/cms/issues"
             },
-            "time": "2026-11-26T05:29:02+00:00"
+            "time": "2026-11-26T06:30:27+00:00"
         },
         {
             "name": "astrx/config",
@@ -1976,12 +1976,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Vxmdzhb/template.git",
-                "reference": "3b29ab233eb4a66714b15d75b4b2b00556c97845"
+                "reference": "69016b1a3be56995ae1a753b61ee77b4095eb9a7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vxmdzhb/template/zipball/3b29ab233eb4a66714b15d75b4b2b00556c97845",
-                "reference": "3b29ab233eb4a66714b15d75b4b2b00556c97845",
+                "url": "https://api.github.com/repos/Vxmdzhb/template/zipball/69016b1a3be56995ae1a753b61ee77b4095eb9a7",
+                "reference": "69016b1a3be56995ae1a753b61ee77b4095eb9a7",
                 "shasum": ""
             },
             "require": {
@@ -2016,7 +2016,7 @@
                 "source": "https://github.com/Vxmdzhb/template/tree/main",
                 "issues": "https://github.com/Vxmdzhb/template/issues"
             },
-            "time": "2026-11-01T11:26:45+00:00"
+            "time": "2026-11-26T06:30:20+00:00"
         }
     ],
     "packages-dev": [],
