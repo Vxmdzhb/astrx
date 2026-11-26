@@ -5,7 +5,6 @@ namespace AstrX\Site\Controller;
 
 use AstrX\Auth\Gate;
 use AstrX\Captcha\CaptchaService;
-use AstrX\Captcha\CaptchaType;
 use AstrX\Comment\CommentService;
 use AstrX\Csrf\CsrfHandler;
 use AstrX\Http\Request;
@@ -16,7 +15,6 @@ use AstrX\Page\Page;
 use AstrX\Result\DiagnosticsCollector;
 use AstrX\Result\Result;
 use AstrX\Routing\UrlGenerator;
-use AstrX\Config\Config;
 use AstrX\Comment\CommentPrgHandler;
 use AstrX\Session\FlashBag;
 use AstrX\Comment\CommentState;
@@ -66,7 +64,6 @@ final class CommentController extends AbstractController
         private readonly Gate                  $gate,
         private readonly UserSession           $session,
         private readonly CsrfHandler           $csrf,
-        private readonly Config                $config,
         private readonly CommentPrgHandler     $commentPrg,
         private readonly UrlGenerator          $urlGen,
         private readonly Translator            $t,
@@ -134,7 +131,6 @@ final class CommentController extends AbstractController
             );
             if (!$captchaResult->isOk()) {
                 $captchaResult->drainTo($this->collector);
-                $this->flash->set('error', $this->t->t('comment.error.captcha'));
                 return;
             }
         }
@@ -155,14 +151,22 @@ final class CommentController extends AbstractController
 
         $postResult = $this->commentService->post(
             $this->page->id, $content, $name, $email, $replyTo, $remoteIp
-        )->drainTo($this->collector);
+        );
 
-        // PRG swallows collector diagnostics on redirect, so surface the outcome
-        // as a flash message the poster actually sees.
         if ($postResult->isOk()) {
+            $postResult->drainTo($this->collector);
             $this->flash->set('success', $this->t->t('comment.posted'));
             return;
         }
+
+        // The flash below tells the poster why the comment was refused, in the
+        // words the site chose (an antispam rule's own message, say). The
+        // refusal's own diagnostic would say the same thing twice; anything
+        // else, a database error say, still goes to the message bar.
+        $this->collector->emitAll($postResult->diagnostics()->filter(
+            static fn (\AstrX\Result\DiagnosticInterface $d): bool => !str_starts_with($d->id(), 'astrx.comment/')
+                || $d->id() === 'astrx.comment/db_error',
+        ));
 
         $errRaw = $postResult->error();
         $key    = is_string($errRaw) && $errRaw !== '' ? $errRaw : 'comment.error.generic';
@@ -354,15 +358,8 @@ final class CommentController extends AbstractController
         $captchaId    = '';
         $captchaImage = '';
         if (!$this->session->isLoggedIn()) {
-            // tryFrom(...) ?? MEDIUM: comment_captcha_difficulty is MOD-settable
-            // via the admin config with no guaranteed 0..2 clamp, and
-            // CaptchaType::from() would throw a ValueError (→ 500) on any
-            // out-of-range value, breaking comment rendering for EVERY guest.
-            // Fall back to MEDIUM instead of trusting the stored int.
-            $commentDifficulty = CaptchaType::tryFrom(
-                $this->config->getConfigInt('CaptchaRenderer', 'comment_captcha_difficulty', CaptchaType::MEDIUM->value)
-            ) ?? CaptchaType::MEDIUM;
-            $captchaGen = $this->captchaService->generateWithType($commentDifficulty);
+            // At the difficulty set for comments in Admin → Captcha.
+            $captchaGen = $this->captchaService->generateFor('comment')->drainTo($this->collector);
             if ($captchaGen->isOk()) {
                 ['id' => $captchaId, 'image_b64' => $captchaImage] = $captchaGen->unwrap();
                 $showCaptcha = true;
@@ -426,6 +423,8 @@ final class CommentController extends AbstractController
         $this->ctx->set('comment_label_content',      $this->t->t('comment.label.content'));
         $this->ctx->set('comment_label_reply',        $this->t->t('comment.label.reply'));
         $this->ctx->set('comment_label_captcha',      $this->t->t('comment.label.captcha'));
+        // The shared captcha partial labels its answer box with captcha_label.
+        $this->ctx->set('captcha_label',              $this->t->t('comment.label.captcha'));
         $this->ctx->set('comment_btn_submit',         $this->t->t('comment.btn.submit'));
         $this->ctx->set('comment_btn_filter',         $this->t->t('comment.btn.filter'));
         $this->ctx->set('comment_btn_reply',          $this->t->t('comment.btn.reply'));
