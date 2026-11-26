@@ -29,6 +29,7 @@ use AstrX\Site\PageRenderer;
 use AstrX\Site\PageResolver;
 use AstrX\Site\PanicLockdown;
 use AstrX\Site\PrgIntake;
+use AstrX\Site\RedirectDiagnostics;
 use AstrX\Site\RequestIdentity;
 use AstrX\Site\SecurityHeaders;
 use AstrX\Site\SessionStarter;
@@ -237,6 +238,9 @@ final class ContentManager
             $this->renderError(HttpStatus::INTERNAL_SERVER_ERROR);
             return;
         }
+        // Most controllers end a form submission with a redirect; what they
+        // reported on the way is shown on the page the redirect leads to.
+        RedirectDiagnostics::keepOnRedirect($ctx);
 
         // Comments stay closed to anyone a panic lockdown seals, even on a page
         // the lockdown leaves open (an exempt page with comments enabled would

@@ -384,6 +384,52 @@ final class DefaultTemplateContext implements TemplateVars
      *   got_results  bool
      *   results      list<array{message: string, level: string, css_class: string}>
      */
+    /**
+     * This request's diagnostics as message-bar entries: at or above the
+     * configured level, and only those the current user may see.
+     *
+     * @return list<array{message:string,level:string,level_label:string,css_class:string}>
+     */
+    public function diagnosticMessages(): array
+    {
+        // Minimum level — controls which diagnostics appear in the message bar.
+        $minLevelVal = $this->config->getConfigInt(
+            'ContentManager',
+            'status_bar_min_level',
+            DiagnosticLevel::NOTICE->value,
+        );
+        $minLevel = DiagnosticLevel::tryFrom($minLevelVal) ?? DiagnosticLevel::NOTICE;
+
+        // Level → CSS class map.
+        $levelClasses = $this->config->getConfig(
+            'ContentManager',
+            'status_bar_level_classes',
+            [
+                'DEBUG'     => 'diag-debug',
+                'INFO'      => 'diag-info',
+                'NOTICE'    => 'diag-notice',
+                'WARNING'   => 'diag-warning',
+                'ERROR'     => 'diag-error',
+                'CRITICAL'  => 'diag-critical',
+                'ALERT'     => 'diag-alert',
+                'EMERGENCY' => 'diag-emergency',
+            ],
+        );
+        $levelClasses = is_array($levelClasses) ? $levelClasses : [];
+
+        $messages = [];
+        foreach ($this->renderer->renderFiltered($this->collector->diagnostics(), $minLevel, $this->checker) as $entry) {
+            $levelName  = $entry['level']->name;
+            $messages[] = [
+                'message'     => $entry['message'],
+                'level'       => $levelName,
+                'level_label' => $entry['level_label'],
+                'css_class'   => is_scalar($levelClasses[$levelName] ?? null) ? (string)($levelClasses[$levelName]) : 'diag-unknown',
+            ];
+        }
+        return $messages;
+    }
+
     public function finalise(): void
     {
         // ── Deferred URL resolution ───────────────────────────────────────────
@@ -492,40 +538,10 @@ final class DefaultTemplateContext implements TemplateVars
             ? round((microtime(true) - (is_float($rtf = $_SERVER['REQUEST_TIME_FLOAT']) ? $rtf : 0.0)), 4)
             : null;
 
-        // Minimum level — controls which diagnostics appear in the message bar.
-        $minLevelVal = $this->config->getConfigInt(
-            'ContentManager',
-            'status_bar_min_level',
-            DiagnosticLevel::NOTICE->value,
-        );
-        $minLevel = DiagnosticLevel::tryFrom($minLevelVal) ?? DiagnosticLevel::NOTICE;
-
-        // Level → CSS class map.
-        $levelClasses = $this->config->getConfig(
-            'ContentManager',
-            'status_bar_level_classes',
-            [
-                'DEBUG'     => 'diag-debug',
-                'INFO'      => 'diag-info',
-                'NOTICE'    => 'diag-notice',
-                'WARNING'   => 'diag-warning',
-                'ERROR'     => 'diag-error',
-                'CRITICAL'  => 'diag-critical',
-                'ALERT'     => 'diag-alert',
-                'EMERGENCY' => 'diag-emergency',
-            ],
-        );
-        assert(is_array($levelClasses));
-
-        $filtered = $this->renderer->renderFiltered(
-            $this->collector->diagnostics(),
-            $minLevel,
-            $this->checker,
-        );
-
         // Merge flash messages and diagnostic messages into one unified list.
         // Flash messages are controller-driven (already translated);
-        // their 'type' maps directly to a css_class. Diagnostics follow.
+        // their 'type' maps directly to a css_class. Then come the diagnostics
+        // of the request that redirected here, then this request's own.
         $messages = [];
 
         foreach ($this->flashBag->pull() as $flash) {
@@ -537,14 +553,10 @@ final class DefaultTemplateContext implements TemplateVars
             ];
         }
 
-        foreach ($filtered as $entry) {
-            $levelName  = $entry['level']->name;
-            $messages[] = [
-                'message'     => $entry['message'],
-                'level'       => $levelName,
-                'level_label' => $entry['level_label'],
-                'css_class'   => is_scalar($levelClasses[$levelName] ?? null) ? (string)($levelClasses[$levelName]) : 'diag-unknown',
-            ];
+        foreach ([...RedirectDiagnostics::pull(), ...$this->diagnosticMessages()] as $entry) {
+            if (!in_array($entry, $messages, true)) {
+                $messages[] = $entry;
+            }
         }
 
         $this->vars['has_messages']       = $messages !== [];
