@@ -109,9 +109,11 @@ final class SessionStarter
             ini_set('session.use_strict_mode', '1');
             // php.ini ships use_cookies=1, so cookieless mode has to switch cookies off
             // explicitly. Bearer requests are stateless too: no Set-Cookie either way.
+            // use_only_cookies stays on: the URL's session id is handed over with
+            // session_id() above, so PHP itself never has to read one from the
+            // query string (and turning it off is deprecated as of PHP 8.4).
             if (!$sessionUseCookies || $bearerPresent) {
                 ini_set('session.use_cookies', '0');
-                ini_set('session.use_only_cookies', '0');
             }
             session_start();
         }
