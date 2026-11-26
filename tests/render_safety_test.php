@@ -122,6 +122,17 @@ namespace {
     check('the compiled class was cached', is_file($cacheDir . $engine->getTemplateClassName('greet', 'Hello {{name}}!') . '.php'));
     eq('no staging file survives in the cache dir', [], glob($cacheDir . '*.tmp.*') ?: []);
 
+    // One section name used in two places, one of them inside another section
+    // (the key form does this with {{#zkp_has_client}}). Section methods were
+    // numbered by position within the enclosing section, so the two could
+    // share a name: "Cannot redeclare", and the page failed to render.
+    file_put_contents($hostileDir . 'twice.html',
+        "{{#outer}}\n<p>x</p>\n{{#inner}}\n<i>{{#link}}A{{/link}}{{^link}}a{{/link}}</i>\n{{/inner}}\n<b>{{#link}}B{{/link}}{{^link}}b{{/link}}</b>\n{{/outer}}\n");
+    eq('the same section name twice, at two depths, renders both',
+        "\n<p>x</p>\n\n<i>A</i>\n\n<b>B</b>\n\n",
+        (static fn (Result $r): mixed => $r->isOk() ? $r->unwrap() : 'render failed')(
+            $engine->renderTemplate('twice', ['outer' => true, 'inner' => true, 'link' => true])));
+
     // PARSE_MODE_PLAIN must read the .html file it checked for.
     $plain = new TemplateEngine(new DiagnosticsCollector());
     $plain->setTemplateDir($hostileDir);
