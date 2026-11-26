@@ -5,6 +5,7 @@ return [
     'generated_in' => 'Generato in:',
     'table_scroll_label' => 'Tabella dati scorrevole',
     'skip_content' => 'Vai al contenuto',
+    'form_expired' => 'Il modulo è scaduto prima dell\'invio. Compilalo di nuovo.',
     'go_top'       => 'Torna su',
 
     'user.nav.guest'    => 'Accedi',

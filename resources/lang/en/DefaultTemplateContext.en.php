@@ -15,6 +15,7 @@ return [
     'generated_in' => 'Generated in:',
     'table_scroll_label' => 'Scrollable data table',
     'skip_content' => 'Skip to content',
+    'form_expired' => 'This form expired before it was sent. Please fill it in again.',
     'go_top'       => 'Go top',
 
     // User nav — shown in the header on every page

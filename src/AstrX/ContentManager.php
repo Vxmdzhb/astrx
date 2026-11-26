@@ -19,6 +19,7 @@ use AstrX\Page\PageHandler;
 use AstrX\Result\DiagnosticsCollector;
 use AstrX\Routing\CurrentUrl;
 use AstrX\Routing\RouteParser;
+use AstrX\Session\FlashBag;
 use AstrX\Session\PrgHandler;
 use AstrX\Site\ControllerDispatcher;
 use AstrX\Site\ControllerMap;
@@ -178,6 +179,9 @@ final class ContentManager
                 $prgHandler,
                 fn(): bool => $this->panicActive() && $this->gate->cannot(AdminPermission::PANIC),
             );
+            if ($prgError === HttpStatus::BAD_REQUEST && $this->reopenExpiredForm(is_string($uriRaw) ? $uriRaw : '/')) {
+                exit;
+            }
             if ($prgError !== null) {
                 $this->renderError($prgError);
                 return;
@@ -291,6 +295,31 @@ final class ContentManager
     // =========================================================================
     // Response helpers (see Site\ErrorResponder, SecurityHeaders, PanicLockdown)
     // =========================================================================
+
+    /**
+     * A form whose PRG id this session doesn't know: the session expired or was
+     * replaced since the page was rendered (common over Tor, where a tab stays
+     * open for hours). Instead of a bare "400 Bad Request", show the same page
+     * again with a fresh form and a message saying why.
+     */
+    private function reopenExpiredForm(string $uri): bool
+    {
+        // Only a local path: never send the visitor anywhere else.
+        if (!str_starts_with($uri, '/') || str_starts_with($uri, '//') || preg_match('/[\x00-\x1f\x7f\\\\]/', $uri) === 1) {
+            return false;
+        }
+        $flashResult = $this->injector->getClass(FlashBag::class);
+        $flash = $flashResult->isOk() ? $flashResult->unwrap() : null;
+        if (!$flash instanceof FlashBag || session_status() !== PHP_SESSION_ACTIVE) {
+            return false;
+        }
+        $this->translator->load('DefaultTemplateContext');
+        $flash->set('error', $this->translator->t(
+            'form_expired',
+            fallback: 'This form expired before it was sent. Please fill it in again.',
+        ));
+        return Response::redirect($uri, HttpStatus::SEE_OTHER->value)->send()->drainTo($this->collector)->isOk();
+    }
 
     /** End the request with the themed error page (or the failsafe). */
     private function renderError(HttpStatus $status): void
