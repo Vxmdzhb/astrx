@@ -488,8 +488,7 @@ final class DefaultTemplateContext implements TemplateVars
                 $entryUrl  = is_string($entry['url'] ?? null) ? (string)$entry['url'] : '';
                 $entryName = is_string($entry['name'] ?? null) ? (string)$entry['name'] : '';
                 if (str_contains($entryUrl, 'logout') || str_contains($entryName, 'ogout')) {
-                    $sep = str_contains($entryUrl, '?') ? '&' : '?';
-                    $entry['url'] = $entryUrl . $sep . '_lt=' . rawurlencode($logoutToken);
+                    $entry['url'] = $this->urlGenerator->withParams($entryUrl, ['_lt' => $logoutToken]);
                 }
                 $navWithToken[] = $entry;
             }

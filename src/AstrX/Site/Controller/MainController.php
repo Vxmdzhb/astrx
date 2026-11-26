@@ -17,8 +17,9 @@ use AstrX\Template\ContextScope;
 use AstrX\Site\DefaultTemplateContext;
 use AstrX\Site\SubPageState;
 use AstrX\Kernel\AbstractController;
+use AstrX\Kernel\ReadsPathSegments;
 
-final class MainController extends AbstractController
+final class MainController extends AbstractController implements ReadsPathSegments
 {
     public function __construct(
         DiagnosticsCollector                   $collector,

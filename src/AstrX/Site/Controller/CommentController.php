@@ -248,9 +248,7 @@ final class CommentController extends AbstractController
         $isAdmin       = $this->gate->can(CommentPermission::ADMIN);
         $allowReplies  = $this->commentService->allowReplies();
         $useIdenticons = $this->avatarService->useIdenticons();
-        $profileBase   = $this->urlGen->toPage(
-            $this->t->t('WORDING_PROFILE', fallback: 'WORDING_PROFILE')
-        );
+        $profileSlug   = $this->t->t('WORDING_PROFILE', fallback: 'WORDING_PROFILE');
 
         // Build reply_to pre-fill URL (strips reply_to, keeps other params)
         $replyToPreFill  = (is_numeric($vq_reply_to = $this->request->query()->get('reply_to')) ? (int)$vq_reply_to : 0);
@@ -269,15 +267,15 @@ final class CommentController extends AbstractController
             if ($row['user_id'] !== null) {
                 $dnRaw = $row['user_display_name'] ?? $row['name'] ?? $anonymousName;
                 $displayName = is_scalar($dnRaw) ? (string)$dnRaw : $anonymousName;
-                $avatarSrc   = $this->urlGen->toPage('avatar', ['uid' => (is_scalar($row['user_id']) ? (string)$row['user_id'] : '')]);
-                $profileUrl  = $profileBase . (str_contains($profileBase, '?') ? '&' : '?') . 'uid=' . rawurlencode((is_scalar($row['user_id']) ? (string)$row['user_id'] : ''));
+                $avatarSrc   = $this->urlGen->toPagePath('avatar', [is_scalar($row['user_id']) ? (string)$row['user_id'] : '']);
+                $profileUrl  = $this->urlGen->toPagePath($profileSlug, [], ['uid' => is_scalar($row['user_id']) ? (string)$row['user_id'] : ''], pathParams: true);
             } else {
                 $displayName = ($row['name'] ?? '') !== '' ? (is_scalar($row['name']) ? (string)$row['name'] : '') : $anonymousName;
                 $profileUrl  = '';
                 $avatarSrc   = $useIdenticons
-                    ? $this->urlGen->toPage('avatar', [
+                    ? $this->urlGen->toPagePath('avatar', [], [
                         'seed' => hash('sha256', is_scalar($row['name'] ?? null) ? (string)$row['name'] : ''),
-                    ])
+                    ], pathParams: true)
                     : '';
             }
 

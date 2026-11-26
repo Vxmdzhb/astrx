@@ -306,6 +306,25 @@ through the application's concrete `Site\DefaultTemplateContext`. That keeps
 the module free of application-layer imports, which
 `tools/check_architecture.php` enforces.
 
+#### Page parameters in URLs
+
+Build a page's links with `Routing\UrlGenerator::toPage($slug, $params)`. With
+URL rewriting on, the parameters become path segments after the page,
+`/en/admin-users/edit/5`, and the router hands them to the controller as query
+parameters, so it reads `$request->query()->get('edit')` whichever form the URL
+had. A value that cannot be a segment (empty, containing `/`, starting with
+`.` or containing `.php`) stays in the query string. `withParams()` adds
+parameters to a page URL, `paramPrefix()` gives a template the start of one
+(`{{edit_url_prefix}}{{id}}`). A request that still carries them as a query
+string, such as a GET form's result, is redirected once to the path form.
+
+A controller that reads the path itself as positions (a board and thread, a
+username, a content slug) implements `Kernel\ReadsPathSegments`: the router
+leaves its segments alone and keeps its parameters in the query string. Link
+to it with `toPagePath($slug, $segments, $params)`; with `pathParams: true`
+when the controller also reads name/value pairs after its own positions
+(`Routing\PathParameters::parse()`), as the board does for `/quote/12`.
+
 ### Permissions
 
 A module declares its permissions as a string-backed enum in its own namespace

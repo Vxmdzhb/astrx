@@ -19,6 +19,7 @@ use AstrX\Support\ResourceRoots;
 use function AstrX\Support\atomicWrite;
 use AstrX\Support\Paths;
 use AstrX\Kernel\AbstractController;
+use AstrX\Kernel\ReadsPathSegments;
 
 /**
  * Experimental client-side browser/runtime.
@@ -38,7 +39,7 @@ use AstrX\Kernel\AbstractController;
  * resource loader, a client template renderer, and a router that browses the
  * PHP site from inside the client runtime.
  */
-final class JsController extends AbstractController
+final class JsController extends AbstractController implements ReadsPathSegments
 {
     private const ASSET_RUNTIME  = 'runtime.js';
     private const ASSET_MANIFEST = 'manifest.json';

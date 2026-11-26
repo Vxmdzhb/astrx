@@ -28,6 +28,7 @@ use AstrX\Site\PageContextBuilder;
 use AstrX\Site\PageGate;
 use AstrX\Site\PageRenderer;
 use AstrX\Site\PageResolver;
+use AstrX\Site\PathParameterIntake;
 use AstrX\Site\PanicLockdown;
 use AstrX\Site\PrgIntake;
 use AstrX\Site\RedirectDiagnostics;
@@ -245,6 +246,17 @@ final class ContentManager
         // Most controllers end a form submission with a redirect; what they
         // reported on the way is shown on the page the redirect leads to.
         RedirectDiagnostics::keepOnRedirect($ctx);
+
+        // Parameters written in the path (/admin-users/edit/5) become query
+        // parameters for the controller; a query string that could be a path
+        // is sent there first (see PathParameterIntake).
+        $pathRedirect = (new PathParameterIntake($this->config))->apply(
+            $request, $current, $this->controllerMap()->classFor($page->fileName), is_string($uriRaw) ? $uriRaw : '/',
+        );
+        if ($pathRedirect !== null) {
+            Response::redirect($pathRedirect)->send()->drainTo($this->collector);
+            exit;
+        }
 
         // Comments stay closed to anyone a panic lockdown seals, even on a page
         // the lockdown leaves open (an exempt page with comments enabled would
